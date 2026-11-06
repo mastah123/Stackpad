@@ -1,0 +1,100 @@
+<p align="center">
+  <img src="docs/assets/logo.svg" width="96" alt="Stackpad logo">
+</p>
+
+<h1 align="center">Stackpad</h1>
+
+<p align="center">
+  A block-based note app for Android. Mix text, lists, checklists, images, tables, voice notes, links and prompts in one note.
+</p>
+
+<p align="center">
+  <img alt="Version" src="https://img.shields.io/badge/version-1.0.0-4F46E5">
+  <img alt="Platform" src="https://img.shields.io/badge/platform-Android%208.0%2B-3DDC84">
+  <img alt="Kotlin" src="https://img.shields.io/badge/Kotlin-2.0-7F52FF">
+  <img alt="License" src="https://img.shields.io/badge/license-MIT-blue">
+</p>
+
+## Features
+
+Every note is a stack of compact blocks, laid out tightly like chat messages.
+
+| Block | What it does |
+| --- | --- |
+| **Text** | Headings (H1, H2, H3), **bold**, *italic*, underline. URLs are highlighted and can be opened. |
+| **Lists** | Bullet, numbered and lettered. Long items wrap under the text, never under the marker. |
+| **Checklist** | Rounded card with a progress tracker, drag handles to reorder, and an "x" to remove it. |
+| **Image** | Full width, from the gallery or camera, with an "x" to remove it. |
+| **Table** | Small spreadsheet with `+ - * /`, parentheses and cell references such as `=A1+B1*2`. |
+| **Audio** | Voice-message style row: play, animated waveform, duration and "x". Recorded in app. |
+| **Link** | Title and URL with validation; opens in the browser. |
+| **Prompt** | Monospace card with a one-tap copy button. |
+
+Also: note list with **search** and **pin**, delete with confirmation, autosave, and a light/dark theme that follows the system by default with a manual override.
+
+## Tech stack
+
+- Kotlin, Jetpack Compose (Material 3)
+- Room for local storage, DataStore for settings
+- kotlinx.serialization for block content
+- Coil for images, MediaRecorder / MediaPlayer for audio
+- GitHub Actions for CI and release signing
+
+All data stays on the device. There is no account, no cloud sync and no analytics.
+
+## Architecture
+
+```
+app/src/main/java/com/stackpad/app/
+├── data/            Room database, repository, media files, settings
+│   ├── model/       Block types and note models
+│   ├── db/          Entity, DAO, database
+│   ├── media/       Image and audio file storage
+│   └── prefs/       Theme preference
+├── domain/          Pure Kotlin logic (unit tested)
+│   ├── formula/     Spreadsheet formula evaluator
+│   ├── sheet/       Table edit operations
+│   └── text/        Span editing, URL detection, list markers
+├── audio/           Recorder, player, waveform helpers
+├── ui/
+│   ├── theme/       Colors, compact typography
+│   ├── components/  Shared widgets
+│   ├── notes/       Note list screen
+│   ├── editor/      Editor screen, toolbars, one view per block type
+│   └── navigation/
+└── util/            Formatting and intent helpers
+```
+
+Each block type has its own view file and its own pure logic, so a block can change without touching the others.
+
+## Build
+
+Requirements: JDK 17 and the Android SDK (Android Studio sets this up).
+
+```bash
+./gradlew testDebugUnitTest   # unit tests
+./gradlew assembleDebug       # debug APK in app/build/outputs/apk/debug/
+```
+
+The app version lives in `gradle.properties` (`VERSION_NAME`, `VERSION_CODE`).
+
+### CI and releases
+
+`.github/workflows/android.yml` runs on every push and pull request to `master`. It runs the unit tests, builds a debug APK, and uploads it as a workflow artifact. When the signing secrets exist, it also builds a signed release APK and AAB.
+
+To enable signed builds, add four repository secrets. Step-by-step instructions are in [docs/SIGNING.md](docs/SIGNING.md). No secret is ever stored in the repository.
+
+## Testing
+
+Unit tests cover the formula evaluator, span editing, URL handling, list markers, table operations, waveform helpers and block serialization. A manual checklist for everything else (UI, audio, camera) is in [docs/TESTING.md](docs/TESTING.md).
+
+## Known limitations
+
+- Inline links are detected automatically from typed or pasted URLs. Open one with the "Open link" button that appears when the cursor is inside it.
+- Table formulas support arithmetic and cell references only (no functions such as `SUM`).
+- Notes are local only; uninstalling the app deletes them. There is no export or backup yet.
+- Recording stops automatically after 10 minutes.
+
+## License
+
+[MIT](LICENSE)

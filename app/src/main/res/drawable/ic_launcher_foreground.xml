@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Stackpad logo: three stacked rounded bars, the middle one carrying a check mark. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+
+    <!-- Top bar -->
+    <path
+        android:fillColor="#FFFFFFFF"
+        android:pathData="M40,28 H60 A7,7 0 0 1 60,42 H40 A7,7 0 0 1 40,28 Z" />
+    <!-- Middle bar (offset right) -->
+    <path
+        android:fillColor="#FFFFFFFF"
+        android:pathData="M48,47 H68 A7,7 0 0 1 68,61 H48 A7,7 0 0 1 48,47 Z" />
+    <!-- Check mark on the middle bar -->
+    <path
+        android:pathData="M45.5,54.5 L48.5,57.5 L54,51"
+        android:strokeColor="#FF4F46E5"
+        android:strokeWidth="2.6"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round" />
+    <!-- Bottom bar -->
+    <path
+        android:fillColor="#B3FFFFFF"
+        android:pathData="M40,66 H52 A7,7 0 0 1 52,80 H40 A7,7 0 0 1 40,66 Z" />
+</vector>
