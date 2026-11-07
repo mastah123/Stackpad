@@ -39,7 +39,6 @@ import com.stackpad.app.data.model.TextLevel
 /** What the toolbar needs to know about the focused text block. */
 data class FormatState(
     val level: TextLevel,
-    val hasSelection: Boolean,
     val bold: Boolean,
     val italic: Boolean,
     val underline: Boolean,
@@ -74,19 +73,16 @@ fun FormatToolbar(
         Spacer(Modifier.width(6.dp))
         FormatButton(
             isSelected = state.bold,
-            enabled = state.hasSelection,
             description = stringResource(R.string.cd_bold),
             onClick = { onToggleSpan(SpanType.BOLD) },
         ) { FormatIcon(Icons.Filled.FormatBold) }
         FormatButton(
             isSelected = state.italic,
-            enabled = state.hasSelection,
             description = stringResource(R.string.cd_italic),
             onClick = { onToggleSpan(SpanType.ITALIC) },
         ) { FormatIcon(Icons.Filled.FormatItalic) }
         FormatButton(
             isSelected = state.underline,
-            enabled = state.hasSelection,
             description = stringResource(R.string.cd_underline),
             onClick = { onToggleSpan(SpanType.UNDERLINE) },
         ) { FormatIcon(Icons.Filled.FormatUnderlined) }

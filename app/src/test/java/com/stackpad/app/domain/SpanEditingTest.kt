@@ -79,4 +79,46 @@ class SpanEditingTest {
         assertFalse(SpanEditing.isFullyStyled(listOf(TextSpan(0, 4, bold)), 2, 2, bold))
         assertEquals(emptyList<TextSpan>(), SpanEditing.toggle(emptyList(), 2, 2, bold))
     }
+
+    @Test
+    fun typingAfterStyledTextContinuesTheStyle() {
+        val result = SpanEditing.applyEdit(listOf(TextSpan(0, 5, bold)), "hello", "hello!")
+        assertEquals(listOf(TextSpan(0, 6, bold)), result)
+    }
+
+    @Test
+    fun typingAfterUnstyledTextStaysUnstyled() {
+        val result = SpanEditing.applyEdit(listOf(TextSpan(0, 2, bold)), "abcd", "abcdX")
+        assertEquals(listOf(TextSpan(0, 2, bold)), result)
+    }
+
+    @Test
+    fun toolbarTypingStylesOverrideInheritance() {
+        val stopBold = SpanEditing.applyEdit(listOf(TextSpan(0, 5, bold)), "hello", "hello!", typing = emptySet())
+        assertEquals(listOf(TextSpan(0, 5, bold)), stopBold)
+
+        val startItalic = SpanEditing.applyEdit(emptyList(), "ab", "abc", typing = setOf(SpanType.ITALIC))
+        assertEquals(listOf(TextSpan(2, 3, SpanType.ITALIC)), startItalic)
+    }
+
+    @Test
+    fun turningStyleOffInsideStyledWordSplitsIt() {
+        val result = SpanEditing.applyEdit(listOf(TextSpan(0, 5, bold)), "hello", "heXllo", typing = emptySet())
+        assertEquals(listOf(TextSpan(0, 2, bold), TextSpan(3, 6, bold)), result)
+    }
+
+    @Test
+    fun replacingStyledTextKeepsItsStyle() {
+        val result = SpanEditing.applyEdit(listOf(TextSpan(0, 5, bold)), "hello", "jello")
+        assertEquals(listOf(TextSpan(0, 5, bold)), result)
+    }
+
+    @Test
+    fun stylesAtReportsEveryStyleOnTheCharacter() {
+        val spans = listOf(TextSpan(2, 4, bold), TextSpan(3, 6, SpanType.ITALIC))
+        assertEquals(setOf(bold, SpanType.ITALIC), SpanEditing.stylesAt(spans, 3))
+        assertEquals(setOf(SpanType.ITALIC), SpanEditing.stylesAt(spans, 4))
+        assertEquals(emptySet<SpanType>(), SpanEditing.stylesAt(spans, -1))
+        assertEquals(emptySet<SpanType>(), SpanEditing.stylesAt(spans, 6))
+    }
 }

@@ -12,6 +12,8 @@ data class EditorUiState(
     val pinned: Boolean = false,
     /** Block that should grab keyboard focus once it is on screen. */
     val focusBlockId: String? = null,
+    /** Caret position to use when focusing [focusBlockId]; null means the end of the text. */
+    val focusCaret: Int? = null,
 )
 
 /** The text block the cursor is in, with its selection (start == end for a caret). */

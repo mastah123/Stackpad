@@ -30,6 +30,7 @@ fun EditorBlockItem(
     block: Block,
     isOnlyBlock: Boolean,
     focusRequested: Boolean,
+    focusCaret: Int?,
     playback: PlaybackState,
     viewModel: NoteEditorViewModel,
     media: MediaStorage,
@@ -47,10 +48,11 @@ fun EditorBlockItem(
             block = block,
             placeholder = if (isOnlyBlock) stringResource(R.string.editor_start_writing) else null,
             requestFocus = focusRequested,
+            focusCaret = focusCaret,
             onFocusHandled = onFocusHandled,
-            onEdit = { transform -> viewModel.edit<TextBlock>(id, transform) },
+            onTextChange = { text, caret -> viewModel.onTextChanged(id, text, caret) },
             onSelectionChange = { start, end -> viewModel.onTextSelection(id, start, end) },
-            onBackspaceWhenEmpty = { viewModel.removeBlock(id, viaBackspace = true) },
+            onBackspaceAtStart = { viewModel.onBackspaceAtStart(id) },
             modifier = modifier,
         )
 

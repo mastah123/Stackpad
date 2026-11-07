@@ -50,6 +50,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.Lifecycle
@@ -83,6 +84,7 @@ fun NoteEditorScreen(
     val state by viewModel.state.collectAsStateWithLifecycle()
     val activeText by viewModel.activeText.collectAsStateWithLifecycle()
     val recording by viewModel.recording.collectAsStateWithLifecycle()
+    val typingStyles by viewModel.typingStyles.collectAsStateWithLifecycle()
     val playback by audioPlayer.state.collectAsStateWithLifecycle()
 
     val context = LocalContext.current
@@ -164,12 +166,20 @@ fun NoteEditorScreen(
 
     val formatState = activeText?.let { active ->
         (state.blocks.firstOrNull { it.id == active.blockId } as? TextBlock)?.let { block ->
+            // With a selection, show what the selected text has. With only a caret, show the
+            // style the next typed character will get.
+            val collapsed = active.start == active.end
+            val atCaret = typingStyles ?: SpanEditing.stylesAt(block.spans, active.start - 1)
+            fun hasStyle(type: SpanType) = if (collapsed) {
+                type in atCaret
+            } else {
+                SpanEditing.isFullyStyled(block.spans, active.start, active.end, type)
+            }
             FormatState(
                 level = block.level,
-                hasSelection = active.start != active.end,
-                bold = SpanEditing.isFullyStyled(block.spans, active.start, active.end, SpanType.BOLD),
-                italic = SpanEditing.isFullyStyled(block.spans, active.start, active.end, SpanType.ITALIC),
-                underline = SpanEditing.isFullyStyled(block.spans, active.start, active.end, SpanType.UNDERLINE),
+                bold = hasStyle(SpanType.BOLD),
+                italic = hasStyle(SpanType.ITALIC),
+                underline = hasStyle(SpanType.UNDERLINE),
                 linkUnderCaret = UrlUtils.findUrls(block.text)
                     .firstOrNull { active.start >= it.start && active.end <= it.end }?.url,
             )
@@ -234,7 +244,7 @@ fun NoteEditorScreen(
                 state = listState,
                 modifier = Modifier.fillMaxSize().padding(padding),
                 contentPadding = PaddingValues(horizontal = 12.dp, vertical = 8.dp),
-                verticalArrangement = Arrangement.spacedBy(4.dp),
+                verticalArrangement = Arrangement.spacedBy(0.dp),
             ) {
                 item(key = "title") {
                     InlineTextField(
@@ -243,7 +253,10 @@ fun NoteEditorScreen(
                         placeholder = stringResource(R.string.editor_title_hint),
                         textStyle = MaterialTheme.typography.headlineSmall,
                         singleLine = true,
-                        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
+                        keyboardOptions = KeyboardOptions(
+                            capitalization = KeyboardCapitalization.Sentences,
+                            imeAction = ImeAction.Next,
+                        ),
                         keyboardActions = KeyboardActions(onNext = { focusManager.moveFocus(FocusDirection.Down) }),
                         modifier = Modifier.padding(bottom = 4.dp),
                     )
@@ -253,11 +266,14 @@ fun NoteEditorScreen(
                         block = block,
                         isOnlyBlock = state.blocks.size == 1,
                         focusRequested = state.focusBlockId == block.id,
+                        focusCaret = state.focusCaret,
                         playback = playback,
                         viewModel = viewModel,
                         media = media,
                         onOpenUrl = openLink,
                         onCopied = { showMessage(R.string.msg_copied) },
+                        // Consecutive text lines sit close together; cards get a little more air.
+                        modifier = Modifier.padding(vertical = if (block is TextBlock) 1.dp else 2.dp),
                     )
                 }
             }

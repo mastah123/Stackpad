@@ -7,6 +7,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.1.0] - 2026-11-07
+
+### Added
+- **List** button in the add bar. One menu now offers Bullets, Numbers, Letters and Checklist.
+- Bold, italic and underline can be switched on at the caret and apply to the text typed next. New text also continues the style of the character before it.
+- Backspace at the start of a line merges it into the line above.
+- Sentence auto-capitalization in the title, text, list, checklist, link title and prompt fields.
+
+### Changed
+- Every line of text is now its own block. Enter starts a new line, so H1, H2 and H3 apply to one line at a time. Notes from 1.0.0 that contain multi-line text are split automatically when opened.
+- The separate Bullets, Numbers, Letters and Checklist chips were replaced by the single List chip.
+- Format buttons stay enabled when nothing is selected.
+
+### Fixed
+- Bold, italic and underline did nothing unless text was selected, and the buttons were disabled without a selection.
+
 ## [1.0.0] - 2026-11-06
 
 ### Added
@@ -27,5 +43,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - GitHub Actions workflow for tests, debug builds and signed release builds using GitHub Secrets.
 - Unit tests for formulas, span editing, URLs, list markers, table operations, waveform helpers and serialization.
 
-[Unreleased]: https://github.com/mastah123/stackpad/compare/v1.0.0...HEAD
-[1.0.0]: https://github.com/YOUR_USERNAME/stackpad/releases/tag/v1.0.0
+[Unreleased]: https://github.com/mastah123/stackpad/compare/v1.1.0...HEAD
+[1.1.0]: https://github.com/mastah123/stackpad/compare/v1.0.0...v1.1.0
+[1.0.0]: https://github.com/mastah123/stackpad/releases/tag/v1.0.0

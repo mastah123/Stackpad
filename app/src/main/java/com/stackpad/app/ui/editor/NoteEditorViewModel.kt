@@ -18,6 +18,7 @@ import com.stackpad.app.data.model.TextLevel
 import com.stackpad.app.data.model.isBlank
 import com.stackpad.app.data.model.mediaFileName
 import com.stackpad.app.domain.text.SpanEditing
+import com.stackpad.app.domain.text.TextSplitting
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -50,6 +51,13 @@ class NoteEditorViewModel(
     private val _activeText = MutableStateFlow<ActiveText?>(null)
     val activeText: StateFlow<ActiveText?> = _activeText.asStateFlow()
 
+    /**
+     * Styles chosen from the toolbar for the next typed text when nothing is selected.
+     * Null means "continue the style of the character before the caret".
+     */
+    private val _typingStyles = MutableStateFlow<Set<SpanType>?>(null)
+    val typingStyles: StateFlow<Set<SpanType>?> = _typingStyles.asStateFlow()
+
     private val _recording = MutableStateFlow<RecordingUiState?>(null)
     val recording: StateFlow<RecordingUiState?> = _recording.asStateFlow()
 
@@ -79,7 +87,7 @@ class NoteEditorViewModel(
                 _state.value = EditorUiState(
                     loaded = true,
                     title = note.title,
-                    blocks = note.blocks.ifEmpty { listOf(BlockFactory.text()) },
+                    blocks = TextSplitting.splitMultilineBlocks(note.blocks).ifEmpty { listOf(BlockFactory.text()) },
                     pinned = note.pinned,
                 )
             } else {
@@ -118,7 +126,7 @@ class NoteEditorViewModel(
                 list.add(if (anchorIndex >= 0) anchorIndex + 1 else list.size, block)
             }
             if (list.last() !is TextBlock) list.add(BlockFactory.text())
-            s.copy(blocks = list, focusBlockId = block.id)
+            s.copy(blocks = list, focusBlockId = block.id, focusCaret = null)
         }
         lastFocusedId = block.id
     }
@@ -141,14 +149,14 @@ class NoteEditorViewModel(
         mutate { s ->
             val remaining = s.blocks.filterNot { it.id == id }.ifEmpty { listOf(BlockFactory.text()) }
             val previousId = remaining.getOrNull((index - 1).coerceAtLeast(0))?.id
-            s.copy(blocks = remaining, focusBlockId = if (viaBackspace) previousId else null)
+            s.copy(blocks = remaining, focusBlockId = if (viaBackspace) previousId else null, focusCaret = null)
         }
         if (lastFocusedId == id) lastFocusedId = null
         if (_activeText.value?.blockId == id) _activeText.value = null
     }
 
     fun consumeFocus(id: String) {
-        _state.update { if (it.focusBlockId == id) it.copy(focusBlockId = null) else it }
+        _state.update { if (it.focusBlockId == id) it.copy(focusBlockId = null, focusCaret = null) else it }
     }
 
     // endregion
@@ -162,15 +170,94 @@ class NoteEditorViewModel(
 
     fun onTextSelection(id: String, start: Int, end: Int) {
         lastFocusedId = id
-        _activeText.value = ActiveText(id, minOf(start, end), maxOf(start, end))
+        val next = ActiveText(id, minOf(start, end), maxOf(start, end))
+        if (_activeText.value != next) {
+            // Moving the caret discards any style picked for the next typed text.
+            _typingStyles.value = null
+            _activeText.value = next
+        }
     }
 
+    /**
+     * Bold/italic/underline. With a selection, toggles the style on the selected text.
+     * With only a caret, toggles the style for the text typed next.
+     */
     fun toggleSpan(type: SpanType) {
         val active = _activeText.value ?: return
-        if (active.start == active.end) return
-        edit<TextBlock>(active.blockId) {
-            it.copy(spans = SpanEditing.toggle(it.spans, active.start, active.end, type))
+        if (active.start != active.end) {
+            edit<TextBlock>(active.blockId) {
+                it.copy(spans = SpanEditing.toggle(it.spans, active.start, active.end, type))
+            }
+            return
         }
+        val block = _state.value.blocks.firstOrNull { it.id == active.blockId } as? TextBlock ?: return
+        val current = _typingStyles.value ?: SpanEditing.stylesAt(block.spans, active.start - 1)
+        _typingStyles.value = if (type in current) current - type else current + type
+    }
+
+    /**
+     * Handles typing in a text block. Newly typed text gets the current typing styles, and
+     * pressing Enter (or pasting several lines) splits the text into one block per line so
+     * every line can have its own heading level.
+     */
+    fun onTextChanged(id: String, newText: String, caret: Int) {
+        val typing = _typingStyles.value
+        _typingStyles.value = null
+        var focusId: String? = null
+        mutate { s ->
+            val index = s.blocks.indexOfFirst { it.id == id }
+            val block = s.blocks.getOrNull(index) as? TextBlock ?: return@mutate s
+            val spans = SpanEditing.applyEdit(block.spans, block.text, newText, typing)
+            val list = s.blocks.toMutableList()
+            if ('\n' !in newText) {
+                list[index] = block.copy(text = newText, spans = spans)
+                s.copy(blocks = list)
+            } else {
+                val split = TextSplitting.splitLines(newText, spans, caret)
+                val lines = split.lines.mapIndexed { i, line ->
+                    if (i == 0) {
+                        block.copy(text = line.text, spans = line.spans)
+                    } else {
+                        TextBlock(BlockFactory.newId(), TextLevel.PARAGRAPH, line.text, line.spans)
+                    }
+                }
+                list.removeAt(index)
+                list.addAll(index, lines)
+                focusId = lines[split.caretLine].id
+                s.copy(blocks = list, focusBlockId = focusId, focusCaret = split.caretOffset)
+            }
+        }
+        focusId?.let { lastFocusedId = it }
+    }
+
+    /**
+     * Backspace with the caret at the very start of a text block: an empty block is removed,
+     * a non-empty one is merged into the text block above it.
+     */
+    fun onBackspaceAtStart(id: String) {
+        val blocks = _state.value.blocks
+        val index = blocks.indexOfFirst { it.id == id }
+        val block = blocks.getOrNull(index) as? TextBlock ?: return
+        if (block.text.isEmpty()) {
+            removeBlock(id, viaBackspace = true)
+            return
+        }
+        val previous = blocks.getOrNull(index - 1) as? TextBlock ?: return
+        mutate { s ->
+            val at = s.blocks.indexOfFirst { it.id == id }
+            val current = s.blocks.getOrNull(at) as? TextBlock ?: return@mutate s
+            val above = s.blocks.getOrNull(at - 1) as? TextBlock ?: return@mutate s
+            val offset = above.text.length
+            val merged = above.copy(
+                text = above.text + current.text,
+                spans = above.spans + current.spans.map { it.copy(start = it.start + offset, end = it.end + offset) },
+            )
+            val list = s.blocks.toMutableList()
+            list[at - 1] = merged
+            list.removeAt(at)
+            s.copy(blocks = list, focusBlockId = merged.id, focusCaret = offset)
+        }
+        lastFocusedId = previous.id
     }
 
     /** Applies [level] to the active text block; tapping the current level reverts to a paragraph. */

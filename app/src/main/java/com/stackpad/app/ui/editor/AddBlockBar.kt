@@ -59,6 +59,7 @@ fun AddBlockBar(
     modifier: Modifier = Modifier,
 ) {
     var imageMenuOpen by remember { mutableStateOf(false) }
+    var listMenuOpen by remember { mutableStateOf(false) }
 
     Row(
         modifier = modifier
@@ -68,16 +69,27 @@ fun AddBlockBar(
         verticalAlignment = Alignment.CenterVertically,
     ) {
         AddChip(Icons.Filled.TextFields, stringResource(R.string.add_text)) { onAddBlock(BlockFactory.text()) }
-        AddChip(Icons.Filled.FormatListBulleted, stringResource(R.string.add_bullets)) {
-            onAddBlock(BlockFactory.list(ListKind.BULLET))
+        Box {
+            AddChip(Icons.Filled.FormatListBulleted, stringResource(R.string.add_list)) { listMenuOpen = true }
+            DropdownMenu(expanded = listMenuOpen, onDismissRequest = { listMenuOpen = false }) {
+                ListMenuItem(Icons.Filled.FormatListBulleted, stringResource(R.string.add_bullets)) {
+                    listMenuOpen = false
+                    onAddBlock(BlockFactory.list(ListKind.BULLET))
+                }
+                ListMenuItem(Icons.Filled.FormatListNumbered, stringResource(R.string.add_numbers)) {
+                    listMenuOpen = false
+                    onAddBlock(BlockFactory.list(ListKind.NUMBERED))
+                }
+                ListMenuItem(Icons.Filled.SortByAlpha, stringResource(R.string.add_letters)) {
+                    listMenuOpen = false
+                    onAddBlock(BlockFactory.list(ListKind.LETTERED))
+                }
+                ListMenuItem(Icons.Filled.CheckBox, stringResource(R.string.add_checklist)) {
+                    listMenuOpen = false
+                    onAddBlock(BlockFactory.checklist())
+                }
+            }
         }
-        AddChip(Icons.Filled.FormatListNumbered, stringResource(R.string.add_numbers)) {
-            onAddBlock(BlockFactory.list(ListKind.NUMBERED))
-        }
-        AddChip(Icons.Filled.SortByAlpha, stringResource(R.string.add_letters)) {
-            onAddBlock(BlockFactory.list(ListKind.LETTERED))
-        }
-        AddChip(Icons.Filled.CheckBox, stringResource(R.string.add_checklist)) { onAddBlock(BlockFactory.checklist()) }
         Box {
             AddChip(Icons.Filled.Image, stringResource(R.string.add_image)) { imageMenuOpen = true }
             DropdownMenu(expanded = imageMenuOpen, onDismissRequest = { imageMenuOpen = false }) {
@@ -104,6 +116,15 @@ fun AddBlockBar(
         AddChip(Icons.Filled.Link, stringResource(R.string.add_link)) { onAddBlock(BlockFactory.link()) }
         AddChip(Icons.Filled.AutoAwesome, stringResource(R.string.add_prompt)) { onAddBlock(BlockFactory.prompt()) }
     }
+}
+
+@Composable
+private fun ListMenuItem(icon: ImageVector, label: String, onClick: () -> Unit) {
+    DropdownMenuItem(
+        text = { Text(label) },
+        leadingIcon = { Icon(icon, contentDescription = null) },
+        onClick = onClick,
+    )
 }
 
 @Composable

@@ -9,7 +9,8 @@
 </p>
 
 <p align="center">
-  <img alt="Version" src="https://img.shields.io/badge/version-1.0.0-4F46E5">
+  <a href="https://github.com/mastah123/stackpad/actions/workflows/android.yml"><img alt="Build" src="https://github.com/mastah123/stackpad/actions/workflows/android.yml/badge.svg"></a>
+  <img alt="Version" src="https://img.shields.io/badge/version-1.1.0-4F46E5">
   <img alt="Platform" src="https://img.shields.io/badge/platform-Android%208.0%2B-3DDC84">
   <img alt="Kotlin" src="https://img.shields.io/badge/Kotlin-2.0-7F52FF">
   <img alt="License" src="https://img.shields.io/badge/license-MIT-blue">
@@ -21,9 +22,8 @@ Every note is a stack of compact blocks, laid out tightly like chat messages.
 
 | Block | What it does |
 | --- | --- |
-| **Text** | Headings (H1, H2, H3), **bold**, *italic*, underline. URLs are highlighted and can be opened. |
-| **Lists** | Bullet, numbered and lettered. Long items wrap under the text, never under the marker. |
-| **Checklist** | Rounded card with a progress tracker, drag handles to reorder, and an "x" to remove it. |
+| **Text** | One line per block, so each line can be H1, H2, H3 or normal. **Bold**, *italic*, underline. URLs are highlighted and can be opened. |
+| **List** (menu) | **Bullets**, **Numbers** and **Letters**: long items wrap under the text, never under the marker. **Checklist**: rounded card with a progress tracker, drag handles to reorder, and an "x" to remove it. |
 | **Image** | Full width, from the gallery or camera, with an "x" to remove it. |
 | **Table** | Small spreadsheet with `+ - * /`, parentheses and cell references such as `=A1+B1*2`. |
 | **Audio** | Voice-message style row: play, animated waveform, duration and "x". Recorded in app. |
@@ -90,6 +90,8 @@ Unit tests cover the formula evaluator, span editing, URL handling, list markers
 
 ## Known limitations
 
+- Auto-capitalization uses the keyboard's own setting, so it depends on your keyboard app.
+- Backspace-at-start merging relies on the keyboard sending a delete key event, which most keyboards do.
 - Inline links are detected automatically from typed or pasted URLs. Open one with the "Open link" button that appears when the cursor is inside it.
 - Table formulas support arithmetic and cell references only (no functions such as `SUM`).
 - Notes are local only; uninstalling the app deletes them. There is no export or backup yet.
