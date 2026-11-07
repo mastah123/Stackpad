@@ -75,7 +75,8 @@ Covers: formula evaluator, span editing, URL detection/validation, list markers,
 - [ ] The chosen sort is kept after restarting the app.
 
 ### Lists
-- [ ] Tap **List**. A menu offers Bullets, Numbers, Letters and Checklist, and each one adds the right block.
+- [ ] Tap **List**. An option row (same look as the text format toolbar) shows Bullets, Numbers, Letters and Checklist, the List chip is highlighted, and each option adds the right block and closes the row. Tapping List again closes the row.
+- [ ] Tap **Image**. An option row shows "Choose from gallery" and "Take a photo"; each works and closes the row. Tapping another chip closes the row.
 - [ ] Add bullets, numbers and letters. Press Enter to add items; Backspace on an empty item removes it.
 - [ ] Add more than 10 numbered items and more than 26 lettered items (`10.`, `aa.`). Text stays aligned.
 - [ ] Type a very long item. Wrapped lines stay under the item text, not under the marker.

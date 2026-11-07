@@ -20,6 +20,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - A "Folder, tags and color" sheet in the editor.
 
 ### Changed
+- **List** and **Image** now open an option row above the add bar, styled like the text format toolbar, instead of a drop-down menu. The chip is highlighted while its row is open.
 - Tapping a link in text now opens it. The "Open link" button was removed.
 - The delete buttons in the note list and editor now move the note to the trash instead of deleting it immediately.
 - The copy message now reads "Copied to clipboard." because it also applies to code blocks.

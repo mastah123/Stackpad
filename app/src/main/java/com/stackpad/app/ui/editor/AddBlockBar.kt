@@ -3,7 +3,7 @@ package com.stackpad.app.ui.editor
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
@@ -28,8 +28,6 @@ import androidx.compose.material.icons.filled.PhotoLibrary
 import androidx.compose.material.icons.filled.SortByAlpha
 import androidx.compose.material.icons.filled.TableChart
 import androidx.compose.material.icons.filled.TextFields
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -51,7 +49,12 @@ import com.stackpad.app.data.model.Block
 import com.stackpad.app.data.model.BlockFactory
 import com.stackpad.app.data.model.ListKind
 
-/** Scrollable row of chips; each one inserts a block of that type into the note. */
+private enum class OptionRow { LIST, IMAGE }
+
+/**
+ * Scrollable row of chips; each one inserts a block of that type into the note.
+ * List and Image open an option row above the chips, styled like the text format toolbar.
+ */
 @Composable
 fun AddBlockBar(
     recordingActive: Boolean,
@@ -61,76 +64,108 @@ fun AddBlockBar(
     onRecordAudio: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    var imageMenuOpen by remember { mutableStateOf(false) }
-    var listMenuOpen by remember { mutableStateOf(false) }
+    var openRow by remember { mutableStateOf<OptionRow?>(null) }
+    fun toggle(row: OptionRow) {
+        openRow = if (openRow == row) null else row
+    }
+    // Picks an option and closes the row.
+    fun choose(action: () -> Unit) {
+        openRow = null
+        action()
+    }
 
-    Row(
-        modifier = modifier
-            .horizontalScroll(rememberScrollState())
-            .padding(horizontal = 8.dp, vertical = 4.dp),
-        horizontalArrangement = Arrangement.spacedBy(6.dp),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        AddChip(Icons.Filled.TextFields, stringResource(R.string.add_text)) { onAddBlock(BlockFactory.text()) }
-        Box {
-            AddChip(Icons.Filled.FormatListBulleted, stringResource(R.string.add_list)) { listMenuOpen = true }
-            DropdownMenu(expanded = listMenuOpen, onDismissRequest = { listMenuOpen = false }) {
-                ListMenuItem(Icons.Filled.FormatListBulleted, stringResource(R.string.add_bullets)) {
-                    listMenuOpen = false
-                    onAddBlock(BlockFactory.list(ListKind.BULLET))
+    Column(modifier = modifier) {
+        when (openRow) {
+            OptionRow.LIST -> OptionButtons {
+                OptionButton(Icons.Filled.FormatListBulleted, stringResource(R.string.add_bullets)) {
+                    choose { onAddBlock(BlockFactory.list(ListKind.BULLET)) }
                 }
-                ListMenuItem(Icons.Filled.FormatListNumbered, stringResource(R.string.add_numbers)) {
-                    listMenuOpen = false
-                    onAddBlock(BlockFactory.list(ListKind.NUMBERED))
+                OptionButton(Icons.Filled.FormatListNumbered, stringResource(R.string.add_numbers)) {
+                    choose { onAddBlock(BlockFactory.list(ListKind.NUMBERED)) }
                 }
-                ListMenuItem(Icons.Filled.SortByAlpha, stringResource(R.string.add_letters)) {
-                    listMenuOpen = false
-                    onAddBlock(BlockFactory.list(ListKind.LETTERED))
+                OptionButton(Icons.Filled.SortByAlpha, stringResource(R.string.add_letters)) {
+                    choose { onAddBlock(BlockFactory.list(ListKind.LETTERED)) }
                 }
-                ListMenuItem(Icons.Filled.CheckBox, stringResource(R.string.add_checklist)) {
-                    listMenuOpen = false
-                    onAddBlock(BlockFactory.checklist())
+                OptionButton(Icons.Filled.CheckBox, stringResource(R.string.add_checklist)) {
+                    choose { onAddBlock(BlockFactory.checklist()) }
                 }
             }
+            OptionRow.IMAGE -> OptionButtons {
+                OptionButton(Icons.Filled.PhotoLibrary, stringResource(R.string.image_from_gallery)) {
+                    choose(onPickFromGallery)
+                }
+                OptionButton(Icons.Filled.CameraAlt, stringResource(R.string.image_from_camera)) {
+                    choose(onTakePhoto)
+                }
+            }
+            null -> Unit
         }
-        Box {
-            AddChip(Icons.Filled.Image, stringResource(R.string.add_image)) { imageMenuOpen = true }
-            DropdownMenu(expanded = imageMenuOpen, onDismissRequest = { imageMenuOpen = false }) {
-                DropdownMenuItem(
-                    text = { Text(stringResource(R.string.image_from_gallery)) },
-                    leadingIcon = { Icon(Icons.Filled.PhotoLibrary, contentDescription = null) },
-                    onClick = {
-                        imageMenuOpen = false
-                        onPickFromGallery()
-                    },
-                )
-                DropdownMenuItem(
-                    text = { Text(stringResource(R.string.image_from_camera)) },
-                    leadingIcon = { Icon(Icons.Filled.CameraAlt, contentDescription = null) },
-                    onClick = {
-                        imageMenuOpen = false
-                        onTakePhoto()
-                    },
-                )
+        Row(
+            modifier = Modifier
+                .horizontalScroll(rememberScrollState())
+                .padding(horizontal = 8.dp, vertical = 4.dp),
+            horizontalArrangement = Arrangement.spacedBy(6.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            AddChip(Icons.Filled.TextFields, stringResource(R.string.add_text)) {
+                openRow = null
+                onAddBlock(BlockFactory.text())
+            }
+            AddChip(Icons.Filled.FormatListBulleted, stringResource(R.string.add_list), selected = openRow == OptionRow.LIST) {
+                toggle(OptionRow.LIST)
+            }
+            AddChip(Icons.Filled.Image, stringResource(R.string.add_image), selected = openRow == OptionRow.IMAGE) {
+                toggle(OptionRow.IMAGE)
+            }
+            AddChip(Icons.Filled.TableChart, stringResource(R.string.add_table)) {
+                openRow = null
+                onAddBlock(BlockFactory.sheet())
+            }
+            AddChip(Icons.Filled.Mic, stringResource(R.string.add_audio), enabled = !recordingActive) {
+                openRow = null
+                onRecordAudio()
+            }
+            AddChip(Icons.Filled.Link, stringResource(R.string.add_link)) {
+                openRow = null
+                onAddBlock(BlockFactory.link())
+            }
+            AddChip(Icons.Filled.AutoAwesome, stringResource(R.string.add_prompt)) {
+                openRow = null
+                onAddBlock(BlockFactory.prompt())
+            }
+            AddChip(Icons.Filled.FormatQuote, stringResource(R.string.add_quote)) {
+                openRow = null
+                onAddBlock(BlockFactory.quote())
+            }
+            AddChip(Icons.Filled.Code, stringResource(R.string.add_code)) {
+                openRow = null
+                onAddBlock(BlockFactory.code())
+            }
+            AddChip(Icons.Filled.HorizontalRule, stringResource(R.string.add_divider)) {
+                openRow = null
+                onAddBlock(BlockFactory.divider())
             }
         }
-        AddChip(Icons.Filled.TableChart, stringResource(R.string.add_table)) { onAddBlock(BlockFactory.sheet()) }
-        AddChip(Icons.Filled.Mic, stringResource(R.string.add_audio), enabled = !recordingActive, onClick = onRecordAudio)
-        AddChip(Icons.Filled.Link, stringResource(R.string.add_link)) { onAddBlock(BlockFactory.link()) }
-        AddChip(Icons.Filled.AutoAwesome, stringResource(R.string.add_prompt)) { onAddBlock(BlockFactory.prompt()) }
-        AddChip(Icons.Filled.FormatQuote, stringResource(R.string.add_quote)) { onAddBlock(BlockFactory.quote()) }
-        AddChip(Icons.Filled.Code, stringResource(R.string.add_code)) { onAddBlock(BlockFactory.code()) }
-        AddChip(Icons.Filled.HorizontalRule, stringResource(R.string.add_divider)) { onAddBlock(BlockFactory.divider()) }
     }
 }
 
 @Composable
-private fun ListMenuItem(icon: ImageVector, label: String, onClick: () -> Unit) {
-    DropdownMenuItem(
-        text = { Text(label) },
-        leadingIcon = { Icon(icon, contentDescription = null) },
-        onClick = onClick,
-    )
+private fun OptionButtons(content: @Composable () -> Unit) {
+    Row(
+        modifier = Modifier
+            .horizontalScroll(rememberScrollState())
+            .padding(horizontal = 8.dp, vertical = 2.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) { content() }
+}
+
+@Composable
+private fun OptionButton(icon: ImageVector, label: String, onClick: () -> Unit) {
+    FormatButton(isSelected = false, description = label, onClick = onClick) {
+        Icon(imageVector = icon, contentDescription = null, modifier = Modifier.size(16.dp))
+        Spacer(Modifier.width(5.dp))
+        Text(text = label, style = MaterialTheme.typography.labelLarge)
+    }
 }
 
 @Composable
@@ -138,13 +173,14 @@ private fun AddChip(
     icon: ImageVector,
     label: String,
     enabled: Boolean = true,
+    selected: Boolean = false,
     onClick: () -> Unit,
 ) {
     val colors = MaterialTheme.colorScheme
     val contentColor = if (enabled) colors.onSurface else colors.onSurface.copy(alpha = 0.38f)
     Surface(
         shape = RoundedCornerShape(16.dp),
-        color = colors.surfaceVariant,
+        color = if (selected) colors.primaryContainer else colors.surfaceVariant,
         modifier = Modifier
             .height(32.dp)
             .clip(RoundedCornerShape(16.dp))

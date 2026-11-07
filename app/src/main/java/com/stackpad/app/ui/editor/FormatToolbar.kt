@@ -90,8 +90,9 @@ private fun FormatIcon(icon: ImageVector) {
     Icon(imageVector = icon, contentDescription = null, modifier = Modifier.size(18.dp))
 }
 
+/** Small toggle button shared by the format toolbar and the List/Image option rows. */
 @Composable
-private fun FormatButton(
+internal fun FormatButton(
     isSelected: Boolean,
     description: String,
     onClick: () -> Unit,
