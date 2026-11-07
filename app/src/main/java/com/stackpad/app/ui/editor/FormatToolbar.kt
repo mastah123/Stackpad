@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.OpenInNew
 import androidx.compose.material.icons.filled.FormatBold
 import androidx.compose.material.icons.filled.FormatItalic
 import androidx.compose.material.icons.filled.FormatUnderlined
@@ -42,8 +41,6 @@ data class FormatState(
     val bold: Boolean,
     val italic: Boolean,
     val underline: Boolean,
-    /** A URL under the caret that can be opened, if any. */
-    val linkUnderCaret: String?,
 )
 
 /** Heading and inline-format controls, shown while a text block is focused. */
@@ -52,7 +49,6 @@ fun FormatToolbar(
     state: FormatState,
     onToggleLevel: (TextLevel) -> Unit,
     onToggleSpan: (SpanType) -> Unit,
-    onOpenLink: (String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Row(
@@ -86,24 +82,6 @@ fun FormatToolbar(
             description = stringResource(R.string.cd_underline),
             onClick = { onToggleSpan(SpanType.UNDERLINE) },
         ) { FormatIcon(Icons.Filled.FormatUnderlined) }
-
-        state.linkUnderCaret?.let { url ->
-            Spacer(Modifier.width(6.dp))
-            FormatButton(
-                isSelected = false,
-                description = stringResource(R.string.cd_open_link),
-                onClick = { onOpenLink(url) },
-                wide = true,
-            ) {
-                Icon(
-                    imageVector = Icons.AutoMirrored.Filled.OpenInNew,
-                    contentDescription = null,
-                    modifier = Modifier.size(16.dp),
-                )
-                Spacer(Modifier.width(4.dp))
-                Text(text = stringResource(R.string.format_open_link), style = MaterialTheme.typography.labelLarge)
-            }
-        }
     }
 }
 
@@ -119,7 +97,6 @@ private fun FormatButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
-    wide: Boolean = false,
     content: @Composable () -> Unit,
 ) {
     val colors = MaterialTheme.colorScheme
@@ -140,7 +117,7 @@ private fun FormatButton(
                     contentDescription = description
                     selected = isSelected
                 }
-                .padding(horizontal = if (wide) 10.dp else 8.dp),
+                .padding(horizontal = 8.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             content()

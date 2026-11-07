@@ -16,8 +16,11 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AutoAwesome
 import androidx.compose.material.icons.filled.CameraAlt
 import androidx.compose.material.icons.filled.CheckBox
+import androidx.compose.material.icons.filled.Code
 import androidx.compose.material.icons.filled.FormatListBulleted
 import androidx.compose.material.icons.filled.FormatListNumbered
+import androidx.compose.material.icons.filled.FormatQuote
+import androidx.compose.material.icons.filled.HorizontalRule
 import androidx.compose.material.icons.filled.Image
 import androidx.compose.material.icons.filled.Link
 import androidx.compose.material.icons.filled.Mic
@@ -115,6 +118,9 @@ fun AddBlockBar(
         AddChip(Icons.Filled.Mic, stringResource(R.string.add_audio), enabled = !recordingActive, onClick = onRecordAudio)
         AddChip(Icons.Filled.Link, stringResource(R.string.add_link)) { onAddBlock(BlockFactory.link()) }
         AddChip(Icons.Filled.AutoAwesome, stringResource(R.string.add_prompt)) { onAddBlock(BlockFactory.prompt()) }
+        AddChip(Icons.Filled.FormatQuote, stringResource(R.string.add_quote)) { onAddBlock(BlockFactory.quote()) }
+        AddChip(Icons.Filled.Code, stringResource(R.string.add_code)) { onAddBlock(BlockFactory.code()) }
+        AddChip(Icons.Filled.HorizontalRule, stringResource(R.string.add_divider)) { onAddBlock(BlockFactory.divider()) }
     }
 }
 

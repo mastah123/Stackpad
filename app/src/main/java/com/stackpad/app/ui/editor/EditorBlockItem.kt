@@ -1,6 +1,7 @@
 package com.stackpad.app.ui.editor
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import com.stackpad.app.R
@@ -9,18 +10,24 @@ import com.stackpad.app.data.media.MediaStorage
 import com.stackpad.app.data.model.AudioBlock
 import com.stackpad.app.data.model.Block
 import com.stackpad.app.data.model.ChecklistBlock
+import com.stackpad.app.data.model.CodeBlock
+import com.stackpad.app.data.model.DividerBlock
 import com.stackpad.app.data.model.ImageBlock
 import com.stackpad.app.data.model.LinkBlock
 import com.stackpad.app.data.model.ListBlock
 import com.stackpad.app.data.model.PromptBlock
+import com.stackpad.app.data.model.QuoteBlock
 import com.stackpad.app.data.model.SheetBlock
 import com.stackpad.app.data.model.TextBlock
 import com.stackpad.app.ui.editor.blocks.AudioBlockView
 import com.stackpad.app.ui.editor.blocks.ChecklistBlockView
+import com.stackpad.app.ui.editor.blocks.CodeBlockView
+import com.stackpad.app.ui.editor.blocks.DividerBlockView
 import com.stackpad.app.ui.editor.blocks.ImageBlockView
 import com.stackpad.app.ui.editor.blocks.LinkBlockView
 import com.stackpad.app.ui.editor.blocks.ListBlockView
 import com.stackpad.app.ui.editor.blocks.PromptBlockView
+import com.stackpad.app.ui.editor.blocks.QuoteBlockView
 import com.stackpad.app.ui.editor.blocks.SpreadsheetBlockView
 import com.stackpad.app.ui.editor.blocks.TextBlockView
 
@@ -53,6 +60,7 @@ fun EditorBlockItem(
             onTextChange = { text, caret -> viewModel.onTextChanged(id, text, caret) },
             onSelectionChange = { start, end -> viewModel.onTextSelection(id, start, end) },
             onBackspaceAtStart = { viewModel.onBackspaceAtStart(id) },
+            onOpenUrl = onOpenUrl,
             modifier = modifier,
         )
 
@@ -118,5 +126,32 @@ fun EditorBlockItem(
             onRemove = onRemove,
             modifier = modifier,
         )
+
+        is QuoteBlock -> QuoteBlockView(
+            block = block,
+            requestFocus = focusRequested,
+            onFocusHandled = onFocusHandled,
+            onBlockFocused = onBlockFocused,
+            onEdit = { transform -> viewModel.edit<QuoteBlock>(id, transform) },
+            onRemove = onRemove,
+            modifier = modifier,
+        )
+
+        is CodeBlock -> CodeBlockView(
+            block = block,
+            requestFocus = focusRequested,
+            onFocusHandled = onFocusHandled,
+            onBlockFocused = onBlockFocused,
+            onEdit = { transform -> viewModel.edit<CodeBlock>(id, transform) },
+            onCopied = onCopied,
+            onRemove = onRemove,
+            modifier = modifier,
+        )
+
+        is DividerBlock -> {
+            // Nothing to type into, so release the focus request right away.
+            LaunchedEffect(focusRequested) { if (focusRequested) onFocusHandled() }
+            DividerBlockView(onRemove = onRemove, modifier = modifier)
+        }
     }
 }

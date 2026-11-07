@@ -4,12 +4,15 @@ import com.stackpad.app.data.model.AudioBlock
 import com.stackpad.app.data.model.Block
 import com.stackpad.app.data.model.ChecklistBlock
 import com.stackpad.app.data.model.ChecklistItem
+import com.stackpad.app.data.model.CodeBlock
+import com.stackpad.app.data.model.DividerBlock
 import com.stackpad.app.data.model.ImageBlock
 import com.stackpad.app.data.model.LinkBlock
 import com.stackpad.app.data.model.ListBlock
 import com.stackpad.app.data.model.ListItem
 import com.stackpad.app.data.model.ListKind
 import com.stackpad.app.data.model.PromptBlock
+import com.stackpad.app.data.model.QuoteBlock
 import com.stackpad.app.data.model.SheetBlock
 import com.stackpad.app.data.model.SpanType
 import com.stackpad.app.data.model.TextBlock
@@ -29,6 +32,9 @@ class BlockJsonCodecTest {
         AudioBlock("6", "aud_1.m4a", 4200L, listOf(10, 50, 90)),
         LinkBlock("7", "Site", "https://example.com"),
         PromptBlock("8", "Summarize this"),
+        QuoteBlock("9", "To be or not to be"),
+        CodeBlock("10", "val x = 1"),
+        DividerBlock("11"),
     )
 
     @Test

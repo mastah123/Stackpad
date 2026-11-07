@@ -8,7 +8,9 @@ fun Block.searchableText(): String = when (this) {
     is SheetBlock -> cells.joinToString("\n") { row -> row.joinToString(" ") }
     is LinkBlock -> "$title $url"
     is PromptBlock -> text
-    is ImageBlock, is AudioBlock -> ""
+    is QuoteBlock -> text
+    is CodeBlock -> text
+    is ImageBlock, is AudioBlock, is DividerBlock -> ""
 }
 
 /** True when the block holds no user content (used to avoid saving empty notes). */
@@ -19,7 +21,9 @@ fun Block.isBlank(): Boolean = when (this) {
     is SheetBlock -> cells.all { row -> row.all { it.isBlank() } }
     is LinkBlock -> title.isBlank() && url.isBlank()
     is PromptBlock -> text.isBlank()
-    is ImageBlock, is AudioBlock -> false
+    is QuoteBlock -> text.isBlank()
+    is CodeBlock -> text.isBlank()
+    is ImageBlock, is AudioBlock, is DividerBlock -> false
 }
 
 /** The media file this block owns, if any. */

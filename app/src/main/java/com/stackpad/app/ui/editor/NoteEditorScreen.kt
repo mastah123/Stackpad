@@ -19,7 +19,10 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.Redo
+import androidx.compose.material.icons.automirrored.filled.Undo
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Tune
 import androidx.compose.material.icons.filled.PushPin
 import androidx.compose.material.icons.outlined.PushPin
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -61,8 +64,8 @@ import com.stackpad.app.audio.AudioPlayer
 import com.stackpad.app.data.media.MediaStorage
 import com.stackpad.app.data.model.SpanType
 import com.stackpad.app.data.model.TextBlock
+import com.stackpad.app.domain.notes.TrashPolicy
 import com.stackpad.app.domain.text.SpanEditing
-import com.stackpad.app.domain.text.UrlUtils
 import com.stackpad.app.ui.components.ConfirmDialog
 import com.stackpad.app.ui.components.InlineTextField
 import com.stackpad.app.util.openAppSettings
@@ -85,6 +88,10 @@ fun NoteEditorScreen(
     val activeText by viewModel.activeText.collectAsStateWithLifecycle()
     val recording by viewModel.recording.collectAsStateWithLifecycle()
     val typingStyles by viewModel.typingStyles.collectAsStateWithLifecycle()
+    val canUndo by viewModel.canUndo.collectAsStateWithLifecycle()
+    val canRedo by viewModel.canRedo.collectAsStateWithLifecycle()
+    val folders by viewModel.folders.collectAsStateWithLifecycle()
+    val knownTags by viewModel.knownTags.collectAsStateWithLifecycle()
     val playback by audioPlayer.state.collectAsStateWithLifecycle()
 
     val context = LocalContext.current
@@ -93,6 +100,7 @@ fun NoteEditorScreen(
     val snackbar = remember { SnackbarHostState() }
     val listState = rememberLazyListState()
     var confirmDelete by remember { mutableStateOf(false) }
+    var showOptions by remember { mutableStateOf(false) }
 
     fun showMessage(resId: Int) {
         scope.launch { snackbar.showSnackbar(context.getString(resId)) }
@@ -180,8 +188,6 @@ fun NoteEditorScreen(
                 bold = hasStyle(SpanType.BOLD),
                 italic = hasStyle(SpanType.ITALIC),
                 underline = hasStyle(SpanType.UNDERLINE),
-                linkUnderCaret = UrlUtils.findUrls(block.text)
-                    .firstOrNull { active.start >= it.start && active.end <= it.end }?.url,
             )
         }
     }
@@ -198,6 +204,23 @@ fun NoteEditorScreen(
                     }
                 },
                 actions = {
+                    IconButton(onClick = viewModel::undo, enabled = canUndo) {
+                        Icon(Icons.AutoMirrored.Filled.Undo, contentDescription = stringResource(R.string.cd_undo))
+                    }
+                    IconButton(onClick = viewModel::redo, enabled = canRedo) {
+                        Icon(Icons.AutoMirrored.Filled.Redo, contentDescription = stringResource(R.string.cd_redo))
+                    }
+                    IconButton(onClick = { showOptions = true }) {
+                        Icon(
+                            imageVector = Icons.Filled.Tune,
+                            contentDescription = stringResource(R.string.cd_note_options),
+                            tint = if (state.folderId != null || state.tags.isNotEmpty() || state.color != 0) {
+                                MaterialTheme.colorScheme.primary
+                            } else {
+                                MaterialTheme.colorScheme.onSurfaceVariant
+                            },
+                        )
+                    }
                     IconButton(onClick = viewModel::togglePin) {
                         Icon(
                             imageVector = if (state.pinned) Icons.Filled.PushPin else Icons.Outlined.PushPin,
@@ -206,7 +229,7 @@ fun NoteEditorScreen(
                         )
                     }
                     IconButton(onClick = { confirmDelete = true }) {
-                        Icon(Icons.Filled.Delete, contentDescription = stringResource(R.string.cd_delete_note))
+                        Icon(Icons.Filled.Delete, contentDescription = stringResource(R.string.cd_trash_note))
                     }
                 },
             )
@@ -223,7 +246,6 @@ fun NoteEditorScreen(
                             state = format,
                             onToggleLevel = viewModel::toggleLevel,
                             onToggleSpan = viewModel::toggleSpan,
-                            onOpenLink = openLink,
                         )
                     }
                     AddBlockBar(
@@ -282,14 +304,30 @@ fun NoteEditorScreen(
 
     if (confirmDelete) {
         ConfirmDialog(
-            title = stringResource(R.string.dialog_delete_note_title),
-            message = stringResource(R.string.dialog_delete_note_message),
-            confirmLabel = stringResource(R.string.action_delete),
+            title = stringResource(R.string.dialog_trash_note_title),
+            message = stringResource(R.string.dialog_trash_note_message, TrashPolicy.RETENTION_DAYS),
+            confirmLabel = stringResource(R.string.action_move_to_trash),
             onConfirm = {
                 confirmDelete = false
-                viewModel.deleteNote(onDeleted = onBack)
+                viewModel.trashNote(onTrashed = onBack)
             },
             onDismiss = { confirmDelete = false },
+        )
+    }
+
+    if (showOptions) {
+        NoteOptionsSheet(
+            folderId = state.folderId,
+            tags = state.tags,
+            color = state.color,
+            folders = folders,
+            knownTags = knownTags,
+            onSelectFolder = viewModel::setFolder,
+            onCreateFolder = viewModel::createFolder,
+            onAddTag = viewModel::addTag,
+            onRemoveTag = viewModel::removeTag,
+            onSelectColor = viewModel::setColor,
+            onDismiss = { showOptions = false },
         )
     }
 }

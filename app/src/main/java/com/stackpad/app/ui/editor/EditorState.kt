@@ -10,11 +10,20 @@ data class EditorUiState(
     val title: String = "",
     val blocks: List<Block> = emptyList(),
     val pinned: Boolean = false,
+    val folderId: String? = null,
+    val tags: List<String> = emptyList(),
+    /** Index into the note color palette; 0 means no color. */
+    val color: Int = 0,
     /** Block that should grab keyboard focus once it is on screen. */
     val focusBlockId: String? = null,
     /** Caret position to use when focusing [focusBlockId]; null means the end of the text. */
     val focusCaret: Int? = null,
 )
+
+/** The part of the editor state that undo and redo restore. */
+data class EditorSnapshot(val title: String, val blocks: List<Block>)
+
+fun EditorUiState.toSnapshot() = EditorSnapshot(title, blocks)
 
 /** The text block the cursor is in, with its selection (start == end for a caret). */
 data class ActiveText(val blockId: String, val start: Int, val end: Int)

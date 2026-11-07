@@ -11,12 +11,15 @@ import com.stackpad.app.audio.Waveform
 import com.stackpad.app.data.model.AudioBlock
 import com.stackpad.app.data.model.Block
 import com.stackpad.app.data.model.BlockFactory
+import com.stackpad.app.data.model.Folder
 import com.stackpad.app.data.model.Note
 import com.stackpad.app.data.model.SpanType
 import com.stackpad.app.data.model.TextBlock
 import com.stackpad.app.data.model.TextLevel
 import com.stackpad.app.data.model.isBlank
 import com.stackpad.app.data.model.mediaFileName
+import com.stackpad.app.domain.history.UndoHistory
+import com.stackpad.app.domain.notes.Tags
 import com.stackpad.app.domain.text.SpanEditing
 import com.stackpad.app.domain.text.TextSplitting
 import kotlinx.coroutines.Job
@@ -24,9 +27,12 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
@@ -57,6 +63,21 @@ class NoteEditorViewModel(
      */
     private val _typingStyles = MutableStateFlow<Set<SpanType>?>(null)
     val typingStyles: StateFlow<Set<SpanType>?> = _typingStyles.asStateFlow()
+
+    /** Folders the note can be filed in. */
+    val folders: StateFlow<List<Folder>> = repository.observeFolders()
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(STOP_TIMEOUT_MS), emptyList())
+
+    /** Tags used by other notes, offered as suggestions. */
+    val knownTags: StateFlow<List<String>> = repository.observeTagCounts()
+        .map { counts -> counts.map { it.tag } }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(STOP_TIMEOUT_MS), emptyList())
+
+    private val history = UndoHistory<EditorSnapshot>()
+    private val _canUndo = MutableStateFlow(false)
+    val canUndo: StateFlow<Boolean> = _canUndo.asStateFlow()
+    private val _canRedo = MutableStateFlow(false)
+    val canRedo: StateFlow<Boolean> = _canRedo.asStateFlow()
 
     private val _recording = MutableStateFlow<RecordingUiState?>(null)
     val recording: StateFlow<RecordingUiState?> = _recording.asStateFlow()
@@ -89,6 +110,9 @@ class NoteEditorViewModel(
                     title = note.title,
                     blocks = TextSplitting.splitMultilineBlocks(note.blocks).ifEmpty { listOf(BlockFactory.text()) },
                     pinned = note.pinned,
+                    folderId = note.folderId,
+                    tags = note.tags,
+                    color = note.color,
                 )
             } else {
                 _state.value = EditorUiState(loaded = true, blocks = listOf(BlockFactory.text()))
@@ -98,11 +122,62 @@ class NoteEditorViewModel(
 
     // region Editing
 
-    fun setTitle(title: String) = mutate { it.copy(title = title) }
+    fun setTitle(title: String) = mutate(coalesceKey = "title") { it.copy(title = title) }
 
-    fun togglePin() = mutate { it.copy(pinned = !it.pinned) }
+    fun togglePin() = mutate(record = false) { it.copy(pinned = !it.pinned) }
 
-    fun updateBlock(id: String, transform: (Block) -> Block) = mutate { s ->
+    // region Organizing (not part of undo)
+
+    fun setFolder(folderId: String?) = mutate(record = false) { it.copy(folderId = folderId) }
+
+    fun setColor(color: Int) = mutate(record = false) { it.copy(color = color) }
+
+    fun addTag(raw: String) = mutate(record = false) { it.copy(tags = Tags.add(it.tags, raw)) }
+
+    fun removeTag(tag: String) = mutate(record = false) { it.copy(tags = it.tags - tag) }
+
+    /** Creates a folder and files this note in it. */
+    fun createFolder(name: String) {
+        viewModelScope.launch {
+            repository.createFolder(name)?.let { setFolder(it.id) }
+        }
+    }
+
+    // endregion
+
+    // region Undo and redo
+
+    fun undo() {
+        val current = _state.value
+        if (!current.loaded) return
+        history.undo(current.toSnapshot())?.let(::restore)
+    }
+
+    fun redo() {
+        val current = _state.value
+        if (!current.loaded) return
+        history.redo(current.toSnapshot())?.let(::restore)
+    }
+
+    private fun restore(snapshot: EditorSnapshot) {
+        _state.update {
+            it.copy(title = snapshot.title, blocks = snapshot.blocks, focusBlockId = null, focusCaret = null)
+        }
+        _typingStyles.value = null
+        if (snapshot.blocks.none { it.id == _activeText.value?.blockId }) _activeText.value = null
+        if (snapshot.blocks.none { it.id == lastFocusedId }) lastFocusedId = null
+        markChanged()
+        publishHistory()
+    }
+
+    private fun publishHistory() {
+        _canUndo.value = history.canUndo
+        _canRedo.value = history.canRedo
+    }
+
+    // endregion
+
+    fun updateBlock(id: String, transform: (Block) -> Block) = mutate(coalesceKey = "block:$id") { s ->
         s.copy(blocks = s.blocks.map { if (it.id == id) transform(it) else it })
     }
 
@@ -142,10 +217,8 @@ class NoteEditorViewModel(
         if (index < 0) return
         if (viaBackspace && index == blocks.lastIndex && blocks.getOrNull(index - 1) !is TextBlock) return
 
-        blocks[index].mediaFileName()?.let { name ->
-            player.stopIfPlaying(name)
-            media.delete(name)
-        }
+        // The file stays on disk so undo can bring the block back; it is cleaned up on exit.
+        blocks[index].mediaFileName()?.let(player::stopIfPlaying)
         mutate { s ->
             val remaining = s.blocks.filterNot { it.id == id }.ifEmpty { listOf(BlockFactory.text()) }
             val previousId = remaining.getOrNull((index - 1).coerceAtLeast(0))?.id
@@ -204,7 +277,7 @@ class NoteEditorViewModel(
         val typing = _typingStyles.value
         _typingStyles.value = null
         var focusId: String? = null
-        mutate { s ->
+        mutate(coalesceKey = if ('\n' in newText) null else "text:$id") { s ->
             val index = s.blocks.indexOfFirst { it.id == id }
             val block = s.blocks.getOrNull(index) as? TextBlock ?: return@mutate s
             val spans = SpanEditing.applyEdit(block.spans, block.text, newText, typing)
@@ -375,15 +448,18 @@ class NoteEditorViewModel(
 
     // region Persistence
 
-    /** Deletes the note and all of its media, then calls [onDeleted] on the main thread. */
-    fun deleteNote(onDeleted: () -> Unit) {
+    /**
+     * Moves the note to the trash (with its latest edits and media), then calls [onTrashed]
+     * on the main thread. A note that was never saved is simply discarded.
+     */
+    fun trashNote(onTrashed: () -> Unit) {
+        val note = snapshot()
         discarded = true
         saveJob?.cancel()
-        _state.value.blocks.forEach { block -> block.mediaFileName()?.let(media::delete) }
         player.stop()
         viewModelScope.launch {
-            repository.delete(noteId)
-            onDeleted()
+            if (note != null) repository.saveAndTrash(note)
+            onTrashed()
         }
     }
 
@@ -397,9 +473,29 @@ class NoteEditorViewModel(
         repository.saveAsync(note)
     }
 
-    private fun mutate(change: (EditorUiState) -> EditorUiState) {
-        if (!_state.value.loaded) return
-        _state.update(change)
+    /**
+     * Applies [change]. When it alters the title or blocks, the previous state is recorded for
+     * undo ([record] = false skips that); changes sharing a [coalesceKey] within a second become
+     * one undo step, so typing is undone word by word instead of letter by letter.
+     */
+    private fun mutate(
+        coalesceKey: String? = null,
+        record: Boolean = true,
+        change: (EditorUiState) -> EditorUiState,
+    ) {
+        val before = _state.value
+        if (!before.loaded) return
+        val after = change(before)
+        if (after == before) return
+        if (record && (after.title != before.title || after.blocks != before.blocks)) {
+            history.record(before.toSnapshot(), coalesceKey, SystemClock.elapsedRealtime())
+            publishHistory()
+        }
+        _state.value = after
+        markChanged()
+    }
+
+    private fun markChanged() {
         dirty = true
         saveJob?.cancel()
         saveJob = viewModelScope.launch {
@@ -421,6 +517,9 @@ class NoteEditorViewModel(
             title = s.title,
             blocks = s.blocks,
             pinned = s.pinned,
+            folderId = s.folderId,
+            tags = s.tags,
+            color = s.color,
             createdAt = createdAt,
             updatedAt = System.currentTimeMillis(),
         )
@@ -436,9 +535,19 @@ class NoteEditorViewModel(
         finishRecording(save = true)
         flush()
         player.stop()
+        deleteUnusedMedia()
+    }
+
+    /** Deletes media of blocks that were removed (kept until now so undo could restore them). */
+    private fun deleteUnusedMedia() {
+        fun names(blocks: List<Block>) = blocks.mapNotNull { it.mediaFileName() }.toSet()
+        val inUse = names(_state.value.blocks)
+        val everSeen = history.snapshots().flatMap { names(it.blocks) }.toSet()
+        (everSeen - inUse).forEach(media::delete)
     }
 
     companion object {
+        private const val STOP_TIMEOUT_MS = 5_000L
         private const val AUTOSAVE_DELAY_MS = 600L
         private const val SAMPLE_INTERVAL_MS = 80L
         private const val LIVE_BARS = 44

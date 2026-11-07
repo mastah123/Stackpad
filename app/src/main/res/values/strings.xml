@@ -23,7 +23,6 @@
     <string name="cd_cancel_recording">Cancel recording</string>
     <string name="cd_clear_search">Clear search</string>
     <string name="cd_copy_prompt">Copy prompt</string>
-    <string name="cd_delete_note">Delete note</string>
     <string name="cd_drag_handle">Drag to reorder</string>
     <string name="cd_heading" formatted="true">Heading %1$s</string>
     <string name="cd_image">Attached image</string>
@@ -31,7 +30,6 @@
     <string name="cd_move_item_down">Move item down</string>
     <string name="cd_move_item_up">Move item up</string>
     <string name="cd_new_note">New note</string>
-    <string name="cd_open_link">Open link</string>
     <string name="cd_pause_audio">Pause audio</string>
     <string name="cd_pin">Pin note</string>
     <string name="cd_play_audio">Play audio</string>
@@ -49,14 +47,11 @@
     <string name="checklist_add_item">Add item</string>
     <string name="checklist_progress" formatted="true">%1$d/%2$d</string>
     <string name="checklist_title_hint">Checklist</string>
-    <string name="dialog_delete_note_message">This note and its images and audio will be permanently deleted.</string>
-    <string name="dialog_delete_note_title">Delete note?</string>
     <string name="editor_start_writing">Start writing…</string>
     <string name="editor_title">Note</string>
     <string name="editor_title_hint">Title</string>
     <string name="empty_notes">No notes yet.\nTap + to create your first note.</string>
     <string name="empty_search" formatted="true">No notes match “%1$s”.</string>
-    <string name="format_open_link">Open link</string>
     <string name="image_from_camera">Take a photo</string>
     <string name="image_from_gallery">Choose from gallery</string>
     <string name="image_unavailable">Image unavailable</string>
@@ -65,7 +60,7 @@
     <string name="link_url_hint">https://example.com</string>
     <string name="msg_audio_unavailable">This audio file is missing.</string>
     <string name="msg_camera_unavailable">No camera app is available.</string>
-    <string name="msg_copied">Prompt copied to clipboard.</string>
+    <string name="msg_copied">Copied to clipboard.</string>
     <string name="msg_image_failed">Could not add the image.</string>
     <string name="msg_link_open_failed">Could not open the link.</string>
     <string name="msg_mic_denied">Microphone permission is needed to record audio.</string>
@@ -83,4 +78,73 @@
     <string name="theme_dark">Dark</string>
     <string name="theme_light">Light</string>
     <string name="theme_system">System default</string>
+    <string name="action_add">Add</string>
+    <string name="action_create">Create</string>
+    <string name="action_delete_forever">Delete forever</string>
+    <string name="action_move_to_trash">Move to trash</string>
+    <string name="action_save">Save</string>
+    <string name="action_undo">Undo</string>
+    <string name="add_code">Code</string>
+    <string name="add_divider">Divider</string>
+    <string name="add_quote">Quote</string>
+    <string name="block_code">CODE</string>
+    <string name="cd_copy_code">Copy code</string>
+    <string name="cd_erase_note">Delete note forever</string>
+    <string name="cd_folder_options">Folder options</string>
+    <string name="cd_note_options">Folder, tags and color</string>
+    <string name="cd_open_trash">Open trash</string>
+    <string name="cd_open_link">Open link</string>
+    <string name="cd_redo">Redo</string>
+    <string name="cd_remove_code">Remove code block</string>
+    <string name="cd_remove_divider">Remove divider</string>
+    <string name="cd_remove_quote">Remove quote</string>
+    <string name="cd_remove_tag" formatted="true">Remove tag %1$s</string>
+    <string name="cd_restore_note">Restore note</string>
+    <string name="cd_sort">Sort notes</string>
+    <string name="cd_trash_note">Move note to trash</string>
+    <string name="cd_undo">Undo</string>
+    <string name="code_hint">Paste or type code…</string>
+    <string name="dialog_delete_folder_message">Notes in this folder are kept and become unfiled.</string>
+    <string name="dialog_delete_folder_title" formatted="true">Delete folder “%1$s”?</string>
+    <string name="dialog_empty_trash_message">Every note in the trash will be permanently deleted, with its images and audio.</string>
+    <string name="dialog_empty_trash_title">Empty trash?</string>
+    <string name="dialog_erase_note_message">This note and its images and audio will be permanently deleted.</string>
+    <string name="dialog_erase_note_title">Delete forever?</string>
+    <string name="dialog_trash_note_message" formatted="true">You can restore it from the trash for %1$d days. After that it is deleted for good.</string>
+    <string name="dialog_trash_note_title">Move note to trash?</string>
+    <string name="empty_filtered">No notes here.\nTry another folder or tag.</string>
+    <string name="filter_all">All</string>
+    <string name="folder_delete">Delete folder</string>
+    <string name="folder_name_hint">Folder name</string>
+    <string name="folder_new">New folder</string>
+    <string name="folder_none">No folder</string>
+    <string name="folder_rename">Rename folder</string>
+    <string name="msg_moved_to_trash">Moved to trash.</string>
+    <string name="options_color">Color</string>
+    <string name="options_folder">Folder</string>
+    <string name="options_tags">Tags</string>
+    <string name="quote_hint">Quote…</string>
+    <string name="sort_created">Date created</string>
+    <string name="sort_last_edited">Last edited</string>
+    <string name="sort_title">Title</string>
+    <string name="tag_hint">Add a tag</string>
+    <string name="trash_empty">The trash is empty.</string>
+    <string name="trash_empty_action">Empty</string>
+    <string name="trash_info" formatted="true">Notes are deleted for good after %1$d days.</string>
+    <string name="trash_title">Trash</string>
+    <plurals name="trash_days_left">
+        <item quantity="one">%d day left</item>
+        <item quantity="other">%d days left</item>
+    </plurals>
+    <string-array name="note_color_names">
+        <item>No color</item>
+        <item>Red</item>
+        <item>Orange</item>
+        <item>Yellow</item>
+        <item>Green</item>
+        <item>Teal</item>
+        <item>Blue</item>
+        <item>Purple</item>
+        <item>Pink</item>
+    </string-array>
 </resources>

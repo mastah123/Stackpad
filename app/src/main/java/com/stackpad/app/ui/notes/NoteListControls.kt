@@ -13,6 +13,7 @@ import androidx.compose.material.icons.filled.BrightnessMedium
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.SwapVert
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
@@ -34,6 +35,7 @@ import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.unit.dp
 import com.stackpad.app.R
 import com.stackpad.app.data.prefs.ThemeMode
+import com.stackpad.app.domain.notes.NoteSort
 import com.stackpad.app.ui.components.InlineTextField
 import com.stackpad.app.ui.components.SmallIconButton
 
@@ -113,4 +115,38 @@ private fun ThemeMode.labelRes(): Int = when (this) {
     ThemeMode.SYSTEM -> R.string.theme_system
     ThemeMode.LIGHT -> R.string.theme_light
     ThemeMode.DARK -> R.string.theme_dark
+}
+
+/** Top-bar menu to choose how notes are sorted. */
+@Composable
+fun SortMenu(
+    current: NoteSort,
+    onSelect: (NoteSort) -> Unit,
+) {
+    var open by remember { mutableStateOf(false) }
+    Box {
+        IconButton(onClick = { open = true }) {
+            Icon(Icons.Filled.SwapVert, contentDescription = stringResource(R.string.cd_sort))
+        }
+        DropdownMenu(expanded = open, onDismissRequest = { open = false }) {
+            NoteSort.values().forEach { sort ->
+                DropdownMenuItem(
+                    text = { Text(stringResource(sort.labelRes())) },
+                    trailingIcon = {
+                        if (sort == current) Icon(Icons.Filled.Check, contentDescription = null)
+                    },
+                    onClick = {
+                        open = false
+                        onSelect(sort)
+                    },
+                )
+            }
+        }
+    }
+}
+
+private fun NoteSort.labelRes(): Int = when (this) {
+    NoteSort.LAST_EDITED -> R.string.sort_last_edited
+    NoteSort.CREATED -> R.string.sort_created
+    NoteSort.TITLE -> R.string.sort_title
 }

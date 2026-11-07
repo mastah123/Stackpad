@@ -56,4 +56,10 @@ class MediaStorage(private val context: Context) {
     fun delete(fileName: String) {
         file(fileName).delete()
     }
+
+    /** Names of files in the media folder that were last modified more than [minAgeMs] ago. */
+    fun listNames(minAgeMs: Long = 0L): List<String> {
+        val cutoff = System.currentTimeMillis() - minAgeMs
+        return directory.listFiles()?.filter { it.lastModified() <= cutoff }?.map { it.name }.orEmpty()
+    }
 }

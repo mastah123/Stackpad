@@ -100,3 +100,24 @@ data class PromptBlock(
     override val id: String,
     val text: String = "",
 ) : Block
+
+@Serializable
+@SerialName("quote")
+data class QuoteBlock(
+    override val id: String,
+    val text: String = "",
+) : Block
+
+@Serializable
+@SerialName("code")
+data class CodeBlock(
+    override val id: String,
+    val text: String = "",
+) : Block
+
+/** A horizontal rule that separates parts of a note. */
+@Serializable
+@SerialName("divider")
+data class DividerBlock(
+    override val id: String,
+) : Block

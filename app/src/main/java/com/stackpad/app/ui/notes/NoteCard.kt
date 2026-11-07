@@ -24,9 +24,10 @@ import androidx.compose.ui.unit.dp
 import com.stackpad.app.R
 import com.stackpad.app.data.model.NoteSummary
 import com.stackpad.app.ui.components.SmallIconButton
+import com.stackpad.app.ui.theme.noteCardColor
 import com.stackpad.app.util.formatDate
 
-/** Compact row for one note: title, two-line preview, date, and pin/delete actions. */
+/** Compact row for one note: title, two-line preview, tags, date, and pin/trash actions. */
 @Composable
 fun NoteCard(
     note: NoteSummary,
@@ -42,7 +43,7 @@ fun NoteCard(
             .clip(RoundedCornerShape(12.dp))
             .clickable(role = Role.Button, onClick = onClick),
         shape = RoundedCornerShape(12.dp),
-        color = colors.surfaceVariant,
+        color = noteCardColor(note.color),
     ) {
         Row(
             modifier = Modifier.padding(start = 12.dp, top = 8.dp, bottom = 8.dp, end = 4.dp),
@@ -65,6 +66,16 @@ fun NoteCard(
                         overflow = TextOverflow.Ellipsis,
                     )
                 }
+                if (note.tags.isNotEmpty()) {
+                    Text(
+                        text = note.tags.joinToString("  ") { "#$it" },
+                        style = MaterialTheme.typography.labelSmall,
+                        color = colors.primary,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                        modifier = Modifier.padding(top = 2.dp),
+                    )
+                }
                 Text(
                     text = formatDate(note.updatedAt),
                     style = MaterialTheme.typography.labelSmall,
@@ -80,7 +91,7 @@ fun NoteCard(
             )
             SmallIconButton(
                 icon = Icons.Filled.Delete,
-                contentDescription = stringResource(R.string.cd_delete_note),
+                contentDescription = stringResource(R.string.cd_trash_note),
                 onClick = onDelete,
             )
         }

@@ -1,5 +1,8 @@
 package com.stackpad.app.ui.editor.blocks
 
+import androidx.compose.foundation.gestures.awaitEachGesture
+import androidx.compose.foundation.gestures.awaitFirstDown
+import androidx.compose.foundation.gestures.waitForUpOrCancellation
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.text.BasicTextField
@@ -11,26 +14,32 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.input.pointer.PointerEventPass
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.KeyEventType
 import androidx.compose.ui.input.key.key
 import androidx.compose.ui.input.key.onPreviewKeyEvent
 import androidx.compose.ui.input.key.type
+import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.TextFieldValue
 import com.stackpad.app.data.model.TextBlock
+import com.stackpad.app.domain.text.UrlUtils
 import com.stackpad.app.ui.theme.textStyle
 
 /**
  * One line of text with its own heading level and inline bold/italic/underline.
- * URLs are highlighted. Enter starts a new text block, so every line is independent.
+ * URLs are highlighted and open when tapped. Enter starts a new text block, so every line is independent.
  */
 @Composable
 fun TextBlockView(
@@ -42,12 +51,16 @@ fun TextBlockView(
     onTextChange: (text: String, caret: Int) -> Unit,
     onSelectionChange: (start: Int, end: Int) -> Unit,
     onBackspaceAtStart: () -> Unit,
+    onOpenUrl: (String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val colors = MaterialTheme.colorScheme
     var value by remember(block.id) { mutableStateOf(TextFieldValue(block.text)) }
     var focused by remember { mutableStateOf(false) }
     val focusRequester = remember { FocusRequester() }
+    var layout by remember { mutableStateOf<TextLayoutResult?>(null) }
+    val currentOnOpenUrl by rememberUpdatedState(onOpenUrl)
+    val currentText by rememberUpdatedState(block.text)
 
     LaunchedEffect(block.text) {
         if (value.text != block.text) value = TextFieldValue(block.text, TextRange(block.text.length))
@@ -83,6 +96,20 @@ fun TextBlockView(
         modifier = modifier
             .fillMaxWidth()
             .focusRequester(focusRequester)
+            .pointerInput(Unit) {
+                // Watches taps without consuming them, so the field still places its cursor.
+                awaitEachGesture {
+                    val down = awaitFirstDown(requireUnconsumed = false, pass = PointerEventPass.Initial)
+                    val up = waitForUpOrCancellation(PointerEventPass.Initial) ?: return@awaitEachGesture
+                    val quick = up.uptimeMillis - down.uptimeMillis < viewConfiguration.longPressTimeoutMillis
+                    val still = (up.position - down.position).getDistance() < viewConfiguration.touchSlop
+                    if (quick && still) {
+                        layout?.let { result ->
+                            tappedUrl(result, currentText, up.position)?.let(currentOnOpenUrl)
+                        }
+                    }
+                }
+            }
             .onFocusChanged { state ->
                 focused = state.isFocused
                 if (state.isFocused) onSelectionChange(value.selection.min, value.selection.max)
@@ -103,6 +130,7 @@ fun TextBlockView(
         keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Sentences),
         cursorBrush = SolidColor(colors.primary),
         visualTransformation = transformation,
+        onTextLayout = { layout = it },
         decorationBox = { innerTextField ->
             Box {
                 if (value.text.isEmpty() && placeholder != null) {
@@ -115,4 +143,14 @@ fun TextBlockView(
             }
         },
     )
+}
+
+/** The URL under [position] in [text], or null when the tap landed elsewhere. */
+private fun tappedUrl(layout: TextLayoutResult, text: String, position: Offset): String? {
+    if (text.isEmpty()) return null
+    val offset = layout.getOffsetForPosition(position)
+    return UrlUtils.findUrls(text).firstOrNull { url ->
+        offset in url.start until url.end ||
+            (offset == url.end && layout.getBoundingBox(url.end - 1).contains(position))
+    }?.url
 }

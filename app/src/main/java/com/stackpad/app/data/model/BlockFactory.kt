@@ -26,6 +26,12 @@ object BlockFactory {
 
     fun prompt(): PromptBlock = PromptBlock(id = newId())
 
+    fun quote(): QuoteBlock = QuoteBlock(id = newId())
+
+    fun code(): CodeBlock = CodeBlock(id = newId())
+
+    fun divider(): DividerBlock = DividerBlock(id = newId())
+
     fun image(fileName: String): ImageBlock = ImageBlock(id = newId(), fileName = fileName)
 
     fun audio(fileName: String, durationMs: Long, waveform: List<Int>): AudioBlock =

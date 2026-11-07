@@ -9,7 +9,7 @@ import kotlinx.coroutines.flow.map
 
 enum class ThemeMode { SYSTEM, LIGHT, DARK }
 
-private val Context.settingsDataStore by preferencesDataStore(name = "settings")
+internal val Context.settingsDataStore by preferencesDataStore(name = "settings")
 
 /** Persists the user's light/dark preference. Defaults to following the system. */
 class ThemePreferences(private val context: Context) {
