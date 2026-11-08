@@ -7,6 +7,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.5.0] - 2026-11-08
+
+### Added
+- **Cards** chip in the editor's add bar. It opens an option row with Prompt, Quote and Code, which moved out of the main row.
+- **Copy note** in the editor menu: copies the whole note as plain text.
+- **Checklist sort**: a button on the checklist moves done items to the bottom (order inside each group is kept). It can be undone and is disabled when nothing would change.
+- A note's **tags** now show in a row above its title; tapping one opens the note options.
+- **Folders view**: folders are shown as a small grid (All, No folder, each folder, Edit, New folder).
+- **Tags view**: tags are shown in one horizontally scrolling row.
+- The side menu now shows the real Stackpad logo (new PNG).
+
+### Changed
+- The note list title for the "All" view is now **All notes**.
+- The **Pinned** view shows only pinned notes, with no folder or tag bars. The **All notes** view has no bars either; folders and tags have their own views in the side menu.
+- The side menu is thinner (72dp).
+- **Note options** (folder, tags, color) moved from their own button and bottom sheet into the editor's 3-dot menu, as a small popup directly below the dots.
+- While the List, Image or Cards option row is open, or while recording, the text formatting row is hidden.
+
+### Removed
+- The folder and tag picker sheets of the side menu, replaced by the views above.
+
 ## [1.4.0] - 2026-11-08
 
 ### Added
@@ -95,7 +116,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - GitHub Actions workflow for tests, debug builds and signed release builds using GitHub Secrets.
 - Unit tests for formulas, span editing, URLs, list markers, table operations, waveform helpers and serialization.
 
-[Unreleased]: https://github.com/mastah123/stackpad/compare/v1.4.0...HEAD
+[Unreleased]: https://github.com/mastah123/stackpad/compare/v1.5.0...HEAD
+[1.5.0]: https://github.com/mastah123/stackpad/compare/v1.4.0...v1.5.0
 [1.4.0]: https://github.com/mastah123/stackpad/compare/v1.3.0...v1.4.0
 [1.3.0]: https://github.com/mastah123/stackpad/compare/v1.2.0...v1.3.0
 [1.2.0]: https://github.com/mastah123/stackpad/compare/v1.1.0...v1.2.0

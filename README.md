@@ -10,7 +10,7 @@
 
 <p align="center">
   <a href="https://github.com/mastah123/stackpad/actions/workflows/android.yml"><img alt="Build" src="https://github.com/mastah123/stackpad/actions/workflows/android.yml/badge.svg"></a>
-  <img alt="Version" src="https://img.shields.io/badge/version-1.4.0-4F46E5">
+  <img alt="Version" src="https://img.shields.io/badge/version-1.5.0-4F46E5">
   <img alt="Platform" src="https://img.shields.io/badge/platform-Android%208.0%2B-3DDC84">
   <img alt="Kotlin" src="https://img.shields.io/badge/Kotlin-2.0-7F52FF">
   <img alt="License" src="https://img.shields.io/badge/license-MIT-blue">
@@ -23,20 +23,18 @@ Every note is a stack of compact blocks, laid out tightly like chat messages.
 | Block | What it does |
 | --- | --- |
 | **Text** | One line per block, so each line can be H1, H2, H3 or normal. **Bold**, *italic*, underline. URLs are highlighted and open when tapped. |
-| **List** (menu) | **Bullets**, **Numbers** and **Letters**: long items wrap under the text, never under the marker. **Checklist**: rounded card with a progress tracker, drag handles to reorder, due dates with reminder notifications, and an "x" to remove it. |
+| **List** (menu) | **Bullets**, **Numbers** and **Letters**: long items wrap under the text, never under the marker. **Checklist**: rounded card with a progress tracker, drag handles to reorder, a sort button (done items last), due dates with reminder notifications, and an "x" to remove it. |
 | **Image** | Full width, from the gallery or camera. Tap for full-screen zoom, add a caption, or remove it with the "x". |
 | **Table** | Small spreadsheet with `+ - * /`, parentheses, cell references such as `=A1+B1*2`, and `SUM`, `AVERAGE`, `MIN`, `MAX`, `COUNT` over ranges such as `=SUM(A1:A5)`. |
 | **Audio** | Voice-message style row: play, animated waveform you can tap or drag to seek, duration, 1x / 1.5x / 2x speed, and "x". Recorded in app. |
 | **Link** | Title and URL with validation; opens in the browser. |
-| **Prompt** | Monospace card with a one-tap copy button. |
-| **Quote** | Indented italic quotation with an accent bar. |
-| **Code** | Monospace block with a copy button. |
+| **Cards** (menu) | **Prompt**: monospace card with a one-tap copy button. **Quote**: indented italic quotation with an accent bar. **Code**: monospace block with a copy button. |
 | **Divider** | A horizontal rule between parts of a note. |
 
 Also:
 
-- **Side menu** (top-left) with shortcuts for All notes, Pinned, Folders, Tags, Trash and Settings.
-- **Share** a note as Markdown or plain text from the editor menu.
+- **Side menu** (top-left) with shortcuts for All notes, Pinned, Folders (small grid), Tags (scrolling row), Trash and Settings.
+- **Share** a note as Markdown or plain text, or **copy** it whole, from the editor's 3-dot menu, which also holds the note options (folder, tags, color).
 - **Backup and restore**: export every note with its images and audio to a zip, and merge it back later without overwriting newer edits.
 - **App lock** with your fingerprint, face or screen lock, plus a hidden preview in recent apps.
 - **Home-screen widget** with a new-note button and your latest note.

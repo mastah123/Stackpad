@@ -50,14 +50,17 @@ Covers: formula evaluator, span editing, URL detection/validation, list markers,
 - [ ] Quote and code text is found by search.
 
 ### Folders, tags and colors
-- [ ] In a note, tap the folder/tags/color button. In the sheet, create a folder: the note is filed in it.
-- [ ] Back in the list, the folder appears as a chip; selecting it shows only its notes. "No folder" shows unfiled notes. "All" shows everything.
-- [ ] With a folder selected, use its edit button to rename it, then to delete it. After deleting, its notes remain under "No folder".
-- [ ] Add tags to a note (type and press Done or Add; also try `#Work` and `Two Words`). They appear lowercase as `#work` and `#two-words`. Adding the same tag again does nothing. The 11th tag cannot be added.
-- [ ] Tags from other notes appear as suggestions; tapping one adds it. Tapping a tag in the note removes it.
-- [ ] Tag chips in the list show counts. Selecting one filters the list; selecting it again clears the filter. Folder and tag filters combine.
+- [ ] In a note, open the 3-dot menu and choose Note options. A small popup opens directly below the dots with Folder, Tags and Color. Create a folder there: the note is filed in it.
+- [ ] Side menu, Folders: a small grid of tiles (All, No folder, each folder, New folder) appears above the notes, with no tag row. Selecting a tile filters the list and the title shows the folder name.
+- [ ] With a folder selected, the Edit tile offers Rename and Delete. After deleting, its notes remain under "No folder".
+- [ ] With many folders the grid scrolls on its own without pushing the notes off screen.
+- [ ] Add tags to a note (type and press Done or Add; also try `#Work` and `Two Words`). They appear lowercase as `#work` and `#two-words`. Adding the same tag again does nothing. The 11th tag cannot be added. Tapping the X on a tag in the popup removes it.
+- [ ] A note with tags shows them in a row above its title; tapping one opens the options popup.
+- [ ] Tags from other notes appear as suggestions; tapping one adds it.
+- [ ] Side menu, Tags: tags appear in one horizontal scrolling row with counts, and no folder grid. Selecting one filters the list and the title shows `#tag`; selecting it again clears it.
 - [ ] Searching for a tag name finds the note.
 - [ ] Pick each color. The note card in the list is tinted; "No color" removes the tint. Colors look right in light and dark theme.
+- [ ] The 3-dot icon is tinted when the note has a folder, tag or color.
 - [ ] An empty filter result shows "No notes here. Try another folder or tag."
 
 ### Trash
@@ -71,14 +74,12 @@ Covers: formula evaluator, span editing, URL detection/validation, list markers,
 - [ ] A note trashed more than 30 days ago is erased the next time the app starts (set the phone date forward more than 30 days to try this).
 
 ### Side menu
-- [ ] The top-left of the note list is a menu button (no app name). Tapping it, or swiping from the left edge, opens a thin side bar with the logo, All, Pinned, Folders, Tags and Trash. Tapping outside it closes it.
-- [ ] All clears every filter. Pinned shows only pinned notes and is highlighted; tapping it again shows everything.
-- [ ] Folders opens a picker: All, No folder, each folder and New folder. Choosing one filters the list, closes the picker and highlights Folders in the menu. New folder creates and selects a folder.
-- [ ] Tags opens a picker with counts. Choosing a tag filters the list; choosing it again clears it. With no tags, a hint is shown.
-- [ ] Trash opens the trash screen.
-- [ ] The top bar title shows Notes, Pinned, the folder name, "No folder" or `#tag` to match the current view.
-- [ ] Pinned combines with a folder or tag. An empty result shows "No notes here."
-- [ ] The menu is readable and fits in portrait and landscape, light and dark; TalkBack announces each item with its label.
+- [ ] The top-left of the note list is a menu button. Tapping it, or swiping from the left edge, opens a thin side bar with the Stackpad logo (the same picture as the app icon), All, Pinned, Folders, Tags, Trash and Settings. Tapping outside it closes it.
+- [ ] All shows every note with the title "All notes" and no folder or tag bars.
+- [ ] Pinned shows only pinned notes, titled "Pinned", with no folder or tag bars.
+- [ ] Folders and Tags behave as described under "Folders, tags and colors". Switching views clears the previous filter.
+- [ ] Trash opens the trash screen; Settings opens settings.
+- [ ] The menu is thin but readable in portrait and landscape, light and dark; TalkBack announces each item with its label.
 
 ### Share
 - [ ] In a note with a title, headings, bold/italic, a list, a checklist with a due date, a table with a formula, a link, a quote, code and a divider, open the top-right menu and choose Share as Markdown. The share sheet opens; paste into a notes app: `#` title, `-` bullets, `- [ ]` checklist, a table with the calculated value, fenced code, `>` quote and `---`.
@@ -165,6 +166,12 @@ Covers: formula evaluator, span editing, URL detection/validation, list markers,
 - [ ] Tap the waveform: playback jumps there (and starts if it was idle). Drag across the waveform to scrub. A paused note stays paused after seeking.
 - [ ] Tap the speed chip: 1x, 1.5x, 2x, back to 1x. Playback speed changes immediately while playing and applies to the next note you play.
 - [ ] The "x" removes the audio and its file.
+
+### Cards, copy and checklist sort
+- [ ] The add bar has a Cards chip instead of separate Prompt, Quote and Code chips. Tapping it opens a row with Prompt, Quote and Code; each adds its block and closes the row.
+- [ ] While the List, Image or Cards row is open, the text formatting row (H1, H2, H3, B, I, U) is hidden; it returns when the row closes. It is also hidden while recording audio.
+- [ ] In the 3-dot menu, Copy note copies the whole note as plain text; paste it elsewhere to check it includes every block.
+- [ ] In a checklist with a mix of done and open items, the sort button moves done items to the bottom, keeping the order inside each group. The button is disabled when already sorted. Undo restores the order.
 
 ### Link and prompt
 - [ ] Link block: enter a title and `example.com`. The open button works. `not a url` shows an error and disables open.

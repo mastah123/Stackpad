@@ -16,6 +16,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Sort
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.DragHandle
@@ -63,6 +64,7 @@ import com.stackpad.app.R
 import com.stackpad.app.data.model.BlockFactory
 import com.stackpad.app.data.model.ChecklistBlock
 import com.stackpad.app.data.model.ChecklistItem
+import com.stackpad.app.domain.checklist.ChecklistOps
 import com.stackpad.app.ui.components.BlockSurface
 import com.stackpad.app.ui.components.CompactCheckbox
 import com.stackpad.app.ui.components.InlineTextField
@@ -131,6 +133,14 @@ fun ChecklistBlockView(
                 style = MaterialTheme.typography.labelMedium,
                 color = colors.onSurfaceVariant,
                 modifier = Modifier.padding(horizontal = 6.dp),
+            )
+            SmallIconButton(
+                icon = Icons.AutoMirrored.Filled.Sort,
+                contentDescription = stringResource(R.string.cd_sort_checklist),
+                onClick = { onEdit { it.copy(items = ChecklistOps.uncheckedFirst(it.items)) } },
+                enabled = ChecklistOps.canSort(block.items),
+                size = 28.dp,
+                iconSize = 16.dp,
             )
             SmallIconButton(
                 icon = Icons.Filled.Close,

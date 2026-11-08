@@ -29,6 +29,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -68,8 +69,7 @@ fun NoteListScreen(
     var newFolderDialog by remember { mutableStateOf(false) }
     var renameTarget by remember { mutableStateOf<Folder?>(null) }
     var deleteTarget by remember { mutableStateOf<Folder?>(null) }
-    var showFolderPicker by remember { mutableStateOf(false) }
-    var showTagPicker by remember { mutableStateOf(false) }
+    var mode by rememberSaveable { mutableStateOf(ListMode.ALL) }
     val drawerState = rememberDrawerState(DrawerValue.Closed)
     val scope = rememberCoroutineScope()
     fun closeMenu(then: () -> Unit) {
@@ -92,11 +92,17 @@ fun NoteListScreen(
         drawerState = drawerState,
         drawerContent = {
             NoteMenu(
-                filter = ui.filter,
-                onAll = { closeMenu(viewModel::showAll) },
-                onPinned = { closeMenu(viewModel::togglePinnedOnly) },
-                onFolders = { closeMenu { showFolderPicker = true } },
-                onTags = { closeMenu { showTagPicker = true } },
+                mode = mode,
+                onAll = { closeMenu { mode = ListMode.ALL; viewModel.showAll() } },
+                onPinned = {
+                    closeMenu {
+                        mode = ListMode.PINNED
+                        viewModel.showAll()
+                        viewModel.togglePinnedOnly()
+                    }
+                },
+                onFolders = { closeMenu { mode = ListMode.FOLDERS; viewModel.showAll() } },
+                onTags = { closeMenu { mode = ListMode.TAGS; viewModel.showAll() } },
                 onTrash = { closeMenu(onOpenTrash) },
                 onSettings = { closeMenu(onOpenSettings) },
             )
@@ -110,7 +116,7 @@ fun NoteListScreen(
                             Icon(Icons.Filled.Menu, contentDescription = stringResource(R.string.cd_open_menu))
                         }
                     },
-                    title = { Text(sectionTitle(ui), style = MaterialTheme.typography.titleMedium, maxLines = 1) },
+                    title = { Text(sectionTitle(ui, mode), style = MaterialTheme.typography.titleMedium, maxLines = 1) },
                     actions = {
                         SortMenu(current = ui.sort, onSelect = viewModel::setSort)
                         ThemeMenu(current = themeMode, onSelect = viewModel::setThemeMode)
@@ -130,21 +136,32 @@ fun NoteListScreen(
                     onQueryChange = viewModel::setQuery,
                     modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
                 )
-                FolderFilterBar(
-                    folders = ui.folders,
-                    selected = ui.filter.folder,
-                    onSelect = viewModel::selectFolder,
-                    onNewFolder = { newFolderDialog = true },
-                    onRenameFolder = { renameTarget = it },
-                    onDeleteFolder = { deleteTarget = it },
-                )
-                if (ui.tags.isNotEmpty()) {
-                    TagFilterBar(
-                        tags = ui.tags,
-                        selected = ui.filter.tag,
-                        onToggle = viewModel::toggleTag,
-                        modifier = Modifier.padding(top = 2.dp),
+                when (mode) {
+                    ListMode.FOLDERS -> FolderGrid(
+                        folders = ui.folders,
+                        selected = ui.filter.folder,
+                        onSelect = viewModel::selectFolder,
+                        onNewFolder = { newFolderDialog = true },
+                        onRenameFolder = { renameTarget = it },
+                        onDeleteFolder = { deleteTarget = it },
+                        modifier = Modifier.padding(bottom = 4.dp),
                     )
+                    ListMode.TAGS -> if (ui.tags.isEmpty()) {
+                        Text(
+                            text = stringResource(R.string.menu_no_tags),
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp),
+                        )
+                    } else {
+                        TagFilterBar(
+                            tags = ui.tags,
+                            selected = ui.filter.tag,
+                            onToggle = viewModel::toggleTag,
+                            modifier = Modifier.padding(bottom = 4.dp),
+                        )
+                    }
+                    ListMode.ALL, ListMode.PINNED -> Unit
                 }
                 val current = ui.notes
                 when {
@@ -172,34 +189,6 @@ fun NoteListScreen(
                 pendingTrash = null
             },
             onDismiss = { pendingTrash = null },
-        )
-    }
-
-    if (showFolderPicker) {
-        FolderPickerSheet(
-            folders = ui.folders,
-            selected = ui.filter.folder,
-            onSelect = {
-                viewModel.selectFolder(it)
-                showFolderPicker = false
-            },
-            onNewFolder = {
-                showFolderPicker = false
-                newFolderDialog = true
-            },
-            onDismiss = { showFolderPicker = false },
-        )
-    }
-
-    if (showTagPicker) {
-        TagPickerSheet(
-            tags = ui.tags,
-            selected = ui.filter.tag,
-            onToggle = {
-                viewModel.toggleTag(it)
-                showTagPicker = false
-            },
-            onDismiss = { showTagPicker = false },
         )
     }
 
@@ -248,15 +237,19 @@ fun NoteListScreen(
 
 /** Title for the top bar: what the list is currently showing. */
 @Composable
-private fun sectionTitle(ui: NoteListUiState): String {
+private fun sectionTitle(ui: NoteListUiState, mode: ListMode): String {
     val filter = ui.filter
     return when {
-        filter.pinnedOnly -> stringResource(R.string.menu_pinned)
-        filter.tag != null -> "#${filter.tag}"
-        filter.folder == FolderFilter.Unfiled -> stringResource(R.string.folder_none)
-        filter.folder is FolderFilter.InFolder ->
-            ui.folders.firstOrNull { it.id == filter.folder.id }?.name ?: stringResource(R.string.section_notes)
-        else -> stringResource(R.string.section_notes)
+        mode == ListMode.PINNED -> stringResource(R.string.menu_pinned)
+        mode == ListMode.TAGS ->
+            filter.tag?.let { "#$it" } ?: stringResource(R.string.menu_tags)
+        mode == ListMode.FOLDERS -> when {
+            filter.folder == FolderFilter.Unfiled -> stringResource(R.string.folder_none)
+            filter.folder is FolderFilter.InFolder ->
+                ui.folders.firstOrNull { it.id == filter.folder.id }?.name ?: stringResource(R.string.menu_folders)
+            else -> stringResource(R.string.menu_folders)
+        }
+        else -> stringResource(R.string.section_all_notes)
     }
 }
 

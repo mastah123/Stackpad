@@ -1,6 +1,25 @@
 package com.stackpad.app.ui.notes
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.filled.FolderOff
+import androidx.compose.material.icons.filled.Notes
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.selected
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
@@ -11,7 +30,6 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Folder
-import androidx.compose.material3.AssistChip
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.FilterChip
@@ -30,11 +48,14 @@ import com.stackpad.app.R
 import com.stackpad.app.data.model.Folder
 import com.stackpad.app.domain.notes.FolderFilter
 import com.stackpad.app.domain.notes.TagCount
-import com.stackpad.app.ui.components.SmallIconButton
 
-/** Scrollable chips to switch between All notes, Unfiled, and each folder, plus "new folder". */
+/**
+ * Small grid of folder tiles: All, No folder, every folder and "New folder". The selected folder
+ * gets an extra "Edit" tile with rename and delete. Scrolls on its own when there are many folders.
+ */
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
-fun FolderFilterBar(
+fun FolderGrid(
     folders: List<Folder>,
     selected: FolderFilter,
     onSelect: (FolderFilter) -> Unit,
@@ -43,64 +64,77 @@ fun FolderFilterBar(
     onDeleteFolder: (Folder) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    Row(
-        modifier = modifier.horizontalScroll(rememberScrollState()).padding(horizontal = 12.dp),
+    FlowRow(
+        modifier = modifier
+            .heightIn(max = 152.dp)
+            .verticalScroll(rememberScrollState())
+            .padding(horizontal = 12.dp),
         horizontalArrangement = Arrangement.spacedBy(6.dp),
-        verticalAlignment = Alignment.CenterVertically,
+        verticalArrangement = Arrangement.spacedBy(6.dp),
     ) {
-        FilterChip(
-            selected = selected == FolderFilter.All,
-            onClick = { onSelect(FolderFilter.All) },
-            label = { Text(stringResource(R.string.filter_all)) },
-        )
-        FilterChip(
-            selected = selected == FolderFilter.Unfiled,
-            onClick = { onSelect(FolderFilter.Unfiled) },
-            label = { Text(stringResource(R.string.folder_none)) },
-        )
-        folders.forEach { folder ->
-            val isSelected = (selected as? FolderFilter.InFolder)?.id == folder.id
-            FilterChip(
-                selected = isSelected,
-                onClick = { onSelect(FolderFilter.InFolder(folder.id)) },
-                label = { Text(folder.name) },
-                leadingIcon = { Icon(Icons.Filled.Folder, contentDescription = null) },
-            )
-            if (isSelected) FolderMenu({ onRenameFolder(folder) }, { onDeleteFolder(folder) })
+        FolderTile(Icons.Filled.Notes, stringResource(R.string.filter_all), selected == FolderFilter.All) {
+            onSelect(FolderFilter.All)
         }
-        AssistChip(
-            onClick = onNewFolder,
-            label = { Text(stringResource(R.string.folder_new)) },
-            leadingIcon = { Icon(Icons.Filled.Add, contentDescription = null) },
-        )
+        FolderTile(Icons.Filled.FolderOff, stringResource(R.string.folder_none), selected == FolderFilter.Unfiled) {
+            onSelect(FolderFilter.Unfiled)
+        }
+        folders.forEach { folder ->
+            FolderTile(
+                Icons.Filled.Folder,
+                folder.name,
+                (selected as? FolderFilter.InFolder)?.id == folder.id,
+            ) { onSelect(FolderFilter.InFolder(folder.id)) }
+        }
+        val current = folders.firstOrNull { (selected as? FolderFilter.InFolder)?.id == it.id }
+        if (current != null) {
+            FolderEditTile({ onRenameFolder(current) }, { onDeleteFolder(current) })
+        }
+        FolderTile(Icons.Filled.Add, stringResource(R.string.folder_new), false, onClick = onNewFolder)
     }
 }
 
 @Composable
-private fun FolderMenu(onRename: () -> Unit, onDelete: () -> Unit) {
+private fun FolderTile(icon: ImageVector, label: String, selected: Boolean, onClick: () -> Unit) {
+    val colors = MaterialTheme.colorScheme
+    Surface(
+        shape = RoundedCornerShape(12.dp),
+        color = if (selected) colors.primaryContainer else colors.surfaceVariant,
+        modifier = Modifier
+            .width(TILE_WIDTH)
+            .height(40.dp)
+            .clip(RoundedCornerShape(12.dp))
+            .clickable(role = Role.Button, onClick = onClick)
+            .semantics { this.selected = selected },
+    ) {
+        Row(
+            modifier = Modifier.padding(horizontal = 10.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(6.dp),
+        ) {
+            Icon(icon, contentDescription = null, modifier = Modifier.size(16.dp), tint = colors.primary)
+            Text(label, style = MaterialTheme.typography.labelMedium, maxLines = 1, overflow = TextOverflow.Ellipsis)
+        }
+    }
+}
+
+private val TILE_WIDTH = 104.dp
+
+/** Tile that opens the rename / delete menu of the selected folder. */
+@Composable
+private fun FolderEditTile(onRename: () -> Unit, onDelete: () -> Unit) {
     var open by remember { mutableStateOf(false) }
     Box {
-        SmallIconButton(
-            icon = Icons.Filled.Edit,
-            contentDescription = stringResource(R.string.cd_folder_options),
-            onClick = { open = true },
-        )
+        FolderTile(Icons.Filled.Edit, stringResource(R.string.cd_folder_options), false) { open = true }
         DropdownMenu(expanded = open, onDismissRequest = { open = false }) {
             DropdownMenuItem(
                 text = { Text(stringResource(R.string.folder_rename)) },
                 leadingIcon = { Icon(Icons.Filled.Edit, contentDescription = null) },
-                onClick = {
-                    open = false
-                    onRename()
-                },
+                onClick = { open = false; onRename() },
             )
             DropdownMenuItem(
                 text = { Text(stringResource(R.string.folder_delete)) },
                 leadingIcon = { Icon(Icons.Filled.Delete, contentDescription = null) },
-                onClick = {
-                    open = false
-                    onDelete()
-                },
+                onClick = { open = false; onDelete() },
             )
         }
     }

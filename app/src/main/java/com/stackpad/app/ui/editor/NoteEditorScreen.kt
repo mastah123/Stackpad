@@ -21,7 +21,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.Redo
 import androidx.compose.material.icons.automirrored.filled.Undo
-import androidx.compose.material.icons.filled.Tune
 import androidx.compose.material.icons.filled.PushPin
 import androidx.compose.material.icons.outlined.PushPin
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -71,6 +70,9 @@ import com.stackpad.app.ui.components.InlineTextField
 import com.stackpad.app.util.openAppSettings
 import com.stackpad.app.util.openUrl
 import com.stackpad.app.util.shareText
+import com.stackpad.app.domain.export.ExportFormat
+import androidx.compose.ui.platform.LocalClipboardManager
+import androidx.compose.ui.text.AnnotatedString
 import android.os.Build
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
@@ -102,7 +104,9 @@ fun NoteEditorScreen(
     val snackbar = remember { SnackbarHostState() }
     val listState = rememberLazyListState()
     var confirmDelete by remember { mutableStateOf(false) }
-    var showOptions by remember { mutableStateOf(false) }
+    var optionsOpen by remember { mutableStateOf(false) }
+    var optionRowOpen by remember { mutableStateOf(false) }
+    val clipboard = LocalClipboardManager.current
 
     fun showMessage(resId: Int) {
         scope.launch { snackbar.showSnackbar(context.getString(resId)) }
@@ -123,7 +127,7 @@ fun NoteEditorScreen(
         snapshotFlow { state.focusBlockId }.filterNotNull().collectLatest { id ->
             withFrameNanos { }
             val index = state.blocks.indexOfFirst { it.id == id }
-            val itemIndex = index + 1 // the title field is item 0
+            val itemIndex = index + (if (state.tags.isEmpty()) 1 else 2) // the optional tags row and the title come first
             if (index >= 0 && listState.layoutInfo.visibleItemsInfo.none { it.index == itemIndex }) {
                 listState.animateScrollToItem(itemIndex)
             }
@@ -229,17 +233,6 @@ fun NoteEditorScreen(
                     IconButton(onClick = viewModel::redo, enabled = canRedo) {
                         Icon(Icons.AutoMirrored.Filled.Redo, contentDescription = stringResource(R.string.cd_redo))
                     }
-                    IconButton(onClick = { showOptions = true }) {
-                        Icon(
-                            imageVector = Icons.Filled.Tune,
-                            contentDescription = stringResource(R.string.cd_note_options),
-                            tint = if (state.folderId != null || state.tags.isNotEmpty() || state.color != 0) {
-                                MaterialTheme.colorScheme.primary
-                            } else {
-                                MaterialTheme.colorScheme.onSurfaceVariant
-                            },
-                        )
-                    }
                     IconButton(onClick = viewModel::togglePin) {
                         Icon(
                             imageVector = if (state.pinned) Icons.Filled.PushPin else Icons.Outlined.PushPin,
@@ -248,6 +241,25 @@ fun NoteEditorScreen(
                         )
                     }
                     NoteActionsMenu(
+                        options = NoteOptionsState(state.folderId, state.tags, state.color, folders, knownTags),
+                        optionsActions = NoteOptionsActions(
+                            onSelectFolder = viewModel::setFolder,
+                            onCreateFolder = viewModel::createFolder,
+                            onAddTag = viewModel::addTag,
+                            onRemoveTag = viewModel::removeTag,
+                            onSelectColor = viewModel::setColor,
+                        ),
+                        optionsOpen = optionsOpen,
+                        onOptionsOpenChange = { optionsOpen = it },
+                        onCopy = {
+                            val text = viewModel.exportText(ExportFormat.PLAIN)
+                            if (text == null) {
+                                showMessage(R.string.msg_share_empty)
+                            } else {
+                                clipboard.setText(AnnotatedString(text))
+                                showMessage(R.string.msg_note_copied)
+                            }
+                        },
                         onShare = { format ->
                             val text = viewModel.exportText(format)
                             val shared = text != null &&
@@ -272,7 +284,8 @@ fun NoteEditorScreen(
                     recording?.let { live ->
                         RecordingBar(state = live, onStop = viewModel::stopRecording, onCancel = viewModel::cancelRecording)
                     }
-                    formatState?.let { format ->
+                    // The text toolbar steps aside while an option row (List, Image, Cards) or a recording is open.
+                    formatState?.takeIf { !optionRowOpen && recording == null }?.let { format ->
                         FormatToolbar(
                             state = format,
                             onToggleLevel = viewModel::toggleLevel,
@@ -285,6 +298,7 @@ fun NoteEditorScreen(
                         onPickFromGallery = pickFromGallery,
                         onTakePhoto = takePhoto,
                         onRecordAudio = recordAudio,
+                        onOptionRowChange = { optionRowOpen = it },
                     )
                 }
             }
@@ -299,6 +313,11 @@ fun NoteEditorScreen(
                 contentPadding = PaddingValues(horizontal = 12.dp, vertical = 8.dp),
                 verticalArrangement = Arrangement.spacedBy(0.dp),
             ) {
+                if (state.tags.isNotEmpty()) {
+                    item(key = "tags") {
+                        NoteTagsRow(tags = state.tags, onClick = { optionsOpen = true })
+                    }
+                }
                 item(key = "title") {
                     InlineTextField(
                         text = state.title,
@@ -344,22 +363,6 @@ fun NoteEditorScreen(
                 viewModel.trashNote(onTrashed = onBack)
             },
             onDismiss = { confirmDelete = false },
-        )
-    }
-
-    if (showOptions) {
-        NoteOptionsSheet(
-            folderId = state.folderId,
-            tags = state.tags,
-            color = state.color,
-            folders = folders,
-            knownTags = knownTags,
-            onSelectFolder = viewModel::setFolder,
-            onCreateFolder = viewModel::createFolder,
-            onAddTag = viewModel::addTag,
-            onRemoveTag = viewModel::removeTag,
-            onSelectColor = viewModel::setColor,
-            onDismiss = { showOptions = false },
         )
     }
 }

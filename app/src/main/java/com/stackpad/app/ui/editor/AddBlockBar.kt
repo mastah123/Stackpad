@@ -26,6 +26,7 @@ import androidx.compose.material.icons.filled.Link
 import androidx.compose.material.icons.filled.Mic
 import androidx.compose.material.icons.filled.PhotoLibrary
 import androidx.compose.material.icons.filled.SortByAlpha
+import androidx.compose.material.icons.filled.Style
 import androidx.compose.material.icons.filled.TableChart
 import androidx.compose.material.icons.filled.TextFields
 import androidx.compose.material3.Icon
@@ -33,6 +34,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -49,11 +51,12 @@ import com.stackpad.app.data.model.Block
 import com.stackpad.app.data.model.BlockFactory
 import com.stackpad.app.data.model.ListKind
 
-private enum class OptionRow { LIST, IMAGE }
+private enum class OptionRow { LIST, IMAGE, CARDS }
 
 /**
  * Scrollable row of chips; each one inserts a block of that type into the note.
- * List and Image open an option row above the chips, styled like the text format toolbar.
+ * List, Image and Cards open an option row above the chips, styled like the text format toolbar.
+ * [onOptionRowChange] reports whether such a row is open, so the editor can hide the text toolbar.
  */
 @Composable
 fun AddBlockBar(
@@ -62,12 +65,14 @@ fun AddBlockBar(
     onPickFromGallery: () -> Unit,
     onTakePhoto: () -> Unit,
     onRecordAudio: () -> Unit,
+    onOptionRowChange: (Boolean) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     var openRow by remember { mutableStateOf<OptionRow?>(null) }
     fun toggle(row: OptionRow) {
         openRow = if (openRow == row) null else row
     }
+    LaunchedEffect(openRow) { onOptionRowChange(openRow != null) }
     // Picks an option and closes the row.
     fun choose(action: () -> Unit) {
         openRow = null
@@ -96,6 +101,17 @@ fun AddBlockBar(
                 }
                 OptionButton(Icons.Filled.CameraAlt, stringResource(R.string.image_from_camera)) {
                     choose(onTakePhoto)
+                }
+            }
+            OptionRow.CARDS -> OptionButtons {
+                OptionButton(Icons.Filled.AutoAwesome, stringResource(R.string.add_prompt)) {
+                    choose { onAddBlock(BlockFactory.prompt()) }
+                }
+                OptionButton(Icons.Filled.FormatQuote, stringResource(R.string.add_quote)) {
+                    choose { onAddBlock(BlockFactory.quote()) }
+                }
+                OptionButton(Icons.Filled.Code, stringResource(R.string.add_code)) {
+                    choose { onAddBlock(BlockFactory.code()) }
                 }
             }
             null -> Unit
@@ -129,17 +145,8 @@ fun AddBlockBar(
                 openRow = null
                 onAddBlock(BlockFactory.link())
             }
-            AddChip(Icons.Filled.AutoAwesome, stringResource(R.string.add_prompt)) {
-                openRow = null
-                onAddBlock(BlockFactory.prompt())
-            }
-            AddChip(Icons.Filled.FormatQuote, stringResource(R.string.add_quote)) {
-                openRow = null
-                onAddBlock(BlockFactory.quote())
-            }
-            AddChip(Icons.Filled.Code, stringResource(R.string.add_code)) {
-                openRow = null
-                onAddBlock(BlockFactory.code())
+            AddChip(Icons.Filled.Style, stringResource(R.string.add_cards), selected = openRow == OptionRow.CARDS) {
+                toggle(OptionRow.CARDS)
             }
             AddChip(Icons.Filled.HorizontalRule, stringResource(R.string.add_divider)) {
                 openRow = null
