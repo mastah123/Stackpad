@@ -74,6 +74,7 @@ class NoteListViewModel(
         val effective = NoteFilter(
             folder = if (folderOk) folder else FolderFilter.All,
             tag = if (tagOk) filter.tag else null,
+            pinnedOnly = filter.pinnedOnly,
         )
         NoteListUiState(
             notes = NoteOrganizer.organize(notes, sort, effective),
@@ -112,6 +113,16 @@ class NoteListViewModel(
 
     fun selectFolder(folder: FolderFilter) {
         _filter.value = _filter.value.copy(folder = folder)
+    }
+
+    /** Shows every note again: clears the folder, tag and pinned filters. */
+    fun showAll() {
+        _filter.value = NoteFilter()
+    }
+
+    /** Shows only pinned notes, or all notes again when it is already on. */
+    fun togglePinnedOnly() {
+        _filter.value = _filter.value.copy(pinnedOnly = !_filter.value.pinnedOnly)
     }
 
     /** Selecting the active tag again clears it. */

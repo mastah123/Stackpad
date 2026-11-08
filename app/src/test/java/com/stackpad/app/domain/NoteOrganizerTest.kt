@@ -63,4 +63,20 @@ class NoteOrganizerTest {
         val result = NoteOrganizer.organize(notes, NoteSort.TITLE, NoteFilter(FolderFilter.InFolder("f1"), "work"))
         assertEquals(listOf("a"), ids(result))
     }
+
+    @Test
+    fun pinnedOnlyFilter() {
+        val notes = listOf(note("a", pinned = true, folder = "f1"), note("b", pinned = true), note("c"))
+        assertEquals(listOf("a", "b"), ids(NoteOrganizer.organize(notes, NoteSort.TITLE, NoteFilter(pinnedOnly = true))))
+        val both = NoteFilter(FolderFilter.InFolder("f1"), pinnedOnly = true)
+        assertEquals(listOf("a"), ids(NoteOrganizer.organize(notes, NoteSort.TITLE, both)))
+    }
+
+    @Test
+    fun emptyFilterDetection() {
+        assertEquals(true, NoteFilter().isEmpty)
+        assertEquals(false, NoteFilter(pinnedOnly = true).isEmpty)
+        assertEquals(false, NoteFilter(tag = "x").isEmpty)
+        assertEquals(false, NoteFilter(FolderFilter.Unfiled).isEmpty)
+    }
 }

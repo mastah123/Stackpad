@@ -92,7 +92,6 @@
     <string name="cd_erase_note">Delete note forever</string>
     <string name="cd_folder_options">Folder options</string>
     <string name="cd_note_options">Folder, tags and color</string>
-    <string name="cd_open_trash">Open trash</string>
     <string name="cd_open_link">Open link</string>
     <string name="cd_redo">Redo</string>
     <string name="cd_remove_code">Remove code block</string>
@@ -165,4 +164,11 @@
     <string name="cd_due_date" formatted="true">Due %1$s. Tap to change.</string>
     <string name="cd_due_overdue" formatted="true">Overdue, was due %1$s. Tap to change.</string>
     <string name="msg_notifications_off">Notifications are off, so you will not get due date reminders. Turn them on in Settings.</string>
+    <string name="cd_open_menu">Open menu</string>
+    <string name="menu_all">All</string>
+    <string name="menu_pinned">Pinned</string>
+    <string name="menu_folders">Folders</string>
+    <string name="menu_tags">Tags</string>
+    <string name="menu_trash">Trash</string>
+    <string name="menu_no_tags">No tags yet. Add tags from a note\'s options.</string>
 </resources>

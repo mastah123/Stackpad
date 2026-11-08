@@ -26,6 +26,6 @@ object NoteOrganizer {
             FolderFilter.Unfiled -> note.folderId == null
             is FolderFilter.InFolder -> note.folderId == folder.id
         }
-        return folderOk && (filter.tag == null || filter.tag in note.tags)
+        return folderOk && (filter.tag == null || filter.tag in note.tags) && (!filter.pinnedOnly || note.pinned)
     }
 }

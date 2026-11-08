@@ -35,6 +35,7 @@ Every note is a stack of compact blocks, laid out tightly like chat messages.
 
 Also:
 
+- **Side menu** (top-left) with shortcuts for All notes, Pinned, Folders, Tags and Trash.
 - **Undo / redo** in the editor.
 - **Folders**, **tags** and **colors** to organize notes, with filters in the note list.
 - **Trash** with restore; notes are erased after 30 days.
@@ -73,7 +74,7 @@ app/src/main/java/com/stackpad/app/
 ├── ui/
 │   ├── theme/       Colors, compact typography
 │   ├── components/  Shared widgets
-│   ├── notes/       Note list screen, filters, sort
+│   ├── notes/       Note list screen, side menu, filters, sort
 │   ├── trash/       Trash screen
 │   ├── editor/      Editor screen, toolbars, one view per block type
 │   └── navigation/

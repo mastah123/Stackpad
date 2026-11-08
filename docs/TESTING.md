@@ -70,6 +70,16 @@ Covers: formula evaluator, span editing, URL detection/validation, list markers,
 - [ ] Trashed notes do not appear in the list, search or tag counts.
 - [ ] A note trashed more than 30 days ago is erased the next time the app starts (set the phone date forward more than 30 days to try this).
 
+### Side menu
+- [ ] The top-left of the note list is a menu button (no app name). Tapping it, or swiping from the left edge, opens a thin side bar with the logo, All, Pinned, Folders, Tags and Trash. Tapping outside it closes it.
+- [ ] All clears every filter. Pinned shows only pinned notes and is highlighted; tapping it again shows everything.
+- [ ] Folders opens a picker: All, No folder, each folder and New folder. Choosing one filters the list, closes the picker and highlights Folders in the menu. New folder creates and selects a folder.
+- [ ] Tags opens a picker with counts. Choosing a tag filters the list; choosing it again clears it. With no tags, a hint is shown.
+- [ ] Trash opens the trash screen.
+- [ ] The top bar title shows Notes, Pinned, the folder name, "No folder" or `#tag` to match the current view.
+- [ ] Pinned combines with a folder or tag. An empty result shows "No notes here."
+- [ ] The menu is readable and fits in portrait and landscape, light and dark; TalkBack announces each item with its label.
+
 ### Sorting
 - [ ] Sort menu: Last edited, Date created and Title each reorder the list. Pinned notes always stay on top. Title order ignores upper/lower case and puts untitled notes last.
 - [ ] The chosen sort is kept after restarting the app.

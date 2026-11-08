@@ -7,8 +7,12 @@ sealed interface FolderFilter {
     data class InFolder(val id: String) : FolderFilter
 }
 
-/** Folder and tag restrictions for the note list. Both must match when both are set. */
+/** Folder, tag and pinned restrictions for the note list. All that are set must match. */
 data class NoteFilter(
     val folder: FolderFilter = FolderFilter.All,
     val tag: String? = null,
-)
+    val pinnedOnly: Boolean = false,
+) {
+    /** True when nothing is restricted, i.e. the list shows every note. */
+    val isEmpty: Boolean get() = folder == FolderFilter.All && tag == null && !pinnedOnly
+}

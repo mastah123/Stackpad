@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- **Side menu** in the note list. The top-left title is now a menu button that opens a thin side bar with the logo and shortcuts for All notes, Pinned, Folders, Tags and Trash. Folders and Tags open a picker; Pinned shows only pinned notes. The shortcut for the current view is highlighted.
+- The top bar now shows the current view (Notes, Pinned, a folder name, or a `#tag`).
+
+### Changed
+- The Trash button moved from the top bar into the side menu.
+
 ## [1.3.0] - 2026-11-08
 
 ### Added

@@ -10,22 +10,26 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -43,6 +47,7 @@ import com.stackpad.app.domain.notes.FolderNames
 import com.stackpad.app.domain.notes.TrashPolicy
 import com.stackpad.app.ui.components.ConfirmDialog
 import com.stackpad.app.ui.components.TextInputDialog
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -62,6 +67,14 @@ fun NoteListScreen(
     var newFolderDialog by remember { mutableStateOf(false) }
     var renameTarget by remember { mutableStateOf<Folder?>(null) }
     var deleteTarget by remember { mutableStateOf<Folder?>(null) }
+    var showFolderPicker by remember { mutableStateOf(false) }
+    var showTagPicker by remember { mutableStateOf(false) }
+    val drawerState = rememberDrawerState(DrawerValue.Closed)
+    val scope = rememberCoroutineScope()
+    fun closeMenu(then: () -> Unit) {
+        scope.launch { drawerState.close() }
+        then()
+    }
 
     // After a note is moved to the trash, offer to undo it.
     LaunchedEffect(viewModel) {
@@ -74,60 +87,77 @@ fun NoteListScreen(
         }
     }
 
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { Text(stringResource(R.string.app_name), style = MaterialTheme.typography.titleLarge) },
-                actions = {
-                    SortMenu(current = ui.sort, onSelect = viewModel::setSort)
-                    IconButton(onClick = onOpenTrash) {
-                        Icon(Icons.Filled.Delete, contentDescription = stringResource(R.string.cd_open_trash))
-                    }
-                    ThemeMenu(current = themeMode, onSelect = viewModel::setThemeMode)
-                },
+    ModalNavigationDrawer(
+        drawerState = drawerState,
+        drawerContent = {
+            NoteMenu(
+                filter = ui.filter,
+                onAll = { closeMenu(viewModel::showAll) },
+                onPinned = { closeMenu(viewModel::togglePinnedOnly) },
+                onFolders = { closeMenu { showFolderPicker = true } },
+                onTags = { closeMenu { showTagPicker = true } },
+                onTrash = { closeMenu(onOpenTrash) },
             )
         },
-        snackbarHost = { SnackbarHost(snackbar) },
-        floatingActionButton = {
-            FloatingActionButton(onClick = onNewNote) {
-                Icon(Icons.Filled.Add, contentDescription = stringResource(R.string.cd_new_note))
-            }
-        },
-    ) { padding ->
-        Column(modifier = Modifier.fillMaxSize().padding(padding)) {
-            SearchField(
-                query = query,
-                onQueryChange = viewModel::setQuery,
-                modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
-            )
-            FolderFilterBar(
-                folders = ui.folders,
-                selected = ui.filter.folder,
-                onSelect = viewModel::selectFolder,
-                onNewFolder = { newFolderDialog = true },
-                onRenameFolder = { renameTarget = it },
-                onDeleteFolder = { deleteTarget = it },
-            )
-            if (ui.tags.isNotEmpty()) {
-                TagFilterBar(
-                    tags = ui.tags,
-                    selected = ui.filter.tag,
-                    onToggle = viewModel::toggleTag,
-                    modifier = Modifier.padding(top = 2.dp),
+    ) {
+        Scaffold(
+            topBar = {
+                TopAppBar(
+                    navigationIcon = {
+                        IconButton(onClick = { scope.launch { drawerState.open() } }) {
+                            Icon(Icons.Filled.Menu, contentDescription = stringResource(R.string.cd_open_menu))
+                        }
+                    },
+                    title = { Text(sectionTitle(ui), style = MaterialTheme.typography.titleMedium, maxLines = 1) },
+                    actions = {
+                        SortMenu(current = ui.sort, onSelect = viewModel::setSort)
+                        ThemeMenu(current = themeMode, onSelect = viewModel::setThemeMode)
+                    },
                 )
-            }
-            val current = ui.notes
-            when {
-                current == null -> Box(Modifier.fillMaxSize())
-                current.isEmpty() -> EmptyState(query = query, filtered = ui.filter.folder != FolderFilter.All || ui.filter.tag != null)
-                else -> NoteList(
-                    notes = current,
-                    onOpen = onOpenNote,
-                    onTogglePin = viewModel::togglePin,
-                    onTrash = { pendingTrash = it },
+            },
+            snackbarHost = { SnackbarHost(snackbar) },
+            floatingActionButton = {
+                FloatingActionButton(onClick = onNewNote) {
+                    Icon(Icons.Filled.Add, contentDescription = stringResource(R.string.cd_new_note))
+                }
+            },
+        ) { padding ->
+            Column(modifier = Modifier.fillMaxSize().padding(padding)) {
+                SearchField(
+                    query = query,
+                    onQueryChange = viewModel::setQuery,
+                    modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
                 )
+                FolderFilterBar(
+                    folders = ui.folders,
+                    selected = ui.filter.folder,
+                    onSelect = viewModel::selectFolder,
+                    onNewFolder = { newFolderDialog = true },
+                    onRenameFolder = { renameTarget = it },
+                    onDeleteFolder = { deleteTarget = it },
+                )
+                if (ui.tags.isNotEmpty()) {
+                    TagFilterBar(
+                        tags = ui.tags,
+                        selected = ui.filter.tag,
+                        onToggle = viewModel::toggleTag,
+                        modifier = Modifier.padding(top = 2.dp),
+                    )
+                }
+                val current = ui.notes
+                when {
+                    current == null -> Box(Modifier.fillMaxSize())
+                    current.isEmpty() -> EmptyState(query = query, filtered = !ui.filter.isEmpty)
+                    else -> NoteList(
+                        notes = current,
+                        onOpen = onOpenNote,
+                        onTogglePin = viewModel::togglePin,
+                        onTrash = { pendingTrash = it },
+                    )
+                }
             }
         }
+
     }
 
     pendingTrash?.let { note ->
@@ -140,6 +170,34 @@ fun NoteListScreen(
                 pendingTrash = null
             },
             onDismiss = { pendingTrash = null },
+        )
+    }
+
+    if (showFolderPicker) {
+        FolderPickerSheet(
+            folders = ui.folders,
+            selected = ui.filter.folder,
+            onSelect = {
+                viewModel.selectFolder(it)
+                showFolderPicker = false
+            },
+            onNewFolder = {
+                showFolderPicker = false
+                newFolderDialog = true
+            },
+            onDismiss = { showFolderPicker = false },
+        )
+    }
+
+    if (showTagPicker) {
+        TagPickerSheet(
+            tags = ui.tags,
+            selected = ui.filter.tag,
+            onToggle = {
+                viewModel.toggleTag(it)
+                showTagPicker = false
+            },
+            onDismiss = { showTagPicker = false },
         )
     }
 
@@ -183,6 +241,20 @@ fun NoteListScreen(
             },
             onDismiss = { deleteTarget = null },
         )
+    }
+}
+
+/** Title for the top bar: what the list is currently showing. */
+@Composable
+private fun sectionTitle(ui: NoteListUiState): String {
+    val filter = ui.filter
+    return when {
+        filter.pinnedOnly -> stringResource(R.string.menu_pinned)
+        filter.tag != null -> "#${filter.tag}"
+        filter.folder == FolderFilter.Unfiled -> stringResource(R.string.folder_none)
+        filter.folder is FolderFilter.InFolder ->
+            ui.folders.firstOrNull { it.id == filter.folder.id }?.name ?: stringResource(R.string.section_notes)
+        else -> stringResource(R.string.section_notes)
     }
 }
 
