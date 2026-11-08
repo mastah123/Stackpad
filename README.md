@@ -10,7 +10,7 @@
 
 <p align="center">
   <a href="https://github.com/mastah123/stackpad/actions/workflows/android.yml"><img alt="Build" src="https://github.com/mastah123/stackpad/actions/workflows/android.yml/badge.svg"></a>
-  <img alt="Version" src="https://img.shields.io/badge/version-1.3.0-4F46E5">
+  <img alt="Version" src="https://img.shields.io/badge/version-1.4.0-4F46E5">
   <img alt="Platform" src="https://img.shields.io/badge/platform-Android%208.0%2B-3DDC84">
   <img alt="Kotlin" src="https://img.shields.io/badge/Kotlin-2.0-7F52FF">
   <img alt="License" src="https://img.shields.io/badge/license-MIT-blue">
@@ -35,7 +35,11 @@ Every note is a stack of compact blocks, laid out tightly like chat messages.
 
 Also:
 
-- **Side menu** (top-left) with shortcuts for All notes, Pinned, Folders, Tags and Trash.
+- **Side menu** (top-left) with shortcuts for All notes, Pinned, Folders, Tags, Trash and Settings.
+- **Share** a note as Markdown or plain text from the editor menu.
+- **Backup and restore**: export every note with its images and audio to a zip, and merge it back later without overwriting newer edits.
+- **App lock** with your fingerprint, face or screen lock, plus a hidden preview in recent apps.
+- **Home-screen widget** with a new-note button and your latest note.
 - **Undo / redo** in the editor.
 - **Folders**, **tags** and **colors** to organize notes, with filters in the note list.
 - **Trash** with restore; notes are erased after 30 days.
@@ -60,22 +64,30 @@ app/src/main/java/com/stackpad/app/
 │   ├── model/       Block types and note models
 │   ├── db/          Entities, DAOs, database and migrations
 │   ├── media/       Image and audio file storage
-│   └── prefs/       Theme and sort preferences
+│   ├── backup/      Backup file models and the zip export/restore
+│   └── prefs/       Theme, sort and security preferences
 ├── domain/          Pure Kotlin logic (unit tested)
+│   ├── backup/      Backup format rules and merge decision
+│   ├── export/      Markdown and plain-text note export
 │   ├── formula/     Spreadsheet formula evaluator
 │   ├── history/     Undo/redo stacks
 │   ├── image/       Zoom and pan limits
 │   ├── reminders/   Due dates and reminder planning
 │   ├── notes/       Sorting, filtering, tags, folder names, trash policy
+│   ├── security/    When the app lock re-locks
 │   ├── sheet/       Table edit operations
 │   └── text/        Span editing, URL detection, list markers
 ├── audio/           Recorder, player, playback speed, waveform helpers
 ├── notifications/   Reminder alarms and notifications
+├── security/        App lock controller and device credential check
+├── widget/          Home-screen widget
 ├── ui/
 │   ├── theme/       Colors, compact typography
 │   ├── components/  Shared widgets
 │   ├── notes/       Note list screen, side menu, filters, sort
 │   ├── trash/       Trash screen
+│   ├── settings/    Backup, restore, app lock and about
+│   ├── lock/        Lock screen
 │   ├── editor/      Editor screen, toolbars, one view per block type
 │   └── navigation/
 └── util/            Formatting and intent helpers
@@ -102,7 +114,7 @@ To enable signed builds, add four repository secrets. Step-by-step instructions 
 
 ## Testing
 
-Unit tests cover the formula evaluator, span editing, URL handling, list markers, table operations, waveform helpers, block serialization, table functions, due dates and reminder planning, image zoom limits, audio speed, note sorting and filtering, tags, trash timing and undo history. A manual checklist for everything else (UI, audio, camera) is in [docs/TESTING.md](docs/TESTING.md).
+Unit tests cover the formula evaluator, span editing, URL handling, list markers, table operations, waveform helpers, block serialization, table functions, due dates and reminder planning, image zoom limits, audio speed, note sorting and filtering, tags, trash timing, undo history, note export, backup rules and app-lock timing. A manual checklist for everything else (UI, audio, camera) is in [docs/TESTING.md](docs/TESTING.md).
 
 ## Known limitations
 
@@ -112,7 +124,9 @@ Unit tests cover the formula evaluator, span editing, URL handling, list markers
 - Undo and redo cover the title and blocks, not pinning, folder, tags or color. History is cleared when you leave the note.
 - Table functions are `SUM`, `AVERAGE`, `MIN`, `MAX` and `COUNT`. There is no `IF`, text or date handling.
 - Due dates are whole days. Reminders fire at 9:00 and may arrive a little late when the phone is idle (inexact alarms), and nothing is shown if notifications are off for the app.
-- Notes are local only; uninstalling the app deletes them. There is no export or backup yet.
+- Notes are local only; uninstalling the app deletes them unless you exported a backup. Backups are not encrypted, so keep the zip somewhere safe. Restoring adds and updates notes but never deletes any, and a note deleted on this phone comes back if it is in the backup.
+- App lock uses the phone's screen lock. If that lock is removed from the phone, app lock turns itself off. It locks again after 30 seconds in the background. It does not encrypt the notes on disk.
+- The widget shows the most recently edited note and refreshes when you leave the app and about every 30 minutes.
 - Recording stops automatically after 10 minutes.
 
 ## License

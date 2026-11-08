@@ -21,7 +21,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.Redo
 import androidx.compose.material.icons.automirrored.filled.Undo
-import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Tune
 import androidx.compose.material.icons.filled.PushPin
 import androidx.compose.material.icons.outlined.PushPin
@@ -71,6 +70,7 @@ import com.stackpad.app.ui.components.ConfirmDialog
 import com.stackpad.app.ui.components.InlineTextField
 import com.stackpad.app.util.openAppSettings
 import com.stackpad.app.util.openUrl
+import com.stackpad.app.util.shareText
 import android.os.Build
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
@@ -247,9 +247,21 @@ fun NoteEditorScreen(
                             tint = if (state.pinned) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant,
                         )
                     }
-                    IconButton(onClick = { confirmDelete = true }) {
-                        Icon(Icons.Filled.Delete, contentDescription = stringResource(R.string.cd_trash_note))
-                    }
+                    NoteActionsMenu(
+                        onShare = { format ->
+                            val text = viewModel.exportText(format)
+                            val shared = text != null &&
+                                shareText(context, state.title.ifBlank { context.getString(R.string.note_untitled) }, text)
+                            if (!shared) {
+                                scope.launch {
+                                    snackbar.showSnackbar(
+                                        context.getString(if (text == null) R.string.msg_share_empty else R.string.msg_share_failed),
+                                    )
+                                }
+                            }
+                        },
+                        onTrash = { confirmDelete = true },
+                    )
                 },
             )
         },

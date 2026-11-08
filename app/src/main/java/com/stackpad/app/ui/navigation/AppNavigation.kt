@@ -14,17 +14,22 @@ import com.stackpad.app.ui.editor.NoteEditorScreen
 import com.stackpad.app.ui.editor.NoteEditorViewModel
 import com.stackpad.app.ui.notes.NoteListScreen
 import com.stackpad.app.ui.notes.NoteListViewModel
+import com.stackpad.app.security.AppLockController
+import com.stackpad.app.ui.settings.SettingsScreen
+import com.stackpad.app.ui.settings.SettingsViewModel
 import com.stackpad.app.ui.trash.TrashScreen
 import com.stackpad.app.ui.trash.TrashViewModel
 
 private const val ROUTE_NOTES = "notes"
 private const val ROUTE_TRASH = "trash"
+private const val ROUTE_SETTINGS = "settings"
 private const val ARG_NOTE_ID = "noteId"
 private const val ROUTE_EDITOR = "editor/{$ARG_NOTE_ID}"
 
 @Composable
 fun AppNavigation(
     container: AppContainer,
+    appLock: AppLockController,
     noteToOpen: String? = null,
     onNoteOpened: () -> Unit = {},
 ) {
@@ -46,7 +51,12 @@ fun AppNavigation(
                 onOpenNote = { id -> navController.navigate("editor/$id") },
                 onNewNote = { navController.navigate("editor/${BlockFactory.newId()}") },
                 onOpenTrash = { navController.navigate(ROUTE_TRASH) },
+                onOpenSettings = { navController.navigate(ROUTE_SETTINGS) },
             )
+        }
+        composable(ROUTE_SETTINGS) {
+            val viewModel: SettingsViewModel = viewModel(factory = SettingsViewModel.factory(container))
+            SettingsScreen(viewModel = viewModel, appLock = appLock, onBack = { navController.popBackStack() })
         }
         composable(ROUTE_TRASH) {
             val viewModel: TrashViewModel = viewModel(factory = TrashViewModel.factory(container))

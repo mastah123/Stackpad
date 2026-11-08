@@ -18,6 +18,8 @@ import com.stackpad.app.data.model.TextBlock
 import com.stackpad.app.data.model.TextLevel
 import com.stackpad.app.data.model.isBlank
 import com.stackpad.app.data.model.mediaFileName
+import com.stackpad.app.domain.export.ExportFormat
+import com.stackpad.app.domain.export.NoteExporter
 import com.stackpad.app.domain.history.UndoHistory
 import com.stackpad.app.domain.notes.Tags
 import com.stackpad.app.domain.text.SpanEditing
@@ -470,6 +472,13 @@ class NoteEditorViewModel(
             if (note != null) repository.saveAndTrash(note)
             onTrashed()
         }
+    }
+
+    /** The note as shareable text in [format], or null when it has no content yet. */
+    fun exportText(format: ExportFormat): String? {
+        val note = snapshot() ?: return null
+        val text = NoteExporter.export(note, format)
+        return text.takeIf { it.isNotBlank() }
     }
 
     /** Writes pending changes immediately (on a scope that outlives this view model). */

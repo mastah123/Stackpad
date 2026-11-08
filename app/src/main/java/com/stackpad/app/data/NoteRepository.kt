@@ -1,5 +1,9 @@
 package com.stackpad.app.data
 
+import com.stackpad.app.data.backup.BackupFile
+import com.stackpad.app.data.backup.BackupFolder
+import com.stackpad.app.data.backup.BackupNote
+import com.stackpad.app.data.backup.RestoreSummary
 import com.stackpad.app.data.db.FolderDao
 import com.stackpad.app.data.db.FolderEntity
 import com.stackpad.app.data.db.NoteDao
@@ -11,6 +15,8 @@ import com.stackpad.app.data.model.Folder
 import com.stackpad.app.data.model.Note
 import com.stackpad.app.data.model.NoteSummary
 import com.stackpad.app.data.model.mediaFileName
+import com.stackpad.app.domain.backup.BackupRules
+import com.stackpad.app.domain.backup.MergeDecision
 import com.stackpad.app.domain.notes.FolderNames
 import com.stackpad.app.domain.notes.TagCount
 import com.stackpad.app.domain.notes.Tags
@@ -57,6 +63,9 @@ class NoteRepository(
         dao.observeTagStrings().map { rows -> Tags.count(rows.map(Tags::parse)) }
 
     suspend fun load(id: String): Note? = dao.get(id)?.toNote()
+
+    /** The most recently edited note outside the trash. Waits for pending saves so it is current. */
+    suspend fun latestSummary(): NoteSummary? = writeLock.withLock { dao.latestActive()?.toSummary() }
 
     // endregion
 
@@ -176,6 +185,55 @@ class NoteRepository(
             folderDao.delete(id)
         }
     }
+
+    // endregion
+
+    // region Backup
+
+    /** Every note (trash included) and folder, as written to a backup. */
+    suspend fun snapshotForBackup(appVersion: String): BackupFile = writeLock.withLock {
+        BackupFile(
+            formatVersion = BackupRules.FORMAT_VERSION,
+            appVersion = appVersion,
+            createdAt = System.currentTimeMillis(),
+            folders = folderDao.getAll().map { BackupFolder(it.id, it.name, it.createdAt) },
+            notes = (dao.allActive() + dao.allTrashed()).map { it.toBackupNote() },
+        )
+    }
+
+    /**
+     * Merges [backup] into the database. [installMedia] is asked to bring in a media file by name
+     * (returns false when the backup did not contain it); it is only called for notes that are
+     * actually added or replaced. Existing notes are never replaced by older copies.
+     */
+    suspend fun mergeBackup(backup: BackupFile, installMedia: (String) -> Unit): RestoreSummary =
+        writeLock.withLock {
+            val knownFolders = folderDao.getAll().map { it.id }.toMutableSet()
+            backup.folders.forEach { folder ->
+                val name = FolderNames.normalize(folder.name)
+                if (name != null && knownFolders.add(folder.id)) {
+                    folderDao.upsert(FolderEntity(folder.id, name, folder.createdAt))
+                }
+            }
+
+            var added = 0
+            var updated = 0
+            var skipped = 0
+            for (incoming in backup.notes) {
+                val decision = BackupRules.decide(dao.get(incoming.id)?.updatedAt, incoming.updatedAt)
+                if (decision == MergeDecision.SKIP) {
+                    skipped++
+                    continue
+                }
+                val note = incoming.toNote(folderKnown = incoming.folderId in knownFolders)
+                note.blocks.mapNotNull { it.mediaFileName() }.distinct().forEach(installMedia)
+                dao.upsert(note.toEntity(updatedAt = incoming.updatedAt))
+                if (decision == MergeDecision.ADD) added++ else updated++
+            }
+
+            dao.allActive().forEach { scheduleReminders(it.toNote()) }
+            RestoreSummary(added, updated, skipped)
+        }
 
     // endregion
 }

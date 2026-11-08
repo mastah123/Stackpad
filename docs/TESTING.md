@@ -80,6 +80,42 @@ Covers: formula evaluator, span editing, URL detection/validation, list markers,
 - [ ] Pinned combines with a folder or tag. An empty result shows "No notes here."
 - [ ] The menu is readable and fits in portrait and landscape, light and dark; TalkBack announces each item with its label.
 
+### Share
+- [ ] In a note with a title, headings, bold/italic, a list, a checklist with a due date, a table with a formula, a link, a quote, code and a divider, open the top-right menu and choose Share as Markdown. The share sheet opens; paste into a notes app: `#` title, `-` bullets, `- [ ]` checklist, a table with the calculated value, fenced code, `>` quote and `---`.
+- [ ] Share as plain text: no Markdown symbols except what you typed, lists use their own markers.
+- [ ] An image shows as `[Image: caption]`. An audio note shows its length.
+- [ ] Sharing an empty note shows "This note is empty" and opens nothing.
+- [ ] The menu also has Move to trash, which still asks for confirmation.
+
+### Backup and restore
+- [ ] Side menu, Settings, Export backup. Pick a place; a snackbar says how many notes were saved. Open the zip on a computer: it has `backup.json` and a `media` folder with your images and audio.
+- [ ] Trash a note, then export. Make sure the trashed note is also in the backup (it returns to the trash on restore).
+- [ ] Edit a note after exporting, then Restore from that backup: the snackbar says it was skipped, and your newer edit is kept.
+- [ ] Delete a note forever, then restore the backup: the note, its images and audio come back; counts say 1 added.
+- [ ] Restore the same backup twice: the second time everything is skipped.
+- [ ] Choose a random file (a photo or a text file) to restore: "This file is not a Stackpad backup." and nothing changes.
+- [ ] Notes with checklist due dates in the future get their reminders again after a restore.
+- [ ] Backing out of the file picker does nothing and shows no error.
+
+### App lock
+- [ ] With no screen lock on the phone, turning on App lock says to set one first.
+- [ ] With a screen lock, turn on App lock: you must unlock first, and the switch turns on.
+- [ ] Press Home, wait over 30 seconds, return: the lock screen appears and the unlock prompt opens. Unlocking opens the app exactly where you left it.
+- [ ] Return within 30 seconds: no lock.
+- [ ] Cancel the prompt: the lock screen stays; the Unlock button asks again.
+- [ ] The recent-apps screen shows no preview of the app, and a screenshot is blocked while the lock is on.
+- [ ] Force-stop and open the app: it opens locked.
+- [ ] Turn App lock off in Settings (unlock required): the preview and screenshots work again.
+- [ ] Remove the phone's screen lock, return to Stackpad: it opens without a lock and the switch is off.
+
+### Widget
+- [ ] Add the Stackpad widget from the home-screen widget list. It shows the logo, "Latest note" with a title, and a + button.
+- [ ] Tap the + button: Stackpad opens on a new empty note. Tap the widget body: it opens the latest note.
+- [ ] Edit a note's title, press Home: the widget shows the new title within a moment.
+- [ ] With no notes it says "No notes yet". With App lock on it says "Locked" and tapping opens the lock screen.
+- [ ] Rotate the phone after opening from the widget: no second empty note appears.
+- [ ] Dark mode changes the widget colors.
+
 ### Sorting
 - [ ] Sort menu: Last edited, Date created and Title each reorder the list. Pinned notes always stay on top. Title order ignores upper/lower case and puts untitled notes last.
 - [ ] The chosen sort is kept after restarting the app.

@@ -33,6 +33,9 @@ interface NoteDao {
     @Query("SELECT tags FROM notes WHERE trashedAt IS NULL AND tags != ''")
     fun observeTagStrings(): Flow<List<String>>
 
+    @Query("SELECT * FROM notes WHERE trashedAt IS NULL ORDER BY updatedAt DESC LIMIT 1")
+    suspend fun latestActive(): NoteEntity?
+
     @Query("SELECT * FROM notes WHERE id = :id")
     suspend fun get(id: String): NoteEntity?
 

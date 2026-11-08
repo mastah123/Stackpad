@@ -7,12 +7,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.4.0] - 2026-11-08
+
 ### Added
-- **Side menu** in the note list. The top-left title is now a menu button that opens a thin side bar with the logo and shortcuts for All notes, Pinned, Folders, Tags and Trash. Folders and Tags open a picker; Pinned shows only pinned notes. The shortcut for the current view is highlighted.
+- **Share a note** as Markdown or plain text from the new menu in the editor. Headings, bold, italic, lists, checklists (with due dates), tables (formulas calculated), links, quotes, code and dividers are all carried over. Images are shown as a placeholder with their caption.
+- **Backup and restore** in the new Settings screen. Export saves every note (trash included), folders, images and audio to a zip file you choose. Restore merges a backup: missing notes are added, a note is replaced only if the backup copy is newer, and nothing is ever deleted. Restoring checks the file first (size limits, safe file names) and reports what was added, updated and skipped.
+- **App lock**: ask for your fingerprint, face or phone screen lock when Stackpad opens and after 30 seconds in the background. Turning it on or off requires unlocking. While it is on, Stackpad is hidden in the recent-apps screen and screenshots are blocked.
+- **Home-screen widget** with a new-note button and your most recently edited note (tap to open). It shows "Locked" instead of the title while app lock is on.
+- **Side menu** in the note list. The top-left title is now a menu button that opens a thin side bar with the logo and shortcuts for All notes, Pinned, Folders, Tags, Trash and Settings. Folders and Tags open a picker; Pinned shows only pinned notes. The shortcut for the current view is highlighted.
 - The top bar now shows the current view (Notes, Pinned, a folder name, or a `#tag`).
+- Settings screen with backup, app lock and the app version.
 
 ### Changed
-- The Trash button moved from the top bar into the side menu.
+- The Trash button moved from the top bar into the side menu. The editor's delete button moved into its new overflow menu.
+- A launch from a reminder or the widget is handled only once, so rotating the phone no longer reopens the note.
+- New library: AndroidX Biometric (app lock).
 
 ## [1.3.0] - 2026-11-08
 
@@ -86,7 +95,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - GitHub Actions workflow for tests, debug builds and signed release builds using GitHub Secrets.
 - Unit tests for formulas, span editing, URLs, list markers, table operations, waveform helpers and serialization.
 
-[Unreleased]: https://github.com/mastah123/stackpad/compare/v1.3.0...HEAD
+[Unreleased]: https://github.com/mastah123/stackpad/compare/v1.4.0...HEAD
+[1.4.0]: https://github.com/mastah123/stackpad/compare/v1.3.0...v1.4.0
 [1.3.0]: https://github.com/mastah123/stackpad/compare/v1.2.0...v1.3.0
 [1.2.0]: https://github.com/mastah123/stackpad/compare/v1.1.0...v1.2.0
 [1.1.0]: https://github.com/mastah123/stackpad/compare/v1.0.0...v1.1.0

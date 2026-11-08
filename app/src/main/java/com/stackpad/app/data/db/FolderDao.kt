@@ -11,6 +11,9 @@ interface FolderDao {
     @Query("SELECT * FROM folders ORDER BY name COLLATE NOCASE ASC")
     fun observeAll(): Flow<List<FolderEntity>>
 
+    @Query("SELECT * FROM folders")
+    suspend fun getAll(): List<FolderEntity>
+
     @Query("SELECT * FROM folders WHERE id = :id")
     suspend fun get(id: String): FolderEntity?
 

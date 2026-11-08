@@ -51,6 +51,17 @@ class MediaStorage(private val context: Context) {
         }
     }
 
+    /** Copies [source] into the media folder unless a file with that name is already there. */
+    fun install(fileName: String, source: File) {
+        val target = file(fileName)
+        if (target.exists() && target.length() > 0) return
+        source.copyTo(target, overwrite = true)
+    }
+
+    /** Opens the stored file for reading, or null if it is missing. */
+    fun open(fileName: String): java.io.InputStream? =
+        file(fileName).takeIf { it.exists() }?.inputStream()
+
     fun exists(fileName: String): Boolean = file(fileName).let { it.exists() && it.length() > 0 }
 
     fun delete(fileName: String) {

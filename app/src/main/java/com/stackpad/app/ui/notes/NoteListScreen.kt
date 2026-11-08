@@ -56,6 +56,7 @@ fun NoteListScreen(
     onOpenNote: (String) -> Unit,
     onNewNote: () -> Unit,
     onOpenTrash: () -> Unit,
+    onOpenSettings: () -> Unit,
 ) {
     val ui by viewModel.state.collectAsStateWithLifecycle()
     val query by viewModel.query.collectAsStateWithLifecycle()
@@ -97,6 +98,7 @@ fun NoteListScreen(
                 onFolders = { closeMenu { showFolderPicker = true } },
                 onTags = { closeMenu { showTagPicker = true } },
                 onTrash = { closeMenu(onOpenTrash) },
+                onSettings = { closeMenu(onOpenSettings) },
             )
         },
     ) {

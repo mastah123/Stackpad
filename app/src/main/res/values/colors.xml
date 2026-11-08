@@ -2,4 +2,8 @@
 <resources>
     <color name="stackpad_window_background">#FFFBFBFE</color>
     <color name="ic_launcher_background">#FF4F46E5</color>
+    <color name="widget_background">#FFFFFFFF</color>
+    <color name="widget_text">#FF1B1B22</color>
+    <color name="widget_text_secondary">#FF5C5C6B</color>
+    <color name="widget_accent">#FF4F46E5</color>
 </resources>

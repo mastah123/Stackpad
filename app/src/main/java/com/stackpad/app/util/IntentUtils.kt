@@ -28,3 +28,18 @@ fun openAppSettings(context: Context) {
         // Nothing sensible to do; the settings screen is not available on this device.
     }
 }
+
+/** Opens the system share sheet with [text]. Returns false when no app can handle it. */
+fun shareText(context: Context, title: String, text: String): Boolean {
+    val send = Intent(Intent.ACTION_SEND).apply {
+        type = "text/plain"
+        putExtra(Intent.EXTRA_SUBJECT, title)
+        putExtra(Intent.EXTRA_TEXT, text)
+    }
+    return try {
+        context.startActivity(Intent.createChooser(send, null).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
+        true
+    } catch (e: ActivityNotFoundException) {
+        false
+    }
+}

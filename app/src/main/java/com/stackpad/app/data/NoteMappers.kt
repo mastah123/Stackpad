@@ -1,5 +1,6 @@
 package com.stackpad.app.data
 
+import com.stackpad.app.data.backup.BackupNote
 import com.stackpad.app.data.db.FolderEntity
 import com.stackpad.app.data.db.NoteEntity
 import com.stackpad.app.data.model.Folder
@@ -51,3 +52,30 @@ internal fun NoteEntity.toSummary(): NoteSummary = NoteSummary(
 )
 
 internal fun FolderEntity.toFolder(): Folder = Folder(id = id, name = name)
+
+internal fun NoteEntity.toBackupNote(): BackupNote = BackupNote(
+    id = id,
+    title = title,
+    blocks = BlockJsonCodec.decode(blocksJson),
+    pinned = pinned,
+    createdAt = createdAt,
+    updatedAt = updatedAt,
+    folderId = folderId,
+    tags = Tags.parse(tags),
+    color = color,
+    trashedAt = trashedAt,
+)
+
+/** Cleans a note read from a backup: unknown folders are dropped and tags/color are made valid. */
+internal fun BackupNote.toNote(folderKnown: Boolean): Note = Note(
+    id = id,
+    title = title,
+    blocks = blocks,
+    pinned = pinned,
+    createdAt = createdAt,
+    updatedAt = updatedAt,
+    folderId = folderId.takeIf { folderKnown },
+    tags = tags.mapNotNull(Tags::normalize).distinct().take(Tags.MAX_PER_NOTE),
+    color = color.coerceAtLeast(0),
+    trashedAt = trashedAt,
+)

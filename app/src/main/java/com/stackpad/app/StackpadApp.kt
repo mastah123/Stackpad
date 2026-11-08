@@ -6,16 +6,21 @@ import androidx.room.Room
 import com.stackpad.app.audio.AudioPlayer
 import com.stackpad.app.audio.AudioRecorder
 import com.stackpad.app.data.NoteRepository
+import com.stackpad.app.data.backup.BackupManager
 import com.stackpad.app.data.db.MIGRATION_1_2
 import com.stackpad.app.data.db.StackpadDatabase
 import com.stackpad.app.data.media.MediaStorage
 import com.stackpad.app.data.prefs.ListPreferences
+import com.stackpad.app.data.prefs.SecurityPreferences
 import com.stackpad.app.data.prefs.ThemePreferences
 import com.stackpad.app.notifications.AlarmReminderScheduler
+import com.stackpad.app.widget.WidgetContent
+import com.stackpad.app.widget.WidgetRenderer
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
 /** Hand-rolled dependency container shared by the whole app. */
@@ -38,7 +43,31 @@ class AppContainer(context: Context) {
     )
     val themePreferences = ThemePreferences(appContext)
     val listPreferences = ListPreferences(appContext)
+    val securityPreferences = SecurityPreferences(appContext)
     val audioPlayer = AudioPlayer()
+
+    val backupManager = BackupManager(
+        appContext,
+        repository,
+        mediaStorage,
+        runCatching { appContext.packageManager.getPackageInfo(appContext.packageName, 0).versionName }
+            .getOrNull().orEmpty(),
+    )
+
+    /** Redraws the home-screen widget with the latest note (or "Locked"). [onDone] runs afterwards. */
+    fun refreshWidget(onDone: () -> Unit = {}) {
+        appScope.launch {
+            try {
+                val content = when {
+                    securityPreferences.appLockEnabled.first() -> WidgetContent.Locked
+                    else -> repository.latestSummary()?.let { WidgetContent.Latest(it) } ?: WidgetContent.Empty
+                }
+                WidgetRenderer.push(appContext, content)
+            } finally {
+                onDone()
+            }
+        }
+    }
 
     /** Housekeeping at launch: erase expired trash, then remove unreferenced media files. */
     fun runStartupCleanup() {

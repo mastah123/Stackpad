@@ -17,6 +17,7 @@ import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Folder
 import androidx.compose.material.icons.filled.Notes
 import androidx.compose.material.icons.filled.PushPin
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Sell
 import androidx.compose.material3.AssistChip
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -55,6 +56,7 @@ fun NoteMenu(
     onFolders: () -> Unit,
     onTags: () -> Unit,
     onTrash: () -> Unit,
+    onSettings: () -> Unit,
 ) {
     // A plain Surface instead of ModalDrawerSheet, which cannot be narrower than 240dp.
     Surface(
@@ -83,6 +85,7 @@ fun NoteMenu(
                 MenuItem(Icons.Filled.Folder, R.string.menu_folders, filter.folder != FolderFilter.All, onFolders)
                 MenuItem(Icons.Filled.Sell, R.string.menu_tags, filter.tag != null, onTags)
                 MenuItem(Icons.Filled.Delete, R.string.menu_trash, false, onTrash)
+                MenuItem(Icons.Filled.Settings, R.string.menu_settings, false, onSettings)
             }
         }
     }
