@@ -42,6 +42,9 @@ interface NoteDao {
     @Query("SELECT * FROM notes WHERE trashedAt IS NOT NULL AND trashedAt <= :cutoff")
     suspend fun trashedAtOrBefore(cutoff: Long): List<NoteEntity>
 
+    @Query("SELECT * FROM notes WHERE trashedAt IS NULL")
+    suspend fun allActive(): List<NoteEntity>
+
     @Query("SELECT * FROM notes WHERE trashedAt IS NOT NULL")
     suspend fun allTrashed(): List<NoteEntity>
 

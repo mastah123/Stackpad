@@ -147,4 +147,22 @@
         <item>Purple</item>
         <item>Pink</item>
     </string-array>
+    <string name="cd_audio_speed" formatted="true">Playback speed %1$s. Tap to change.</string>
+    <string name="cd_audio_seek">Audio position</string>
+    <string name="cd_view_image">View full screen</string>
+    <string name="cd_close_image">Close image</string>
+    <string name="cd_edit_caption">Edit caption</string>
+    <string name="caption_hint">Add a caption…</string>
+    <string name="reminder_channel_name">Due date reminders</string>
+    <string name="reminder_channel_description">Reminders for checklist items on the day they are due.</string>
+    <string name="reminder_untitled_item">Checklist item</string>
+    <string name="reminder_due_today">Due today</string>
+    <string name="reminder_due_today_in" formatted="true">Due today · %1$s</string>
+    <string name="due_today">Today</string>
+    <string name="due_tomorrow">Tomorrow</string>
+    <string name="due_remove">Remove date</string>
+    <string name="cd_set_due_date">Set due date</string>
+    <string name="cd_due_date" formatted="true">Due %1$s. Tap to change.</string>
+    <string name="cd_due_overdue" formatted="true">Overdue, was due %1$s. Tap to change.</string>
+    <string name="msg_notifications_off">Notifications are off, so you will not get due date reminders. Turn them on in Settings.</string>
 </resources>

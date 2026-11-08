@@ -6,7 +6,7 @@
 ./gradlew testDebugUnitTest
 ```
 
-Covers: formula evaluator, span editing, URL detection/validation, list markers, table operations, waveform helpers, block JSON serialization, note sorting and filtering, tags, trash timing, and undo history.
+Covers: formula evaluator, span editing, URL detection/validation, list markers, table operations, waveform helpers, block JSON serialization, table functions, due dates and reminder planning, image zoom limits, audio speed, note sorting and filtering, tags, trash timing, and undo history.
 
 ## Manual checklist (run on a device or emulator, Android 8.0+)
 
@@ -87,16 +87,28 @@ Covers: formula evaluator, span editing, URL detection/validation, list markers,
 - [ ] Drag an item by its handle to reorder; the order is kept after reopening the note.
 - [ ] "Add item" and Enter add items; Backspace on an empty item removes it.
 - [ ] The "x" removes the whole checklist.
+- [ ] Tap the calendar button on an item, pick a date and Save. Android 13+: a notification permission prompt appears the first time. The date chip shows "Today", "Tomorrow" or e.g. `Nov 20`.
+- [ ] Tap the chip to change the date, and "Remove date" to clear it.
+- [ ] Set a past date on an unchecked item: the chip is highlighted as overdue. Check the item: the highlight goes away.
+- [ ] Deny the notification permission: a message explains that reminders are off, and the date is still saved.
+- [ ] Reminder delivery: set a due date for tomorrow, then set the phone clock to 9:00 tomorrow (or wait). A notification shows the item text and note title; tapping it opens the note. (It may arrive a few minutes late when the phone is idle.)
+- [ ] Check the item before the reminder time, clear its date, delete its checklist, or move the note to the trash: no notification arrives. Restore the note from the trash: the reminder is back.
+- [ ] Restart the phone with a pending reminder: it still fires.
 
 ### Image
 - [ ] Add from the gallery. The image is full width.
 - [ ] Add from the camera. Cancelling the camera adds nothing.
 - [ ] The "x" removes the image.
+- [ ] Tap the image: it opens full screen. Pinch to zoom, drag to pan while zoomed (the image cannot be dragged away from the screen edges), double-tap to zoom in and out. Close button and the back gesture both close it.
+- [ ] Tap the pencil: a caption field appears and is focused. The caption stays under the image, shows in the full-screen view, and is found by search. Clearing it and leaving the field hides the field again.
 
 ### Table
 - [ ] Tap a cell and type `2`, in another `3`, in a third `=A1+B1`. The result shows `5` when not editing.
 - [ ] Try `=2+3*4` (14), `=(2+3)*4` (20), `=1/0` (`#DIV/0!`), `=A1` inside A1 (`#CYCLE!`), `=2+` (`#ERR!`).
 - [ ] Add/remove rows and columns. The table scrolls sideways when wide.
+- [ ] Put `1`, `2`, `3`, `4` in A1:A4 and `=SUM(A1:A4)` elsewhere: `10`. Try `=AVERAGE(A1:A4)` (2.5), `=MIN(A1:A4)`, `=MAX(A1:A4)`, `=COUNT(A1:A4)` (4), and lower-case `=sum(a1:a4)`.
+- [ ] Mixed arguments: `=SUM(A1:A4, 5, A1*2)` (17). Nested: `=MAX(SUM(A1:A2), A4)`. A text or blank cell inside a range is skipped.
+- [ ] Errors: `=FOO(A1)` shows `#NAME?`, `=SUM(A1:A4` shows `#ERR!`, `=SUM(A1:A99)` shows `#REF!`, `=AVERAGE(B1:B2)` over blank cells shows `#DIV/0!`, a range that includes its own cell shows `#CYCLE!`.
 
 ### Audio
 - [ ] Tap Audio, allow the microphone. A recording bar shows a live waveform and timer.
@@ -104,6 +116,8 @@ Covers: formula evaluator, span editing, URL detection/validation, list markers,
 - [ ] Play, pause and resume. The waveform fills and pulses while playing; the duration counts.
 - [ ] Cancel a recording (the "x" in the bar). Nothing is added.
 - [ ] Deny the microphone permission. A message with a "Settings" action appears.
+- [ ] Tap the waveform: playback jumps there (and starts if it was idle). Drag across the waveform to scrub. A paused note stays paused after seeking.
+- [ ] Tap the speed chip: 1x, 1.5x, 2x, back to 1x. Playback speed changes immediately while playing and applies to the next note you play.
 - [ ] The "x" removes the audio and its file.
 
 ### Link and prompt

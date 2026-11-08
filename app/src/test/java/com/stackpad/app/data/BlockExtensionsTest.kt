@@ -2,6 +2,7 @@ package com.stackpad.app.data
 
 import com.stackpad.app.data.model.CodeBlock
 import com.stackpad.app.data.model.DividerBlock
+import com.stackpad.app.data.model.ImageBlock
 import com.stackpad.app.data.model.QuoteBlock
 import com.stackpad.app.data.model.isBlank
 import com.stackpad.app.data.model.mediaFileName
@@ -34,5 +35,13 @@ class BlockExtensionsTest {
         assertNull(QuoteBlock("q", "x").mediaFileName())
         assertNull(CodeBlock("c", "x").mediaFileName())
         assertNull(DividerBlock("d").mediaFileName())
+    }
+
+    @Test
+    fun imageCaptionIsSearchableButImageIsNeverBlank() {
+        assertEquals("sunset", ImageBlock("i", "a.jpg", "sunset").searchableText())
+        assertEquals("", ImageBlock("i", "a.jpg").searchableText())
+        assertFalse(ImageBlock("i", "a.jpg").isBlank())
+        assertEquals("a.jpg", ImageBlock("i", "a.jpg", "x").mediaFileName())
     }
 }

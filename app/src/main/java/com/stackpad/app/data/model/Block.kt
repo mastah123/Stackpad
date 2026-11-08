@@ -23,7 +23,13 @@ enum class ListKind { BULLET, NUMBERED, LETTERED }
 data class ListItem(val id: String, val text: String = "")
 
 @Serializable
-data class ChecklistItem(val id: String, val text: String = "", val checked: Boolean = false)
+data class ChecklistItem(
+    val id: String,
+    val text: String = "",
+    val checked: Boolean = false,
+    /** Due date as an ISO local date (`2026-11-10`), or null. A reminder fires at 9:00 that day. */
+    val dueDate: String? = null,
+)
 
 /**
  * One building block of a note. A note is an ordered list of blocks.
@@ -65,6 +71,8 @@ data class ImageBlock(
     override val id: String,
     /** File name inside the app's media folder. */
     val fileName: String,
+    /** Optional text shown under the image. */
+    val caption: String = "",
 ) : Block
 
 @Serializable

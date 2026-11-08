@@ -27,7 +27,7 @@ class BlockJsonCodecTest {
         TextBlock("1", TextLevel.H2, "Hello", listOf(TextSpan(0, 3, SpanType.BOLD))),
         ListBlock("2", ListKind.LETTERED, listOf(ListItem("a", "one"), ListItem("b", "two"))),
         ChecklistBlock("3", "Todo", listOf(ChecklistItem("c", "x", true), ChecklistItem("d", "y", false))),
-        ImageBlock("4", "img_1.jpg"),
+        ImageBlock("4", "img_1.jpg", "A caption"),
         SheetBlock("5", listOf(listOf("1", "=A1+1"), listOf("", "text"))),
         AudioBlock("6", "aud_1.m4a", 4200L, listOf(10, 50, 90)),
         LinkBlock("7", "Site", "https://example.com"),
@@ -40,6 +40,12 @@ class BlockJsonCodecTest {
     @Test
     fun everyBlockTypeSurvivesARoundTrip() {
         assertEquals(blocks, BlockJsonCodec.decode(BlockJsonCodec.encode(blocks)))
+    }
+
+    @Test
+    fun imageWithoutCaptionFromOlderNotesDecodesWithEmptyCaption() {
+        val json = """[{"type":"image","id":"4","fileName":"img_1.jpg"}]"""
+        assertEquals(listOf<Block>(ImageBlock("4", "img_1.jpg", "")), BlockJsonCodec.decode(json))
     }
 
     @Test

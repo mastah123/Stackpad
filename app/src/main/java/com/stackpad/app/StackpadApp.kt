@@ -11,6 +11,8 @@ import com.stackpad.app.data.db.StackpadDatabase
 import com.stackpad.app.data.media.MediaStorage
 import com.stackpad.app.data.prefs.ListPreferences
 import com.stackpad.app.data.prefs.ThemePreferences
+import com.stackpad.app.notifications.AlarmReminderScheduler
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -27,7 +29,13 @@ class AppContainer(context: Context) {
             .build()
 
     val mediaStorage = MediaStorage(appContext)
-    val repository = NoteRepository(database.noteDao(), database.folderDao(), mediaStorage, appScope)
+    val repository = NoteRepository(
+        database.noteDao(),
+        database.folderDao(),
+        mediaStorage,
+        AlarmReminderScheduler(appContext),
+        appScope,
+    )
     val themePreferences = ThemePreferences(appContext)
     val listPreferences = ListPreferences(appContext)
     val audioPlayer = AudioPlayer()
@@ -37,8 +45,12 @@ class AppContainer(context: Context) {
         appScope.launch {
             repository.purgeExpiredTrash()
             repository.sweepOrphanMedia()
+            repository.rescheduleAllReminders()
         }
     }
+
+    /** Re-creates reminder alarms that the system dropped (after a reboot or an app update). */
+    fun rescheduleReminders(): Job = appScope.launch { repository.rescheduleAllReminders() }
 
     fun createAudioRecorder(): AudioRecorder = AudioRecorder(appContext)
 }

@@ -1,6 +1,7 @@
 package com.stackpad.app.ui.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -22,8 +23,20 @@ private const val ARG_NOTE_ID = "noteId"
 private const val ROUTE_EDITOR = "editor/{$ARG_NOTE_ID}"
 
 @Composable
-fun AppNavigation(container: AppContainer) {
+fun AppNavigation(
+    container: AppContainer,
+    noteToOpen: String? = null,
+    onNoteOpened: () -> Unit = {},
+) {
     val navController = rememberNavController()
+
+    // A tapped reminder notification opens its note on top of the list.
+    LaunchedEffect(noteToOpen) {
+        noteToOpen?.let { id ->
+            navController.navigate("editor/$id") { launchSingleTop = true }
+            onNoteOpened()
+        }
+    }
 
     NavHost(navController = navController, startDestination = ROUTE_NOTES) {
         composable(ROUTE_NOTES) {

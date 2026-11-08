@@ -15,18 +15,22 @@ import com.stackpad.app.domain.notes.FolderNames
 import com.stackpad.app.domain.notes.TagCount
 import com.stackpad.app.domain.notes.Tags
 import com.stackpad.app.domain.notes.TrashPolicy
+import com.stackpad.app.domain.reminders.ReminderPlanner
+import com.stackpad.app.domain.reminders.ReminderScheduler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import java.time.ZoneId
 
 /** Single entry point for reading and writing notes, folders and their media files. */
 class NoteRepository(
     private val dao: NoteDao,
     private val folderDao: FolderDao,
     private val media: MediaStorage,
+    private val reminders: ReminderScheduler,
     private val scope: CoroutineScope,
 ) {
     private val writeLock = Mutex()
@@ -60,7 +64,11 @@ class NoteRepository(
 
     suspend fun save(note: Note) {
         writeLock.withLock {
+            val previous = dao.get(note.id)?.toNote()
             dao.upsert(note.toEntity(updatedAt = System.currentTimeMillis()))
+            val changes = ReminderPlanner.reconcile(previous, note, System.currentTimeMillis(), ZoneId.systemDefault())
+            changes.cancel.forEach(reminders::cancel)
+            changes.schedule.forEach(reminders::schedule)
         }
     }
 
@@ -82,15 +90,31 @@ class NoteRepository(
         writeLock.withLock {
             val now = System.currentTimeMillis()
             dao.upsert(note.copy(trashedAt = now).toEntity(updatedAt = now))
+            ReminderPlanner.dueKeys(note).forEach(reminders::cancel)
         }
     }
 
     suspend fun moveToTrash(id: String) {
-        writeLock.withLock { dao.setTrashedAt(id, System.currentTimeMillis()) }
+        writeLock.withLock {
+            dao.setTrashedAt(id, System.currentTimeMillis())
+            dao.get(id)?.toNote()?.let { ReminderPlanner.dueKeys(it).forEach(reminders::cancel) }
+        }
     }
 
     suspend fun restore(id: String) {
-        writeLock.withLock { dao.setTrashedAt(id, null) }
+        writeLock.withLock {
+            dao.setTrashedAt(id, null)
+            dao.get(id)?.toNote()?.let(::scheduleReminders)
+        }
+    }
+
+    /** Re-creates every pending reminder, e.g. after a reboot or an app update cleared the alarms. */
+    suspend fun rescheduleAllReminders() {
+        writeLock.withLock { dao.allActive().forEach { scheduleReminders(it.toNote()) } }
+    }
+
+    private fun scheduleReminders(note: Note) {
+        ReminderPlanner.plan(note, System.currentTimeMillis(), ZoneId.systemDefault()).forEach(reminders::schedule)
     }
 
     /** Permanently deletes the note and every image/audio file it owns. */
@@ -109,7 +133,9 @@ class NoteRepository(
 
     private suspend fun deleteNotes(notes: List<NoteEntity>) {
         notes.forEach { entity ->
-            entity.toNote().blocks.forEach { block -> block.mediaFileName()?.let(media::delete) }
+            val note = entity.toNote()
+            ReminderPlanner.dueKeys(note).forEach(reminders::cancel)
+            note.blocks.forEach { block -> block.mediaFileName()?.let(media::delete) }
             dao.delete(entity.id)
         }
     }

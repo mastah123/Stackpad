@@ -388,6 +388,15 @@ class NoteEditorViewModel(
         }
     }
 
+    /** Moves the playhead to [fraction] (0..1) of the note, starting playback if it was idle. */
+    fun seekAudio(block: AudioBlock, fraction: Float) {
+        if (!player.seekTo(block.fileName, media.file(block.fileName), fraction)) {
+            emit(EditorMessage.AUDIO_UNAVAILABLE)
+        }
+    }
+
+    fun cycleAudioSpeed() = player.cycleSpeed()
+
     fun isAudioAvailable(block: AudioBlock): Boolean = media.exists(block.fileName)
 
     /** Starts recording. The caller must already hold the microphone permission. */

@@ -10,7 +10,8 @@ fun Block.searchableText(): String = when (this) {
     is PromptBlock -> text
     is QuoteBlock -> text
     is CodeBlock -> text
-    is ImageBlock, is AudioBlock, is DividerBlock -> ""
+    is ImageBlock -> caption
+    is AudioBlock, is DividerBlock -> ""
 }
 
 /** True when the block holds no user content (used to avoid saving empty notes). */

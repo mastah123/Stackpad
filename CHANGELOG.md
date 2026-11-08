@@ -7,6 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.3.0] - 2026-11-08
+
+### Added
+- **Table functions**: `SUM`, `AVERAGE`, `MIN`, `MAX` and `COUNT`, over single cells, ranges such as `A1:A5` or `A1:B4`, and expressions, for example `=SUM(A1:A4, 5, B1*2)`. Blank and text cells inside a range are skipped. New error `#NAME?` for unknown functions.
+- **Audio seek and speed**: tap or drag the waveform to move the playhead, and tap the speed chip to cycle 1x, 1.5x and 2x.
+- **Checklist due dates**: set a date on any checklist item with the calendar button. Overdue unchecked items are highlighted. A **reminder notification** is shown at 9:00 on the due day, and tapping it opens the note. Reminders are removed when an item is checked, loses its date, or its note is trashed, and are restored with the note. They are recreated after a restart or an app update.
+- **Image zoom**: tap an image to view it full screen. Pinch to zoom, drag to pan, double-tap to zoom in and out.
+- **Image captions**: add a caption under any image with the pencil button. Captions are searchable.
+- Notification permission is requested the first time a due date is set (Android 13 and later).
+
+### Changed
+- The "x" and pencil buttons on images sit in opposite corners of the image.
+- Notes from 1.2.0 open unchanged: new fields (due date, caption) default to empty, and no database upgrade is needed.
+
 ## [1.2.0] - 2026-11-07
 
 ### Added
@@ -65,7 +79,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - GitHub Actions workflow for tests, debug builds and signed release builds using GitHub Secrets.
 - Unit tests for formulas, span editing, URLs, list markers, table operations, waveform helpers and serialization.
 
-[Unreleased]: https://github.com/mastah123/stackpad/compare/v1.2.0...HEAD
+[Unreleased]: https://github.com/mastah123/stackpad/compare/v1.3.0...HEAD
+[1.3.0]: https://github.com/mastah123/stackpad/compare/v1.2.0...v1.3.0
 [1.2.0]: https://github.com/mastah123/stackpad/compare/v1.1.0...v1.2.0
 [1.1.0]: https://github.com/mastah123/stackpad/compare/v1.0.0...v1.1.0
 [1.0.0]: https://github.com/mastah123/stackpad/releases/tag/v1.0.0

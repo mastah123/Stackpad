@@ -65,11 +65,13 @@ import com.stackpad.app.data.media.MediaStorage
 import com.stackpad.app.data.model.SpanType
 import com.stackpad.app.data.model.TextBlock
 import com.stackpad.app.domain.notes.TrashPolicy
+import com.stackpad.app.notifications.ReminderNotifications
 import com.stackpad.app.domain.text.SpanEditing
 import com.stackpad.app.ui.components.ConfirmDialog
 import com.stackpad.app.ui.components.InlineTextField
 import com.stackpad.app.util.openAppSettings
 import com.stackpad.app.util.openUrl
+import android.os.Build
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import kotlinx.coroutines.flow.filterNotNull
@@ -136,6 +138,23 @@ fun NoteEditorScreen(
     val cameraLauncher = rememberLauncherForActivityResult(ActivityResultContracts.TakePicture()) { saved ->
         viewModel.onCameraResult(saved)
     }
+    val notificationLauncher = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
+        if (!granted) showMessage(R.string.msg_notifications_off)
+    }
+
+    // Due dates only produce reminders when notifications are allowed, so ask the first time one is set.
+    fun onDueDateSet() {
+        if (ReminderNotifications.canNotify(context)) return
+        val needsPermission = Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
+            ContextCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS) !=
+            PackageManager.PERMISSION_GRANTED
+        if (needsPermission) {
+            notificationLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+        } else {
+            showMessage(R.string.msg_notifications_off)
+        }
+    }
+
     val micLauncher = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
         if (granted) {
             viewModel.startRecording()
@@ -294,6 +313,7 @@ fun NoteEditorScreen(
                         media = media,
                         onOpenUrl = openLink,
                         onCopied = { showMessage(R.string.msg_copied) },
+                        onDueDateSet = ::onDueDateSet,
                         // Consecutive text lines sit close together; cards get a little more air.
                         modifier = Modifier.padding(vertical = if (block is TextBlock) 1.dp else 2.dp),
                     )

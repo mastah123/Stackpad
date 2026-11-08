@@ -43,6 +43,7 @@ fun EditorBlockItem(
     media: MediaStorage,
     onOpenUrl: (String) -> Unit,
     onCopied: () -> Unit,
+    onDueDateSet: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val id = block.id
@@ -80,12 +81,16 @@ fun EditorBlockItem(
             onFocusHandled = onFocusHandled,
             onBlockFocused = onBlockFocused,
             onEdit = { transform -> viewModel.edit<ChecklistBlock>(id, transform) },
+            onDueDateSet = onDueDateSet,
             onRemove = onRemove,
             modifier = modifier,
         )
 
         is ImageBlock -> ImageBlockView(
             file = media.file(block.fileName),
+            caption = block.caption,
+            onCaptionChange = { text -> viewModel.edit<ImageBlock>(id) { it.copy(caption = text) } },
+            onBlockFocused = onBlockFocused,
             onRemove = onRemove,
             modifier = modifier,
         )
@@ -103,6 +108,8 @@ fun EditorBlockItem(
             playback = playback,
             available = viewModel.isAudioAvailable(block),
             onTogglePlay = { viewModel.togglePlayback(block) },
+            onSeek = { fraction -> viewModel.seekAudio(block, fraction) },
+            onCycleSpeed = viewModel::cycleAudioSpeed,
             onRemove = onRemove,
             modifier = modifier,
         )

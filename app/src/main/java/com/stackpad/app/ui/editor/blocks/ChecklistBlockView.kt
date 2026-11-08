@@ -79,10 +79,12 @@ fun ChecklistBlockView(
     onFocusHandled: () -> Unit,
     onBlockFocused: () -> Unit,
     onEdit: ((ChecklistBlock) -> ChecklistBlock) -> Unit,
+    onDueDateSet: () -> Unit,
     onRemove: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val colors = MaterialTheme.colorScheme
+    var dueEditId by remember { mutableStateOf<String?>(null) }
     val done = block.items.count { it.checked }
     val total = block.items.size
     val progress by animateFloatAsState(
@@ -158,6 +160,7 @@ fun ChecklistBlockView(
                     dragOffsetProvider = { dragOffset },
                     focusRequester = requesters.getOrPut(item.id) { FocusRequester() },
                     onHeight = { heights[item.id] = it },
+                    onEditDueDate = { dueEditId = item.id },
                     onFocused = onBlockFocused,
                     onCheckedChange = { checked ->
                         onEdit { b -> b.copy(items = b.items.map { if (it.id == item.id) it.copy(checked = checked) else it }) }
@@ -250,6 +253,27 @@ fun ChecklistBlockView(
         }
     }
 
+    dueEditId?.let { id ->
+        val item = block.items.firstOrNull { it.id == id }
+        if (item == null) {
+            dueEditId = null
+        } else {
+            fun setDueDate(date: String?) {
+                onEdit { b -> b.copy(items = b.items.map { if (it.id == id) it.copy(dueDate = date) else it }) }
+                dueEditId = null
+            }
+            DueDateDialog(
+                initial = item.dueDate,
+                onConfirm = { date ->
+                    setDueDate(date)
+                    onDueDateSet()
+                },
+                onClear = { setDueDate(null) },
+                onDismiss = { dueEditId = null },
+            )
+        }
+    }
+
     LaunchedEffect(requestFocus) {
         if (requestFocus) {
             block.items.firstOrNull()?.let { runCatching { requesters[it.id]?.requestFocus() } }
@@ -271,6 +295,7 @@ private fun ChecklistRow(
     dragOffsetProvider: () -> Float,
     focusRequester: FocusRequester,
     onHeight: (Int) -> Unit,
+    onEditDueDate: () -> Unit,
     onFocused: () -> Unit,
     onCheckedChange: (Boolean) -> Unit,
     onTextChange: (String) -> Unit,
@@ -385,5 +410,6 @@ private fun ChecklistRow(
             keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Sentences),
             cursorBrush = SolidColor(colors.primary),
         )
+        DueDateButton(dueDate = item.dueDate, checked = item.checked, onClick = onEditDueDate)
     }
 }
