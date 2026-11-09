@@ -10,7 +10,7 @@
 
 <p align="center">
   <a href="https://github.com/mastah123/stackpad/actions/workflows/android.yml"><img alt="Build" src="https://github.com/mastah123/stackpad/actions/workflows/android.yml/badge.svg"></a>
-  <img alt="Version" src="https://img.shields.io/badge/version-1.5.0-4F46E5">
+  <img alt="Version" src="https://img.shields.io/badge/version-1.6.0-4F46E5">
   <img alt="Platform" src="https://img.shields.io/badge/platform-Android%208.0%2B-3DDC84">
   <img alt="Kotlin" src="https://img.shields.io/badge/Kotlin-2.0-7F52FF">
   <img alt="License" src="https://img.shields.io/badge/license-MIT-blue">
@@ -35,6 +35,9 @@ Also:
 
 - **Side menu** (top-left) with shortcuts for All notes, Pinned, Folders (small grid), Tags (scrolling row), Trash and Settings.
 - **Share** a note as Markdown or plain text, or **copy** it whole, from the editor's 3-dot menu, which also holds the note options (folder, tags, color).
+- **Templates**: start from Meeting notes, To-do, Journal or Project plan, or save any note as your own template.
+- **Select blocks** and copy them as text, or copy the whole note.
+- **Lock a single note** behind your screen lock, even with app lock off.
 - **Backup and restore**: export every note with its images and audio to a zip, and merge it back later without overwriting newer edits.
 - **App lock** with your fingerprint, face or screen lock, plus a hidden preview in recent apps.
 - **Home-screen widget** with a new-note button and your latest note.
@@ -74,6 +77,7 @@ app/src/main/java/com/stackpad/app/
 │   ├── notes/       Sorting, filtering, tags, folder names, trash policy
 │   ├── security/    When the app lock re-locks
 │   ├── sheet/       Table edit operations
+│   ├── templates/   Built-in templates and template rules
 │   └── text/        Span editing, URL detection, list markers
 ├── audio/           Recorder, player, playback speed, waveform helpers
 ├── notifications/   Reminder alarms and notifications
@@ -123,6 +127,8 @@ Unit tests cover the formula evaluator, span editing, URL handling, list markers
 - Table functions are `SUM`, `AVERAGE`, `MIN`, `MAX` and `COUNT`. There is no `IF`, text or date handling.
 - Due dates are whole days. Reminders fire at 9:00 and may arrive a little late when the phone is idle (inexact alarms), and nothing is shown if notifications are off for the app.
 - Notes are local only; uninstalling the app deletes them unless you exported a backup. Backups are not encrypted, so keep the zip somewhere safe. Restoring adds and updates notes but never deletes any, and a note deleted on this phone comes back if it is in the backup.
+- Note lock and app lock use the phone's screen lock to gate the app. They do not encrypt notes on disk, and backups are not encrypted either, so a locked note's content is readable in a backup file.
+- Block selection copies whole blocks; selecting a range of characters across blocks is not possible.
 - App lock uses the phone's screen lock. If that lock is removed from the phone, app lock turns itself off. It locks again after 30 seconds in the background. It does not encrypt the notes on disk.
 - The widget shows the most recently edited note and refreshes when you leave the app and about every 30 minutes.
 - Recording stops automatically after 10 minutes.

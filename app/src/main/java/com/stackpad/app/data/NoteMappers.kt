@@ -22,13 +22,15 @@ internal fun NoteEntity.toNote(): Note = Note(
     tags = Tags.parse(tags),
     color = color,
     trashedAt = trashedAt,
+    locked = locked,
 )
 
 internal fun Note.toEntity(updatedAt: Long): NoteEntity = NoteEntity(
     id = id,
     title = title,
     blocksJson = BlockJsonCodec.encode(blocks),
-    searchText = blocks.map { it.searchableText() }.filter { it.isNotBlank() }.joinToString("\n"),
+    // A locked note keeps its content out of search and previews.
+    searchText = if (locked) "" else blocks.map { it.searchableText() }.filter { it.isNotBlank() }.joinToString("\n"),
     pinned = pinned,
     createdAt = createdAt,
     updatedAt = updatedAt,
@@ -36,6 +38,7 @@ internal fun Note.toEntity(updatedAt: Long): NoteEntity = NoteEntity(
     tags = Tags.serialize(tags),
     color = color,
     trashedAt = trashedAt,
+    locked = locked,
 )
 
 internal fun NoteEntity.toSummary(): NoteSummary = NoteSummary(
@@ -49,6 +52,7 @@ internal fun NoteEntity.toSummary(): NoteSummary = NoteSummary(
     tags = Tags.parse(tags),
     color = color,
     trashedAt = trashedAt,
+    locked = locked,
 )
 
 internal fun FolderEntity.toFolder(): Folder = Folder(id = id, name = name)
@@ -64,6 +68,7 @@ internal fun NoteEntity.toBackupNote(): BackupNote = BackupNote(
     tags = Tags.parse(tags),
     color = color,
     trashedAt = trashedAt,
+    locked = locked,
 )
 
 /** Cleans a note read from a backup: unknown folders are dropped and tags/color are made valid. */
@@ -78,4 +83,5 @@ internal fun BackupNote.toNote(folderKnown: Boolean): Note = Note(
     tags = tags.mapNotNull(Tags::normalize).distinct().take(Tags.MAX_PER_NOTE),
     color = color.coerceAtLeast(0),
     trashedAt = trashedAt,
+    locked = locked,
 )

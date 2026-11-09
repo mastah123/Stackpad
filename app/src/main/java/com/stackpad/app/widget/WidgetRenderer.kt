@@ -37,9 +37,14 @@ object WidgetRenderer {
             }
             is WidgetContent.Latest -> {
                 views.setTextViewText(R.id.widget_label, context.getString(R.string.widget_latest_label))
+                // A locked note's title stays hidden, like its content.
                 views.setTextViewText(
                     R.id.widget_title,
-                    content.note.title.ifBlank { content.note.preview.ifBlank { context.getString(R.string.note_untitled) } },
+                    if (content.note.locked) {
+                        context.getString(R.string.widget_locked_note)
+                    } else {
+                        content.note.title.ifBlank { content.note.preview.ifBlank { context.getString(R.string.note_untitled) } }
+                    },
                 )
                 openIntent.putExtra(MainActivity.EXTRA_NOTE_ID, content.note.id)
             }

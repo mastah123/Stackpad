@@ -14,6 +14,8 @@ data class EditorUiState(
     val tags: List<String> = emptyList(),
     /** Index into the note color palette; 0 means no color. */
     val color: Int = 0,
+    /** True when the note needs the phone's screen lock to open. */
+    val locked: Boolean = false,
     /** Block that should grab keyboard focus once it is on screen. */
     val focusBlockId: String? = null,
     /** Caret position to use when focusing [focusBlockId]; null means the end of the text. */
@@ -42,4 +44,7 @@ enum class EditorMessage(@StringRes val resId: Int) {
     IMAGE_FAILED(R.string.msg_image_failed),
     CAMERA_UNAVAILABLE(R.string.msg_camera_unavailable),
     AUDIO_UNAVAILABLE(R.string.msg_audio_unavailable),
+    TEMPLATE_SAVED(R.string.msg_template_saved),
+    TEMPLATE_EMPTY(R.string.msg_template_empty),
+    TEMPLATE_LIMIT(R.string.msg_template_limit),
 }

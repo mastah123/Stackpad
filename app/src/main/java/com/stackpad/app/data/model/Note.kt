@@ -14,6 +14,8 @@ data class Note(
     val color: Int = 0,
     /** When the note was moved to the trash, or null for a normal note. */
     val trashedAt: Long? = null,
+    /** True when opening the note requires the phone's screen lock. */
+    val locked: Boolean = false,
 )
 
 /** Lightweight note projection shown in the note list and the trash. */
@@ -28,6 +30,8 @@ data class NoteSummary(
     val tags: List<String> = emptyList(),
     val color: Int = 0,
     val trashedAt: Long? = null,
+    /** True for a locked note: the preview is empty. */
+    val locked: Boolean = false,
 )
 
 /** A user-created folder that notes can be filed in. A note is in at most one folder. */

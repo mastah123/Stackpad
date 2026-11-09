@@ -2,7 +2,12 @@ package com.stackpad.app.ui.editor
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.BookmarkAdd
+import androidx.compose.material.icons.filled.Checklist
 import androidx.compose.material.icons.filled.ContentCopy
+import androidx.compose.material.icons.filled.Dashboard
+import androidx.compose.material.icons.filled.Lock
+import androidx.compose.material.icons.filled.LockOpen
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Share
@@ -53,6 +58,11 @@ fun NoteActionsMenu(
     onOptionsOpenChange: (Boolean) -> Unit,
     onShare: (ExportFormat) -> Unit,
     onCopy: () -> Unit,
+    locked: Boolean,
+    onToggleLock: () -> Unit,
+    onInsertTemplate: () -> Unit,
+    onSaveTemplate: () -> Unit,
+    onSelectBlocks: () -> Unit,
     onTrash: () -> Unit,
 ) {
     var open by remember { mutableStateOf(false) }
@@ -87,6 +97,26 @@ fun NoteActionsMenu(
                 text = { Text(stringResource(R.string.action_copy_note)) },
                 leadingIcon = { Icon(Icons.Filled.ContentCopy, contentDescription = null) },
                 onClick = { open = false; onCopy() },
+            )
+            DropdownMenuItem(
+                text = { Text(stringResource(R.string.action_select_blocks)) },
+                leadingIcon = { Icon(Icons.Filled.Checklist, contentDescription = null) },
+                onClick = { open = false; onSelectBlocks() },
+            )
+            DropdownMenuItem(
+                text = { Text(stringResource(R.string.action_templates)) },
+                leadingIcon = { Icon(Icons.Filled.Dashboard, contentDescription = null) },
+                onClick = { open = false; onInsertTemplate() },
+            )
+            DropdownMenuItem(
+                text = { Text(stringResource(R.string.action_save_template)) },
+                leadingIcon = { Icon(Icons.Filled.BookmarkAdd, contentDescription = null) },
+                onClick = { open = false; onSaveTemplate() },
+            )
+            DropdownMenuItem(
+                text = { Text(stringResource(if (locked) R.string.action_unlock_note else R.string.action_lock_note)) },
+                leadingIcon = { Icon(if (locked) Icons.Filled.LockOpen else Icons.Filled.Lock, contentDescription = null) },
+                onClick = { open = false; onToggleLock() },
             )
             DropdownMenuItem(
                 text = { Text(stringResource(R.string.action_move_to_trash)) },

@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.6.0] - 2026-11-09
+
+### Added
+- **Select blocks**: choose "Select blocks" in the editor's 3-dot menu, tap blocks to select them (or Select all), and copy them as plain text. Back or the close button leaves selection mode.
+- **Templates**: "Insert template" in the editor menu adds a template to the note (it replaces the note while it is still empty). Four are built in (Meeting notes, To-do list, Daily journal, Project plan). "Save as template" keeps the current note as your own template (up to 20); saved templates can be deleted from the picker. Images and audio are not saved in templates, and checklist items are saved unchecked without due dates.
+- **Note lock**: "Lock note" in the editor menu makes a single note need your fingerprint, face or phone screen lock to open, even if app lock is off. Locked notes show a lock icon in the list with no preview, their content is left out of search, reminder notifications and the widget show no text from them, and the editor locks again after 30 seconds away. "Remove note lock" needs the screen lock too.
+
+### Changed
+- Database version 3 (adds the lock flag). Existing notes are migrated and stay unlocked.
+- Backups now include the lock flag.
+- New editor menu entries: Select blocks, Insert template, Save as template, Lock note.
+
 ## [1.5.0] - 2026-11-08
 
 ### Added
@@ -116,7 +128,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - GitHub Actions workflow for tests, debug builds and signed release builds using GitHub Secrets.
 - Unit tests for formulas, span editing, URLs, list markers, table operations, waveform helpers and serialization.
 
-[Unreleased]: https://github.com/mastah123/stackpad/compare/v1.5.0...HEAD
+[Unreleased]: https://github.com/mastah123/stackpad/compare/v1.6.0...HEAD
+[1.6.0]: https://github.com/mastah123/stackpad/compare/v1.5.0...v1.6.0
 [1.5.0]: https://github.com/mastah123/stackpad/compare/v1.4.0...v1.5.0
 [1.4.0]: https://github.com/mastah123/stackpad/compare/v1.3.0...v1.4.0
 [1.3.0]: https://github.com/mastah123/stackpad/compare/v1.2.0...v1.3.0

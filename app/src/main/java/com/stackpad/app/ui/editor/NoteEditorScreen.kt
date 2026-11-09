@@ -70,6 +70,13 @@ import com.stackpad.app.ui.components.InlineTextField
 import com.stackpad.app.util.openAppSettings
 import com.stackpad.app.util.openUrl
 import com.stackpad.app.util.shareText
+import android.os.SystemClock
+import androidx.activity.compose.BackHandler
+import androidx.compose.runtime.saveable.rememberSaveable
+import com.stackpad.app.domain.security.LockPolicy
+import com.stackpad.app.domain.templates.TemplateRules
+import com.stackpad.app.security.AppLockController
+import com.stackpad.app.ui.components.TextInputDialog
 import com.stackpad.app.domain.export.ExportFormat
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.text.AnnotatedString
@@ -80,12 +87,49 @@ import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
-@OptIn(ExperimentalMaterial3Api::class)
+/**
+ * The editor. A locked note shows [NoteLockedGate] instead of its content until the user proves who
+ * they are, and locks again after the screen has been away for [LockPolicy.GRACE_MS].
+ */
 @Composable
 fun NoteEditorScreen(
     viewModel: NoteEditorViewModel,
     audioPlayer: AudioPlayer,
     media: MediaStorage,
+    appLock: AppLockController,
+    onBack: () -> Unit,
+) {
+    val state by viewModel.state.collectAsStateWithLifecycle()
+    val context = LocalContext.current
+    var unlocked by rememberSaveable { mutableStateOf(false) }
+    var stoppedAt by remember { mutableStateOf<Long?>(null) }
+
+    LifecycleEventEffect(Lifecycle.Event.ON_STOP) { stoppedAt = SystemClock.elapsedRealtime() }
+    LifecycleEventEffect(Lifecycle.Event.ON_START) {
+        if (unlocked && LockPolicy.shouldLock(true, false, stoppedAt, SystemClock.elapsedRealtime())) unlocked = false
+        stoppedAt = null
+    }
+
+    val gated = state.loaded && state.locked && !unlocked && appLock.canVerify()
+    val unlock = {
+        appLock.verify(context.getString(R.string.lock_prompt_title)) { ok -> if (ok) unlocked = true }
+    }
+    LaunchedEffect(gated) { if (gated) unlock() }
+
+    if (gated) {
+        NoteLockedGate(onBack = onBack, onUnlock = unlock)
+    } else {
+        NoteEditorContent(viewModel, audioPlayer, media, appLock, onBack)
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun NoteEditorContent(
+    viewModel: NoteEditorViewModel,
+    audioPlayer: AudioPlayer,
+    media: MediaStorage,
+    appLock: AppLockController,
     onBack: () -> Unit,
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
@@ -106,6 +150,11 @@ fun NoteEditorScreen(
     var confirmDelete by remember { mutableStateOf(false) }
     var optionsOpen by remember { mutableStateOf(false) }
     var optionRowOpen by remember { mutableStateOf(false) }
+    var showTemplates by remember { mutableStateOf(false) }
+    var saveTemplateDialog by remember { mutableStateOf(false) }
+    var selecting by remember { mutableStateOf(false) }
+    var selectedIds by remember { mutableStateOf(emptySet<String>()) }
+    val templates by viewModel.templates.collectAsStateWithLifecycle()
     val clipboard = LocalClipboardManager.current
 
     fun showMessage(resId: Int) {
@@ -195,6 +244,12 @@ fun NoteEditorScreen(
 
     // endregion
 
+    val closeSelection = {
+        selecting = false
+        selectedIds = emptySet()
+    }
+    BackHandler(enabled = selecting, onBack = closeSelection)
+
     val formatState = activeText?.let { active ->
         (state.blocks.firstOrNull { it.id == active.blockId } as? TextBlock)?.let { block ->
             // With a selection, show what the selected text has. With only a caret, show the
@@ -217,7 +272,23 @@ fun NoteEditorScreen(
 
     Scaffold(
         topBar = {
-            TopAppBar(
+            if (selecting) {
+                SelectionTopBar(
+                    selectedCount = selectedIds.size,
+                    onClose = closeSelection,
+                    onSelectAll = { selectedIds = state.blocks.map { it.id }.toSet() },
+                    onCopy = {
+                        val text = viewModel.exportBlocks(selectedIds)
+                        if (text == null) {
+                            showMessage(R.string.msg_share_empty)
+                        } else {
+                            clipboard.setText(AnnotatedString(text))
+                            showMessage(R.string.msg_blocks_copied)
+                            closeSelection()
+                        }
+                    },
+                )
+            } else TopAppBar(
                 title = {
                     Text(stringResource(R.string.editor_title), style = MaterialTheme.typography.titleMedium)
                 },
@@ -251,6 +322,27 @@ fun NoteEditorScreen(
                         ),
                         optionsOpen = optionsOpen,
                         onOptionsOpenChange = { optionsOpen = it },
+                        locked = state.locked,
+                        onToggleLock = {
+                            if (!appLock.canVerify()) {
+                                showMessage(R.string.msg_lock_unavailable)
+                            } else {
+                                appLock.verify(context.getString(R.string.lock_prompt_title)) { ok ->
+                                    if (ok) {
+                                        val nowLocked = !viewModel.state.value.locked
+                                        viewModel.toggleLocked()
+                                        showMessage(if (nowLocked) R.string.msg_note_lock_on else R.string.msg_note_lock_off)
+                                    }
+                                }
+                            }
+                        },
+                        onInsertTemplate = { showTemplates = true },
+                        onSaveTemplate = { saveTemplateDialog = true },
+                        onSelectBlocks = {
+                            focusManager.clearFocus()
+                            selectedIds = emptySet()
+                            selecting = true
+                        },
                         onCopy = {
                             val text = viewModel.exportText(ExportFormat.PLAIN)
                             if (text == null) {
@@ -279,7 +371,7 @@ fun NoteEditorScreen(
         },
         snackbarHost = { SnackbarHost(snackbar) },
         bottomBar = {
-            Surface(color = MaterialTheme.colorScheme.surface, tonalElevation = 2.dp) {
+            if (!selecting) Surface(color = MaterialTheme.colorScheme.surface, tonalElevation = 2.dp) {
                 Column(modifier = Modifier.navigationBarsPadding().imePadding()) {
                     recording?.let { live ->
                         RecordingBar(state = live, onStop = viewModel::stopRecording, onCancel = viewModel::cancelRecording)
@@ -334,6 +426,13 @@ fun NoteEditorScreen(
                     )
                 }
                 items(state.blocks, key = { it.id }) { block ->
+                    SelectableBlock(
+                        selecting = selecting,
+                        selected = block.id in selectedIds,
+                        onToggle = {
+                            selectedIds = if (block.id in selectedIds) selectedIds - block.id else selectedIds + block.id
+                        },
+                    ) {
                     EditorBlockItem(
                         block = block,
                         isOnlyBlock = state.blocks.size == 1,
@@ -348,9 +447,37 @@ fun NoteEditorScreen(
                         // Consecutive text lines sit close together; cards get a little more air.
                         modifier = Modifier.padding(vertical = if (block is TextBlock) 1.dp else 2.dp),
                     )
+                    }
                 }
             }
         }
+    }
+
+    if (showTemplates) {
+        TemplatePickerSheet(
+            templates = templates,
+            onPick = {
+                viewModel.applyTemplate(it)
+                showTemplates = false
+            },
+            onDelete = { viewModel.deleteTemplate(it.id) },
+            onDismiss = { showTemplates = false },
+        )
+    }
+
+    if (saveTemplateDialog) {
+        TextInputDialog(
+            title = stringResource(R.string.action_save_template),
+            initialText = state.title,
+            placeholder = stringResource(R.string.template_name_hint),
+            confirmLabel = stringResource(R.string.action_save),
+            maxLength = TemplateRules.MAX_NAME_LENGTH,
+            onConfirm = {
+                saveTemplateDialog = false
+                viewModel.saveAsTemplate(it)
+            },
+            onDismiss = { saveTemplateDialog = false },
+        )
     }
 
     if (confirmDelete) {

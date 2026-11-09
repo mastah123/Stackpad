@@ -19,6 +19,9 @@ import com.stackpad.app.data.model.TextLevel
 import com.stackpad.app.data.model.isBlank
 import com.stackpad.app.data.model.mediaFileName
 import com.stackpad.app.domain.export.ExportFormat
+import com.stackpad.app.domain.templates.BuiltInTemplates
+import com.stackpad.app.domain.templates.NoteTemplate
+import com.stackpad.app.domain.templates.TemplateRules
 import com.stackpad.app.domain.export.NoteExporter
 import com.stackpad.app.domain.history.UndoHistory
 import com.stackpad.app.domain.notes.Tags
@@ -75,6 +78,11 @@ class NoteEditorViewModel(
         .map { counts -> counts.map { it.tag } }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(STOP_TIMEOUT_MS), emptyList())
 
+    /** Built-in templates followed by the ones the user saved. */
+    val templates: StateFlow<List<NoteTemplate>> = container.templatePreferences.templates
+        .map { saved -> BuiltInTemplates.all() + saved }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(STOP_TIMEOUT_MS), BuiltInTemplates.all())
+
     private val history = UndoHistory<EditorSnapshot>()
     private val _canUndo = MutableStateFlow(false)
     val canUndo: StateFlow<Boolean> = _canUndo.asStateFlow()
@@ -115,6 +123,7 @@ class NoteEditorViewModel(
                     folderId = note.folderId,
                     tags = note.tags,
                     color = note.color,
+                    locked = note.locked,
                 )
             } else {
                 _state.value = EditorUiState(loaded = true, blocks = listOf(BlockFactory.text()))
@@ -131,6 +140,8 @@ class NoteEditorViewModel(
     // region Organizing (not part of undo)
 
     fun setFolder(folderId: String?) = mutate(record = false) { it.copy(folderId = folderId) }
+
+    fun setLocked(locked: Boolean) = mutate(record = false) { it.copy(locked = locked) }
 
     fun setColor(color: Int) = mutate(record = false) { it.copy(color = color) }
 
@@ -474,6 +485,55 @@ class NoteEditorViewModel(
         }
     }
 
+    /** Adds [template] to the note (it replaces the note while that is still empty). */
+    fun applyTemplate(template: NoteTemplate) = mutate { s ->
+        s.copy(
+            blocks = TemplateRules.apply(s.blocks, template),
+            title = s.title.ifBlank { template.title },
+        )
+    }
+
+    /** Saves the note's content (without images and audio) as a template called [name]. */
+    fun saveAsTemplate(name: String) {
+        val clean = TemplateRules.normalizeName(name) ?: return
+        val blocks = TemplateRules.storableBlocks(_state.value.blocks)
+        if (blocks.isEmpty()) {
+            emit(EditorMessage.TEMPLATE_EMPTY)
+            return
+        }
+        viewModelScope.launch {
+            if (container.templatePreferences.count() >= TemplateRules.MAX_USER_TEMPLATES) {
+                emit(EditorMessage.TEMPLATE_LIMIT)
+                return@launch
+            }
+            container.templatePreferences.add(
+                NoteTemplate(
+                    id = BlockFactory.newId(),
+                    name = clean,
+                    title = _state.value.title,
+                    blocks = blocks,
+                ),
+            )
+            emit(EditorMessage.TEMPLATE_SAVED)
+        }
+    }
+
+    fun deleteTemplate(id: String) {
+        viewModelScope.launch { container.templatePreferences.remove(id) }
+    }
+
+    /** Locks or unlocks the note. The caller has already verified the user. */
+    fun toggleLocked() {
+        mutate(record = false) { it.copy(locked = !it.locked) }
+        flush()
+    }
+
+    /** The blocks with these ids (in note order) as plain text, or null when they hold nothing to copy. */
+    fun exportBlocks(ids: Set<String>): String? {
+        val chosen = _state.value.blocks.filter { it.id in ids }
+        return NoteExporter.exportBlocks(chosen, ExportFormat.PLAIN).takeIf { it.isNotBlank() }
+    }
+
     /** The note as shareable text in [format], or null when it has no content yet. */
     fun exportText(format: ExportFormat): String? {
         val note = snapshot() ?: return null
@@ -538,6 +598,7 @@ class NoteEditorViewModel(
             folderId = s.folderId,
             tags = s.tags,
             color = s.color,
+            locked = s.locked,
             createdAt = createdAt,
             updatedAt = System.currentTimeMillis(),
         )

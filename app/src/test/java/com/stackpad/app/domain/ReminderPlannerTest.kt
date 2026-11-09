@@ -102,4 +102,13 @@ class ReminderPlannerTest {
         assertTrue(changes.cancel.isEmpty())
         assertEquals(1, changes.schedule.size)
     }
+
+    @Test
+    fun lockedNoteRemindersHideItsText() {
+        val n = note(ChecklistItem("a", "Secret item", false, "2026-11-10")).copy(locked = true)
+        val spec = ReminderPlanner.plan(n, before, zone).single()
+        assertEquals("", spec.itemText)
+        assertEquals("", spec.noteTitle)
+        assertEquals("n1:a", spec.key)
+    }
 }

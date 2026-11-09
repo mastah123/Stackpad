@@ -23,4 +23,6 @@ data class NoteEntity(
     @ColumnInfo(defaultValue = "0") val color: Int = 0,
     /** When the note was moved to the trash, or null for a normal note. */
     val trashedAt: Long? = null,
+    /** True when opening the note requires the phone's screen lock. Its content is then hidden from search and previews. */
+    @ColumnInfo(defaultValue = "0") val locked: Boolean = false,
 )

@@ -29,6 +29,7 @@ data class BackupNote(
     val tags: List<String> = emptyList(),
     val color: Int = 0,
     val trashedAt: Long? = null,
+    val locked: Boolean = false,
 )
 
 internal val backupJson = Json {

@@ -217,4 +217,33 @@
     <string name="cd_sort_checklist">Move done items to the bottom</string>
     <string name="section_all_notes">All notes</string>
     <string name="folders_empty">No folders yet.</string>
+    <string name="action_lock_note">Lock note</string>
+    <string name="action_unlock_note">Remove note lock</string>
+    <string name="action_templates">Insert template</string>
+    <string name="action_save_template">Save as template</string>
+    <string name="action_select_blocks">Select blocks</string>
+    <string name="action_copy_selected">Copy selected</string>
+    <string name="action_select_all">Select all</string>
+    <string name="cd_close_selection">Close selection</string>
+    <string name="cd_block_selected">Selected</string>
+    <string name="cd_block_not_selected">Not selected</string>
+    <string name="cd_delete_template" formatted="true">Delete template %1$s</string>
+    <string name="cd_locked_note">Locked note</string>
+    <string name="selection_count" formatted="true">%1$d selected</string>
+    <string name="msg_blocks_copied">Selected blocks copied to clipboard.</string>
+    <string name="msg_template_saved">Template saved.</string>
+    <string name="msg_template_empty">Add some text, lists or tables first. Images and audio are not saved in templates.</string>
+    <string name="msg_template_limit">You can keep up to 20 templates. Delete one first.</string>
+    <string name="msg_note_lock_on">Note locked. It needs your screen lock to open.</string>
+    <string name="msg_note_lock_off">Note lock removed.</string>
+    <string name="templates_title">Templates</string>
+    <string name="templates_built_in">Built in</string>
+    <string name="templates_yours">Yours</string>
+    <string name="templates_none_saved">Templates you save appear here.</string>
+    <string name="template_name_hint">Template name</string>
+    <string name="dialog_delete_template_title" formatted="true">Delete template “%1$s”?</string>
+    <string name="dialog_delete_template_message">Notes made from it are not affected.</string>
+    <string name="gate_title">This note is locked</string>
+    <string name="gate_message">Unlock with your fingerprint, face or screen lock to read it.</string>
+    <string name="widget_locked_note">Locked note</string>
 </resources>

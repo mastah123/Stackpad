@@ -8,10 +8,12 @@ import com.stackpad.app.audio.AudioRecorder
 import com.stackpad.app.data.NoteRepository
 import com.stackpad.app.data.backup.BackupManager
 import com.stackpad.app.data.db.MIGRATION_1_2
+import com.stackpad.app.data.db.MIGRATION_2_3
 import com.stackpad.app.data.db.StackpadDatabase
 import com.stackpad.app.data.media.MediaStorage
 import com.stackpad.app.data.prefs.ListPreferences
 import com.stackpad.app.data.prefs.SecurityPreferences
+import com.stackpad.app.data.prefs.TemplatePreferences
 import com.stackpad.app.data.prefs.ThemePreferences
 import com.stackpad.app.notifications.AlarmReminderScheduler
 import com.stackpad.app.widget.WidgetContent
@@ -30,7 +32,7 @@ class AppContainer(context: Context) {
 
     private val database: StackpadDatabase =
         Room.databaseBuilder(appContext, StackpadDatabase::class.java, "stackpad.db")
-            .addMigrations(MIGRATION_1_2)
+            .addMigrations(MIGRATION_1_2, MIGRATION_2_3)
             .build()
 
     val mediaStorage = MediaStorage(appContext)
@@ -44,6 +46,7 @@ class AppContainer(context: Context) {
     val themePreferences = ThemePreferences(appContext)
     val listPreferences = ListPreferences(appContext)
     val securityPreferences = SecurityPreferences(appContext)
+    val templatePreferences = TemplatePreferences(appContext)
     val audioPlayer = AudioPlayer()
 
     val backupManager = BackupManager(

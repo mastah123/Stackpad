@@ -31,6 +31,10 @@ enum class ExportFormat { MARKDOWN, PLAIN }
  */
 object NoteExporter {
 
+    /** Exports just [blocks], without a title (used to copy a selection). */
+    fun exportBlocks(blocks: List<Block>, format: ExportFormat): String =
+        export(Note(id = "", title = "", blocks = blocks, pinned = false, createdAt = 0, updatedAt = 0), format)
+
     fun export(note: Note, format: ExportFormat): String {
         val markdown = format == ExportFormat.MARKDOWN
         val parts = ArrayList<Pair<String, Boolean>>() // text, isPlainTextLine

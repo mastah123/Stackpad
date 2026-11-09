@@ -147,4 +147,12 @@ class NoteExporterTest {
     fun fenceGrowsWhenCodeContainsBackticks() {
         assertEquals("````\n```\ninner\n```\n````", md("", CodeBlock("1", "```\ninner\n```")))
     }
+
+    @Test fun exportBlocksHasNoTitle() {
+        val text = NoteExporter.exportBlocks(
+            listOf(TextBlock("t1", text = "one"), TextBlock("t2", text = "two")),
+            ExportFormat.MARKDOWN,
+        )
+        assertEquals("one\n\ntwo", text)
+    }
 }

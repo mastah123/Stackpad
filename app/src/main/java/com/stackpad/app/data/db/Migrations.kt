@@ -3,6 +3,13 @@ package com.stackpad.app.data.db
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 
+/** 2 -> 3 (app 1.6.0): per-note lock. Existing notes are unlocked. */
+val MIGRATION_2_3 = object : Migration(2, 3) {
+    override fun migrate(db: SupportSQLiteDatabase) {
+        db.execSQL("ALTER TABLE notes ADD COLUMN locked INTEGER NOT NULL DEFAULT 0")
+    }
+}
+
 /**
  * 1 -> 2 (app 1.2.0): folders, tags, note colors and the trash.
  * Existing notes keep all their data: they get no folder, no tags, no color, and are not trashed.

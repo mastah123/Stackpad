@@ -35,7 +35,10 @@ object ReminderPlanner {
                 val date = DueDates.parse(item.dueDate) ?: return@mapNotNull null
                 val trigger = DueDates.reminderTime(date, zone)
                 if (trigger <= now) return@mapNotNull null
-                ReminderSpec(key(note.id, item.id), note.id, note.title, item.text, trigger)
+                // A locked note's text must not appear in a notification.
+                val title = if (note.locked) "" else note.title
+                val text = if (note.locked) "" else item.text
+                ReminderSpec(key(note.id, item.id), note.id, title, text, trigger)
             }
         }
 

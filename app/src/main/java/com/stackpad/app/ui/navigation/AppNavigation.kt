@@ -75,6 +75,7 @@ fun AppNavigation(
                 viewModel = viewModel,
                 audioPlayer = container.audioPlayer,
                 media = container.mediaStorage,
+                appLock = appLock,
                 onBack = { navController.popBackStack() },
             )
         }

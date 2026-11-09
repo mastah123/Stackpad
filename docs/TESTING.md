@@ -81,6 +81,21 @@ Covers: formula evaluator, span editing, URL detection/validation, list markers,
 - [ ] Trash opens the trash screen; Settings opens settings.
 - [ ] The menu is thin but readable in portrait and landscape, light and dark; TalkBack announces each item with its label.
 
+### Select blocks, templates and note lock
+- [ ] Menu, Select blocks: the bottom bars disappear, each block gets a checkbox, and tapping a block selects it without opening the keyboard. The top bar shows "N selected".
+- [ ] Select all selects every block. Copy selected copies them in note order; paste elsewhere. Copy is disabled with nothing selected. Close or the back button leaves selection mode.
+- [ ] Menu, Insert template, Meeting notes on an empty note: the note is filled and the title is set. On a note with content, the template is added at the end and the title is kept.
+- [ ] Insert the same template twice: both copies work independently (editing one does not change the other).
+- [ ] Menu, Save as template with a name: "Template saved." It appears under Yours in the picker, also after restarting the app. Images and audio are not in it; checklist items are unchecked.
+- [ ] Save as template on an empty note shows a message and saves nothing. Delete a saved template (asks to confirm); the built-in ones have no delete.
+- [ ] With a screen lock set: Menu, Lock note asks you to unlock, then shows "Note locked". In the list the note has a lock icon and no preview, and searching for words inside it does not find it (its title still does).
+- [ ] Open a locked note: a lock screen shows and the prompt opens; the note's text is not visible. Cancel keeps the lock screen; Unlock asks again. Back works.
+- [ ] After unlocking, leave the app for over 30 seconds and return: the note is locked again. Under 30 seconds: still open.
+- [ ] Menu, Remove note lock asks you to unlock; afterwards the preview and search work again.
+- [ ] A locked note with a due-date item shows a generic reminder ("Checklist item", "Due today") without its text; tapping it asks to unlock.
+- [ ] With the widget on a locked latest note, it shows "Locked note".
+- [ ] Without any phone screen lock, Lock note says to set one first. Updating from 1.5.0 keeps all notes unlocked and nothing is lost.
+
 ### Share
 - [ ] In a note with a title, headings, bold/italic, a list, a checklist with a due date, a table with a formula, a link, a quote, code and a divider, open the top-right menu and choose Share as Markdown. The share sheet opens; paste into a notes app: `#` title, `-` bullets, `- [ ]` checklist, a table with the calculated value, fenced code, `>` quote and `---`.
 - [ ] Share as plain text: no Markdown symbols except what you typed, lists use their own markers.

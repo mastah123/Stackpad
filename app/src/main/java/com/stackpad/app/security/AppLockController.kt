@@ -97,6 +97,21 @@ class AppLockController(
         }
     }
 
+    /**
+     * Asks the user to prove who they are (for a locked note, or to lock one). [onResult] gets true on
+     * success. Counts as the app being in use, so the app-wide lock does not trigger during the prompt.
+     */
+    fun verify(title: String, onResult: (Boolean) -> Unit) {
+        if (!DeviceCredential.isAvailable(activity)) {
+            onResult(false)
+            return
+        }
+        authenticate(title, onResult)
+    }
+
+    /** True when the phone has a screen lock or biometrics that can be used to verify. */
+    fun canVerify(): Boolean = DeviceCredential.isAvailable(activity)
+
     /** Turns the lock on or off after the user proves who they are. */
     fun requestChange(enable: Boolean, onResult: (LockChangeResult) -> Unit) {
         if (!DeviceCredential.isAvailable(activity)) {
