@@ -118,9 +118,6 @@
     <string name="folder_none">No folder</string>
     <string name="folder_rename">Rename folder</string>
     <string name="msg_moved_to_trash">Moved to trash.</string>
-    <string name="options_color">Color</string>
-    <string name="options_folder">Folder</string>
-    <string name="options_tags">Tags</string>
     <string name="quote_hint">Quote…</string>
     <string name="sort_created">Date created</string>
     <string name="sort_last_edited">Last edited</string>
@@ -170,8 +167,6 @@
     <string name="menu_tags">Tags</string>
     <string name="menu_trash">Trash</string>
     <string name="menu_no_tags">No tags yet. Add tags from a note\'s options.</string>
-    <string name="action_share_markdown">Share as Markdown</string>
-    <string name="action_share_plain">Share as plain text</string>
     <string name="cd_more_actions">More actions</string>
     <string name="msg_share_empty">This note is empty, so there is nothing to share.</string>
     <string name="msg_share_failed">No app was found to share with.</string>
@@ -211,8 +206,6 @@
     <string name="widget_locked">Locked</string>
     <string name="widget_latest_label">Latest note</string>
     <string name="add_cards">Cards</string>
-    <string name="action_note_options">Note options</string>
-    <string name="action_copy_note">Copy note</string>
     <string name="msg_note_copied">Note copied to clipboard.</string>
     <string name="cd_sort_checklist">Move done items to the bottom</string>
     <string name="section_all_notes">All notes</string>
@@ -263,4 +256,17 @@
         <item quantity="one">%d note moved to trash.</item>
         <item quantity="other">%d notes moved to trash.</item>
     </plurals>
+    <string name="add_plus">Add</string>
+    <string name="add_tag">Tag</string>
+    <string name="tag_new">New tag</string>
+    <string name="action_color">Color</string>
+    <string name="action_share">Share</string>
+    <string name="share_copy">Copy</string>
+    <string name="share_text">Text</string>
+    <string name="share_markdown">Markdown</string>
+    <string name="share_image">Image</string>
+    <string name="share_pdf">PDF</string>
+    <string name="msg_share_render_failed">Could not create the file. Nothing was shared.</string>
+    <string name="msg_share_too_tall">This note is too long for one image. Share it as PDF instead.</string>
+    <string name="action_back">Back</string>
 </resources>

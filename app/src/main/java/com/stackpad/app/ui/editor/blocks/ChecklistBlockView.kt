@@ -1,5 +1,6 @@
 package com.stackpad.app.ui.editor.blocks
 
+import com.stackpad.app.ui.components.keepCaretVisible
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -320,6 +321,8 @@ private fun ChecklistRow(
     val colors = MaterialTheme.colorScheme
     val moveUpLabel = stringResource(R.string.cd_move_item_up)
     val moveDownLabel = stringResource(R.string.cd_move_item_down)
+    var focused by remember { mutableStateOf(false) }
+    var layout by remember { mutableStateOf<androidx.compose.ui.text.TextLayoutResult?>(null) }
     var value by remember(item.id) {
         mutableStateOf(TextFieldValue(item.text, TextRange(item.text.length)))
     }
@@ -404,7 +407,8 @@ private fun ChecklistRow(
                 .weight(1f)
                 .padding(top = 5.dp)
                 .focusRequester(focusRequester)
-                .onFocusChanged { if (it.isFocused) onFocused() }
+                .onFocusChanged { focused = it.isFocused; if (it.isFocused) onFocused() }
+                .keepCaretVisible(value.selection, layout, focused)
                 .onPreviewKeyEvent { event ->
                     if (event.key == Key.Backspace &&
                         event.type == KeyEventType.KeyDown &&
@@ -419,6 +423,7 @@ private fun ChecklistRow(
             textStyle = textStyle,
             keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Sentences),
             cursorBrush = SolidColor(colors.primary),
+            onTextLayout = { layout = it },
         )
         DueDateButton(dueDate = item.dueDate, checked = item.checked, onClick = onEditDueDate)
     }

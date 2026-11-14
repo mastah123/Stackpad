@@ -11,7 +11,6 @@ import com.stackpad.app.audio.Waveform
 import com.stackpad.app.data.model.AudioBlock
 import com.stackpad.app.data.model.Block
 import com.stackpad.app.data.model.BlockFactory
-import com.stackpad.app.data.model.Folder
 import com.stackpad.app.data.model.Note
 import com.stackpad.app.data.model.SpanType
 import com.stackpad.app.data.model.TextBlock
@@ -70,11 +69,6 @@ class NoteEditorViewModel(
     private val _typingStyles = MutableStateFlow<Set<SpanType>?>(null)
     val typingStyles: StateFlow<Set<SpanType>?> = _typingStyles.asStateFlow()
 
-    /** Folders the note can be filed in. */
-    val folders: StateFlow<List<Folder>> = repository.observeFolders()
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(STOP_TIMEOUT_MS), emptyList())
-
-    /** Tags used by other notes, offered as suggestions. */
     val knownTags: StateFlow<List<String>> = repository.observeTagCounts()
         .map { counts -> counts.map { it.tag } }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(STOP_TIMEOUT_MS), emptyList())
@@ -140,8 +134,6 @@ class NoteEditorViewModel(
 
     // region Organizing (not part of undo)
 
-    fun setFolder(folderId: String?) = mutate(record = false) { it.copy(folderId = folderId) }
-
     fun setLocked(locked: Boolean) = mutate(record = false) { it.copy(locked = locked) }
 
     fun setColor(color: Int) = mutate(record = false) { it.copy(color = color) }
@@ -149,13 +141,6 @@ class NoteEditorViewModel(
     fun addTag(raw: String) = mutate(record = false) { it.copy(tags = Tags.add(it.tags, raw)) }
 
     fun removeTag(tag: String) = mutate(record = false) { it.copy(tags = it.tags - tag) }
-
-    /** Creates a folder and files this note in it. */
-    fun createFolder(name: String) {
-        viewModelScope.launch {
-            repository.createFolder(name)?.let { setFolder(it.id) }
-        }
-    }
 
     // endregion
 
@@ -552,6 +537,9 @@ class NoteEditorViewModel(
         val text = NoteExporter.export(note, format)
         return text.takeIf { it.isNotBlank() }
     }
+
+    /** The open note as it would be saved now, or null while it is still empty. Used for image and PDF export. */
+    fun exportNote(): Note? = snapshot()
 
     /** Writes pending changes immediately (on a scope that outlives this view model). */
     fun flush() {

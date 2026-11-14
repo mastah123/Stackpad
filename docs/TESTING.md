@@ -6,7 +6,7 @@
 ./gradlew testDebugUnitTest
 ```
 
-Covers: formula evaluator, span editing, URL detection/validation, list markers, table operations, waveform helpers, block JSON serialization, table functions, due dates and reminder planning, image zoom limits, audio speed, note sorting and filtering, tags, trash timing, and undo history.
+Covers: formula evaluator, span editing, URL detection/validation, list markers, table operations, waveform helpers, block JSON serialization, table functions, due dates and reminder planning, image zoom limits, audio speed, note sorting and filtering, tags, trash timing, and undo history, note export, and the image/PDF layout and pagination.
 
 ## Manual checklist (run on a device or emulator, Android 8.0+)
 
@@ -50,17 +50,17 @@ Covers: formula evaluator, span editing, URL detection/validation, list markers,
 - [ ] Quote and code text is found by search.
 
 ### Folders, tags and colors
-- [ ] In a note, open the 3-dot menu and choose Note options. A small popup opens directly below the dots with Folder, Tags and Color. Create a folder there: the note is filed in it.
+- [ ] The 3-dot menu has no Note options and no folder choice. Color opens in place below the dots, with a Back row; picking a color applies it and closes the menu.
 - [ ] Side menu, Folders: a small grid of tiles (All, No folder, each folder, New folder) appears above the notes, with no tag row. Selecting a tile filters the list and the title shows the folder name.
 - [ ] With a folder selected, the Edit tile offers Rename and Delete. After deleting, its notes remain under "No folder".
 - [ ] With many folders the grid scrolls on its own without pushing the notes off screen.
-- [ ] Add tags to a note (type and press Done or Add; also try `#Work` and `Two Words`). They appear lowercase as `#work` and `#two-words`. Adding the same tag again does nothing. The 11th tag cannot be added. Tapping the X on a tag in the popup removes it.
-- [ ] A note with tags shows them in a row above its title; tapping one opens the options popup.
-- [ ] Tags from other notes appear as suggestions; tapping one adds it.
+- [ ] Add tags to a note (type and press Done or Add; also try `#Work` and `Two Words`). They appear lowercase as `#work` and `#two-words`. Adding the same tag again does nothing. The 11th tag cannot be added. Tapping a tag above the title (its X) removes it.
+- [ ] A note with tags shows them as chips in a row above its title; tapping one removes it.
+- [ ] Tag chip in the add bar: opens a row with "+" and every tag in use. The note's tags are highlighted; tapping a tag adds or removes it; "+" asks for a name and adds the tag. The row stays open after each tap.
 - [ ] Side menu, Tags: tags appear in one horizontal scrolling row with counts, and no folder grid. Selecting one filters the list and the title shows `#tag`; selecting it again clears it.
 - [ ] Searching for a tag name finds the note.
 - [ ] Pick each color. The note card in the list is tinted; "No color" removes the tint. Colors look right in light and dark theme.
-- [ ] The 3-dot icon is tinted when the note has a folder, tag or color.
+- [ ] The 3-dot icon is tinted when the note has a color.
 - [ ] An empty filter result shows "No notes here. Try another folder or tag."
 
 ### Trash
@@ -80,6 +80,10 @@ Covers: formula evaluator, span editing, URL detection/validation, list markers,
 - [ ] Folders and Tags behave as described under "Folders, tags and colors". Switching views clears the previous filter.
 - [ ] Trash opens the trash screen; Settings opens settings.
 - [ ] The menu is thin but readable in portrait and landscape, light and dark; TalkBack announces each item with its label.
+
+### Caret and selection checkbox
+- [ ] In a long note, type on a line near the bottom with the keyboard open, then open the + or Tag row: the line with the cursor scrolls up so the cursor is never hidden behind the chips or option row. Same in a list, a checklist, a quote and the title.
+- [ ] Select blocks: every block (a one-line text, a tall image, a table) has the same 24 dp checkbox in the same left column.
 
 ### Select blocks, templates and note lock
 - [ ] Menu, Select blocks: the bottom bars disappear, each block gets a checkbox, and tapping a block selects it without opening the keyboard. The top bar shows "N selected".
@@ -114,10 +118,14 @@ Covers: formula evaluator, span editing, URL detection/validation, list markers,
 - [ ] A locked note can be selected, pinned, moved and trashed without being opened.
 
 ### Share
-- [ ] In a note with a title, headings, bold/italic, a list, a checklist with a due date, a table with a formula, a link, a quote, code and a divider, open the top-right menu and choose Share as Markdown. The share sheet opens; paste into a notes app: `#` title, `-` bullets, `- [ ]` checklist, a table with the calculated value, fenced code, `>` quote and `---`.
-- [ ] Share as plain text: no Markdown symbols except what you typed, lists use their own markers.
+- [ ] In a note with a title, headings, bold/italic, a list, a checklist with a due date, a table with a formula, a link, a quote, code and a divider, open the 3-dot menu, Share, Markdown. The share sheet opens; paste into a notes app: `#` title, `-` bullets, `- [ ]` checklist, a table with the calculated value, fenced code, `>` quote and `---`.
+- [ ] Share, Text: no Markdown symbols except what you typed, lists use their own markers.
 - [ ] An image shows as `[Image: caption]`. An audio note shows its length.
 - [ ] Sharing an empty note shows "This note is empty" and opens nothing.
+- [ ] Share, Copy copies the whole note as plain text. Back returns to the main menu.
+- [ ] Share, Image: a single PNG opens in the share sheet. Check title, headings, bold/italic, list markers, checklist boxes (done items struck through), table with grid and calculated values, quote bar, code box, link, divider and pictures with captions. Open the shared file to confirm it.
+- [ ] Share, PDF: A4 pages; blocks are not cut in half unless taller than a page; pictures fit the page width. Try a note with many blocks (several pages) and one empty note (message, nothing shared).
+- [ ] A very long note shows "too long for one image" for Image and still works as PDF.
 - [ ] The menu also has Move to trash, which still asks for confirmation.
 
 ### Backup and restore
@@ -199,10 +207,10 @@ Covers: formula evaluator, span editing, URL detection/validation, list markers,
 - [ ] Tap the speed chip: 1x, 1.5x, 2x, back to 1x. Playback speed changes immediately while playing and applies to the next note you play.
 - [ ] The "x" removes the audio and its file.
 
-### Cards, copy and checklist sort
+### Add bar, cards and checklist sort
+- [ ] The add bar order is +, Text, List, Cards, Tag. The + chip opens Image, Camera, Audio, Link, Table and Divider; each adds its block and closes the row. Audio is hidden while recording.
 - [ ] The add bar has a Cards chip instead of separate Prompt, Quote and Code chips. Tapping it opens a row with Prompt, Quote and Code; each adds its block and closes the row.
-- [ ] While the List, Image or Cards row is open, the text formatting row (H1, H2, H3, B, I, U) is hidden; it returns when the row closes. It is also hidden while recording audio.
-- [ ] In the 3-dot menu, Copy note copies the whole note as plain text; paste it elsewhere to check it includes every block.
+- [ ] While the +, List, Cards or Tag row is open, the text formatting row (H1, H2, H3, B, I, U) is hidden; it returns when the row closes. It is also hidden while recording audio.
 - [ ] In a checklist with a mix of done and open items, the sort button moves done items to the bottom, keeping the order inside each group. The button is disabled when already sorted. Undo restores the order.
 
 ### Link and prompt

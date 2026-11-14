@@ -36,7 +36,11 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.ui.layout.onSizeChanged
+import com.stackpad.app.ui.components.LocalCaretRevealKey
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -70,6 +74,10 @@ import com.stackpad.app.ui.components.InlineTextField
 import com.stackpad.app.util.openAppSettings
 import com.stackpad.app.util.openUrl
 import com.stackpad.app.util.shareText
+import com.stackpad.app.util.shareFile
+import com.stackpad.app.data.export.NoteFileExporter
+import com.stackpad.app.data.export.NoteTooTallException
+import com.stackpad.app.domain.notes.Tags
 import android.os.SystemClock
 import androidx.activity.compose.BackHandler
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -138,7 +146,6 @@ private fun NoteEditorContent(
     val typingStyles by viewModel.typingStyles.collectAsStateWithLifecycle()
     val canUndo by viewModel.canUndo.collectAsStateWithLifecycle()
     val canRedo by viewModel.canRedo.collectAsStateWithLifecycle()
-    val folders by viewModel.folders.collectAsStateWithLifecycle()
     val knownTags by viewModel.knownTags.collectAsStateWithLifecycle()
     val playback by audioPlayer.state.collectAsStateWithLifecycle()
 
@@ -148,7 +155,8 @@ private fun NoteEditorContent(
     val snackbar = remember { SnackbarHostState() }
     val listState = rememberLazyListState()
     var confirmDelete by remember { mutableStateOf(false) }
-    var optionsOpen by remember { mutableStateOf(false) }
+    var barHeight by remember { mutableIntStateOf(0) }
+    var newTagDialog by remember { mutableStateOf(false) }
     var optionRowOpen by remember { mutableStateOf(false) }
     var showTemplates by remember { mutableStateOf(false) }
     var saveTemplateDialog by remember { mutableStateOf(false) }
@@ -159,6 +167,53 @@ private fun NoteEditorContent(
 
     fun showMessage(resId: Int) {
         scope.launch { snackbar.showSnackbar(context.getString(resId)) }
+    }
+
+    val fileExporter = remember { NoteFileExporter(context, media) }
+
+    fun share(target: ShareTarget) {
+        val title = state.title.ifBlank { context.getString(R.string.note_untitled) }
+        when (target) {
+            ShareTarget.COPY -> {
+                val text = viewModel.exportText(ExportFormat.PLAIN)
+                if (text == null) {
+                    showMessage(R.string.msg_share_empty)
+                } else {
+                    clipboard.setText(AnnotatedString(text))
+                    showMessage(R.string.msg_note_copied)
+                }
+            }
+            ShareTarget.TEXT, ShareTarget.MARKDOWN -> {
+                val format = if (target == ShareTarget.TEXT) ExportFormat.PLAIN else ExportFormat.MARKDOWN
+                val text = viewModel.exportText(format)
+                when {
+                    text == null -> showMessage(R.string.msg_share_empty)
+                    !shareText(context, title, text) -> showMessage(R.string.msg_share_failed)
+                }
+            }
+            ShareTarget.IMAGE, ShareTarget.PDF -> {
+                val note = viewModel.exportNote()
+                if (note == null) {
+                    showMessage(R.string.msg_share_empty)
+                    return
+                }
+                scope.launch {
+                    snackbar.currentSnackbarData?.dismiss()
+                    val result = runCatching {
+                        if (target == ShareTarget.IMAGE) fileExporter.toPng(note) else fileExporter.toPdf(note)
+                    }
+                    val file = result.getOrNull()
+                    when {
+                        file != null -> {
+                            val mime = if (target == ShareTarget.IMAGE) "image/png" else "application/pdf"
+                            if (!shareFile(context, file, mime, title)) showMessage(R.string.msg_share_failed)
+                        }
+                        result.exceptionOrNull() is NoteTooTallException -> showMessage(R.string.msg_share_too_tall)
+                        else -> showMessage(R.string.msg_share_render_failed)
+                    }
+                }
+            }
+        }
     }
 
     // Save what has been typed (and keep a running recording) when the app goes to the background.
@@ -316,16 +371,8 @@ private fun NoteEditorContent(
                         )
                     }
                     NoteActionsMenu(
-                        options = NoteOptionsState(state.folderId, state.tags, state.color, folders, knownTags),
-                        optionsActions = NoteOptionsActions(
-                            onSelectFolder = viewModel::setFolder,
-                            onCreateFolder = viewModel::createFolder,
-                            onAddTag = viewModel::addTag,
-                            onRemoveTag = viewModel::removeTag,
-                            onSelectColor = viewModel::setColor,
-                        ),
-                        optionsOpen = optionsOpen,
-                        onOptionsOpenChange = { optionsOpen = it },
+                        color = state.color,
+                        onSelectColor = viewModel::setColor,
                         locked = state.locked,
                         onToggleLock = {
                             if (!appLock.canVerify()) {
@@ -347,27 +394,7 @@ private fun NoteEditorContent(
                             selectedIds = emptySet()
                             selecting = true
                         },
-                        onCopy = {
-                            val text = viewModel.exportText(ExportFormat.PLAIN)
-                            if (text == null) {
-                                showMessage(R.string.msg_share_empty)
-                            } else {
-                                clipboard.setText(AnnotatedString(text))
-                                showMessage(R.string.msg_note_copied)
-                            }
-                        },
-                        onShare = { format ->
-                            val text = viewModel.exportText(format)
-                            val shared = text != null &&
-                                shareText(context, state.title.ifBlank { context.getString(R.string.note_untitled) }, text)
-                            if (!shared) {
-                                scope.launch {
-                                    snackbar.showSnackbar(
-                                        context.getString(if (text == null) R.string.msg_share_empty else R.string.msg_share_failed),
-                                    )
-                                }
-                            }
-                        },
+                        onShare = ::share,
                         onTrash = { confirmDelete = true },
                     )
                 },
@@ -375,12 +402,16 @@ private fun NoteEditorContent(
         },
         snackbarHost = { SnackbarHost(snackbar) },
         bottomBar = {
-            if (!selecting) Surface(color = MaterialTheme.colorScheme.surface, tonalElevation = 2.dp) {
+            if (!selecting) Surface(
+                color = MaterialTheme.colorScheme.surface,
+                tonalElevation = 2.dp,
+                modifier = Modifier.onSizeChanged { barHeight = it.height },
+            ) {
                 Column(modifier = Modifier.navigationBarsPadding().imePadding()) {
                     recording?.let { live ->
                         RecordingBar(state = live, onStop = viewModel::stopRecording, onCancel = viewModel::cancelRecording)
                     }
-                    // The text toolbar steps aside while an option row (List, Image, Cards) or a recording is open.
+                    // The text toolbar steps aside while an option row (+, List, Cards, Tag) or a recording is open.
                     formatState?.takeIf { !optionRowOpen && recording == null }?.let { format ->
                         FormatToolbar(
                             state = format,
@@ -394,6 +425,10 @@ private fun NoteEditorContent(
                         onPickFromGallery = pickFromGallery,
                         onTakePhoto = takePhoto,
                         onRecordAudio = recordAudio,
+                        noteTags = state.tags,
+                        knownTags = knownTags,
+                        onToggleTag = { tag -> if (tag in state.tags) viewModel.removeTag(tag) else viewModel.addTag(tag) },
+                        onNewTag = { newTagDialog = true },
                         onOptionRowChange = { optionRowOpen = it },
                     )
                 }
@@ -403,6 +438,7 @@ private fun NoteEditorContent(
         if (!state.loaded) {
             Box(Modifier.fillMaxSize().padding(padding))
         } else {
+            CompositionLocalProvider(LocalCaretRevealKey provides barHeight) {
             LazyColumn(
                 state = listState,
                 modifier = Modifier.fillMaxSize().padding(padding),
@@ -411,7 +447,7 @@ private fun NoteEditorContent(
             ) {
                 if (state.tags.isNotEmpty()) {
                     item(key = "tags") {
-                        NoteTagsRow(tags = state.tags, onClick = { optionsOpen = true })
+                        NoteTagsRow(tags = state.tags, onRemove = viewModel::removeTag)
                     }
                 }
                 item(key = "title") {
@@ -454,7 +490,22 @@ private fun NoteEditorContent(
                     }
                 }
             }
+            }
         }
+    }
+
+    if (newTagDialog) {
+        TextInputDialog(
+            title = stringResource(R.string.tag_new),
+            placeholder = stringResource(R.string.tag_hint),
+            confirmLabel = stringResource(R.string.action_add),
+            maxLength = Tags.MAX_LENGTH,
+            onConfirm = {
+                newTagDialog = false
+                viewModel.addTag(it)
+            },
+            onDismiss = { newTagDialog = false },
+        )
     }
 
     if (showTemplates) {

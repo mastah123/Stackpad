@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.AutoAwesome
 import androidx.compose.material.icons.filled.CameraAlt
 import androidx.compose.material.icons.filled.CheckBox
@@ -25,6 +26,7 @@ import androidx.compose.material.icons.filled.Image
 import androidx.compose.material.icons.filled.Link
 import androidx.compose.material.icons.filled.Mic
 import androidx.compose.material.icons.filled.PhotoLibrary
+import androidx.compose.material.icons.filled.Sell
 import androidx.compose.material.icons.filled.SortByAlpha
 import androidx.compose.material.icons.filled.Style
 import androidx.compose.material.icons.filled.TableChart
@@ -51,11 +53,11 @@ import com.stackpad.app.data.model.Block
 import com.stackpad.app.data.model.BlockFactory
 import com.stackpad.app.data.model.ListKind
 
-private enum class OptionRow { LIST, IMAGE, CARDS }
+private enum class OptionRow { PLUS, LIST, CARDS, TAGS }
 
 /**
  * Scrollable row of chips; each one inserts a block of that type into the note.
- * List, Image and Cards open an option row above the chips, styled like the text format toolbar.
+ * "+", List, Cards and Tag open an option row above the chips, styled like the text format toolbar.
  * [onOptionRowChange] reports whether such a row is open, so the editor can hide the text toolbar.
  */
 @Composable
@@ -65,6 +67,11 @@ fun AddBlockBar(
     onPickFromGallery: () -> Unit,
     onTakePhoto: () -> Unit,
     onRecordAudio: () -> Unit,
+    /** Tags on this note, every tag in use, and what tapping them or "+" does. */
+    noteTags: List<String>,
+    knownTags: List<String>,
+    onToggleTag: (String) -> Unit,
+    onNewTag: () -> Unit,
     onOptionRowChange: (Boolean) -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -95,12 +102,24 @@ fun AddBlockBar(
                     choose { onAddBlock(BlockFactory.checklist()) }
                 }
             }
-            OptionRow.IMAGE -> OptionButtons {
+            OptionRow.PLUS -> OptionButtons {
                 OptionButton(Icons.Filled.PhotoLibrary, stringResource(R.string.image_from_gallery)) {
                     choose(onPickFromGallery)
                 }
                 OptionButton(Icons.Filled.CameraAlt, stringResource(R.string.image_from_camera)) {
                     choose(onTakePhoto)
+                }
+                if (!recordingActive) {
+                    OptionButton(Icons.Filled.Mic, stringResource(R.string.add_audio)) { choose(onRecordAudio) }
+                }
+                OptionButton(Icons.Filled.Link, stringResource(R.string.add_link)) {
+                    choose { onAddBlock(BlockFactory.link()) }
+                }
+                OptionButton(Icons.Filled.TableChart, stringResource(R.string.add_table)) {
+                    choose { onAddBlock(BlockFactory.sheet()) }
+                }
+                OptionButton(Icons.Filled.HorizontalRule, stringResource(R.string.add_divider)) {
+                    choose { onAddBlock(BlockFactory.divider()) }
                 }
             }
             OptionRow.CARDS -> OptionButtons {
@@ -114,6 +133,15 @@ fun AddBlockBar(
                     choose { onAddBlock(BlockFactory.code()) }
                 }
             }
+            OptionRow.TAGS -> OptionButtons {
+                OptionButton(Icons.Filled.Add, stringResource(R.string.tag_new), onClick = onNewTag)
+                (noteTags + knownTags.filterNot { it in noteTags }.sortedBy { it }).let { all ->
+                    // The note's own tags come first so they are always in view.
+                    all.forEach { tag ->
+                        TagToggle(tag = tag, selected = tag in noteTags, onClick = { onToggleTag(tag) })
+                    }
+                }
+            }
             null -> Unit
         }
         Row(
@@ -123,6 +151,9 @@ fun AddBlockBar(
             horizontalArrangement = Arrangement.spacedBy(6.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
+            AddChip(Icons.Filled.Add, stringResource(R.string.add_plus), selected = openRow == OptionRow.PLUS) {
+                toggle(OptionRow.PLUS)
+            }
             AddChip(Icons.Filled.TextFields, stringResource(R.string.add_text)) {
                 openRow = null
                 onAddBlock(BlockFactory.text())
@@ -130,27 +161,11 @@ fun AddBlockBar(
             AddChip(Icons.Filled.FormatListBulleted, stringResource(R.string.add_list), selected = openRow == OptionRow.LIST) {
                 toggle(OptionRow.LIST)
             }
-            AddChip(Icons.Filled.Image, stringResource(R.string.add_image), selected = openRow == OptionRow.IMAGE) {
-                toggle(OptionRow.IMAGE)
-            }
-            AddChip(Icons.Filled.TableChart, stringResource(R.string.add_table)) {
-                openRow = null
-                onAddBlock(BlockFactory.sheet())
-            }
-            AddChip(Icons.Filled.Mic, stringResource(R.string.add_audio), enabled = !recordingActive) {
-                openRow = null
-                onRecordAudio()
-            }
-            AddChip(Icons.Filled.Link, stringResource(R.string.add_link)) {
-                openRow = null
-                onAddBlock(BlockFactory.link())
-            }
             AddChip(Icons.Filled.Style, stringResource(R.string.add_cards), selected = openRow == OptionRow.CARDS) {
                 toggle(OptionRow.CARDS)
             }
-            AddChip(Icons.Filled.HorizontalRule, stringResource(R.string.add_divider)) {
-                openRow = null
-                onAddBlock(BlockFactory.divider())
+            AddChip(Icons.Filled.Sell, stringResource(R.string.add_tag), selected = openRow == OptionRow.TAGS) {
+                toggle(OptionRow.TAGS)
             }
         }
     }
@@ -164,6 +179,24 @@ private fun OptionButtons(content: @Composable () -> Unit) {
             .padding(horizontal = 8.dp, vertical = 2.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) { content() }
+}
+
+@Composable
+private fun TagToggle(tag: String, selected: Boolean, onClick: () -> Unit) {
+    val colors = MaterialTheme.colorScheme
+    Surface(
+        shape = RoundedCornerShape(14.dp),
+        color = if (selected) colors.primaryContainer else colors.surface,
+        modifier = Modifier
+            .padding(horizontal = 3.dp)
+            .height(30.dp)
+            .clip(RoundedCornerShape(14.dp))
+            .clickable(role = Role.Checkbox, onClick = onClick),
+    ) {
+        Row(modifier = Modifier.padding(horizontal = 10.dp), verticalAlignment = Alignment.CenterVertically) {
+            Text(text = "#$tag", style = MaterialTheme.typography.labelLarge, color = colors.onSurface)
+        }
+    }
 }
 
 @Composable

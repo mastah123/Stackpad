@@ -1,5 +1,6 @@
 package com.stackpad.app.ui.editor.blocks
 
+import com.stackpad.app.ui.components.keepCaretVisible
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -144,6 +145,8 @@ private fun ListItemRow(
 ) {
     val colors = MaterialTheme.colorScheme
     val textStyle = MaterialTheme.typography.bodyMedium.copy(color = colors.onSurface)
+    var focused by remember { mutableStateOf(false) }
+    var layout by remember { mutableStateOf<androidx.compose.ui.text.TextLayoutResult?>(null) }
     var value by remember(item.id) {
         mutableStateOf(TextFieldValue(item.text, TextRange(item.text.length)))
     }
@@ -178,7 +181,8 @@ private fun ListItemRow(
             modifier = Modifier
                 .weight(1f)
                 .focusRequester(focusRequester)
-                .onFocusChanged { if (it.isFocused) onFocused() }
+                .onFocusChanged { focused = it.isFocused; if (it.isFocused) onFocused() }
+                .keepCaretVisible(value.selection, layout, focused)
                 .onPreviewKeyEvent { event ->
                     if (event.key == Key.Backspace &&
                         event.type == KeyEventType.KeyDown &&
@@ -193,6 +197,7 @@ private fun ListItemRow(
             textStyle = textStyle,
             keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Sentences),
             cursorBrush = SolidColor(colors.primary),
+            onTextLayout = { layout = it },
         )
     }
 }

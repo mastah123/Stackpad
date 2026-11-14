@@ -1,5 +1,6 @@
 package com.stackpad.app.ui.editor.blocks
 
+import com.stackpad.app.ui.components.keepCaretVisible
 import androidx.compose.foundation.gestures.awaitEachGesture
 import androidx.compose.foundation.gestures.awaitFirstDown
 import androidx.compose.foundation.gestures.waitForUpOrCancellation
@@ -96,6 +97,7 @@ fun TextBlockView(
         modifier = modifier
             .fillMaxWidth()
             .focusRequester(focusRequester)
+            .keepCaretVisible(value.selection, layout, focused)
             .pointerInput(Unit) {
                 // Watches taps without consuming them, so the field still places its cursor.
                 awaitEachGesture {

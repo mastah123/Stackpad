@@ -43,3 +43,21 @@ fun shareText(context: Context, title: String, text: String): Boolean {
         false
     }
 }
+
+/** Opens the share sheet for a file from the app's cache `exports/` folder. Returns false when sharing is impossible. */
+fun shareFile(context: Context, file: java.io.File, mimeType: String, title: String): Boolean = try {
+    val uri = androidx.core.content.FileProvider.getUriForFile(context, "${context.packageName}.fileprovider", file)
+    val send = Intent(Intent.ACTION_SEND).apply {
+        type = mimeType
+        putExtra(Intent.EXTRA_SUBJECT, title)
+        putExtra(Intent.EXTRA_STREAM, uri)
+        clipData = android.content.ClipData.newRawUri(title, uri)
+        addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+    }
+    context.startActivity(Intent.createChooser(send, null).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
+    true
+} catch (e: ActivityNotFoundException) {
+    false
+} catch (e: IllegalArgumentException) {
+    false
+}

@@ -10,7 +10,7 @@
 
 <p align="center">
   <a href="https://github.com/mastah123/stackpad/actions/workflows/android.yml"><img alt="Build" src="https://github.com/mastah123/stackpad/actions/workflows/android.yml/badge.svg"></a>
-  <img alt="Version" src="https://img.shields.io/badge/version-1.7.0-4F46E5">
+  <img alt="Version" src="https://img.shields.io/badge/version-1.8.0-4F46E5">
   <img alt="Platform" src="https://img.shields.io/badge/platform-Android%208.0%2B-3DDC84">
   <img alt="Kotlin" src="https://img.shields.io/badge/Kotlin-2.0-7F52FF">
   <img alt="License" src="https://img.shields.io/badge/license-MIT-blue">
@@ -24,17 +24,19 @@ Every note is a stack of compact blocks, laid out tightly like chat messages.
 | --- | --- |
 | **Text** | One line per block, so each line can be H1, H2, H3 or normal. **Bold**, *italic*, underline. URLs are highlighted and open when tapped. |
 | **List** (menu) | **Bullets**, **Numbers** and **Letters**: long items wrap under the text, never under the marker. **Checklist**: rounded card with a progress tracker, drag handles to reorder, a sort button (done items last), due dates with reminder notifications, and an "x" to remove it. |
-| **Image** | Full width, from the gallery or camera. Tap for full-screen zoom, add a caption, or remove it with the "x". |
-| **Table** | Small spreadsheet with `+ - * /`, parentheses, cell references such as `=A1+B1*2`, and `SUM`, `AVERAGE`, `MIN`, `MAX`, `COUNT` over ranges such as `=SUM(A1:A5)`. |
-| **Audio** | Voice-message style row: play, animated waveform you can tap or drag to seek, duration, 1x / 1.5x / 2x speed, and "x". Recorded in app. |
-| **Link** | Title and URL with validation; opens in the browser. |
+| **Image** (+ menu) | Full width, from the gallery or camera. Tap for full-screen zoom, add a caption, or remove it with the "x". |
+| **Table** (+ menu) | Small spreadsheet with `+ - * /`, parentheses, cell references such as `=A1+B1*2`, and `SUM`, `AVERAGE`, `MIN`, `MAX`, `COUNT` over ranges such as `=SUM(A1:A5)`. |
+| **Audio** (+ menu) | Voice-message style row: play, animated waveform you can tap or drag to seek, duration, 1x / 1.5x / 2x speed, and "x". Recorded in app. |
+| **Link** (+ menu) | Title and URL with validation; opens in the browser. |
 | **Cards** (menu) | **Prompt**: monospace card with a one-tap copy button. **Quote**: indented italic quotation with an accent bar. **Code**: monospace block with a copy button. |
-| **Divider** | A horizontal rule between parts of a note. |
+| **Divider** (+ menu) | A horizontal rule between parts of a note. |
 
 Also:
 
 - **Side menu** (top-left) with shortcuts for All notes, Pinned, Folders (small grid), Tags (scrolling row), Trash and Settings.
-- **Share** a note as Markdown or plain text, or **copy** it whole, from the editor's 3-dot menu, which also holds the note options (folder, tags, color).
+- **Share** from the editor's 3-dot menu: copy, plain text, Markdown, a single **image** (PNG) or a **PDF** (A4 pages). The same menu sets the note **color**.
+- **Tags** are added from the Tag chip in the add bar (tap a tag to add or remove it, "+" creates one); tags show above the title and tap to remove.
+- The add bar groups blocks: **+** (image, camera, audio, link, table, divider), Text, List, Cards, Tag.
 - **Templates**: start from Meeting notes, To-do, Journal or Project plan, or save any note as your own template.
 - **Select blocks** to copy them as text or move them up and down, or copy the whole note.
 - **Lock a single note** behind your screen lock, even with app lock off.
@@ -42,7 +44,7 @@ Also:
 - **App lock** with your fingerprint, face or screen lock, plus a hidden preview in recent apps.
 - **Home-screen widget** with a new-note button and your latest note.
 - **Undo / redo** in the editor.
-- **Folders**, **tags** and **colors** to organize notes, with filters in the note list.
+- **Folders** (managed from the note list), **tags** and **colors** to organize notes, with filters in the note list.
 - **Trash** with restore; notes are erased after 30 days.
 - **Sort** by last edited, date created or title.
 - Note list with word-based **search** (highlighted matches, filters by folder, tag and color), **pin**, and **multi-select** (long-press) to pin, file, tag or trash several notes at once, autosave, and a light/dark theme that follows the system by default with a manual override.
@@ -116,7 +118,7 @@ To enable signed builds, add four repository secrets. Step-by-step instructions 
 
 ## Testing
 
-Unit tests cover the formula evaluator, span editing, URL handling, list markers, table operations, waveform helpers, block serialization, table functions, due dates and reminder planning, image zoom limits, audio speed, note sorting and filtering, tags, trash timing, undo history, note export, backup rules and app-lock timing. A manual checklist for everything else (UI, audio, camera) is in [docs/TESTING.md](docs/TESTING.md).
+Unit tests cover the formula evaluator, span editing, URL handling, list markers, table operations, waveform helpers, block serialization, table functions, due dates and reminder planning, image zoom limits, audio speed, note sorting and filtering, tags, trash timing, undo history, note export (text, image/PDF layout and pagination), backup rules and app-lock timing. A manual checklist for everything else (UI, audio, camera) is in [docs/TESTING.md](docs/TESTING.md).
 
 ## Known limitations
 

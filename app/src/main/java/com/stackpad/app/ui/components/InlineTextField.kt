@@ -17,6 +17,7 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.KeyboardCapitalization
@@ -47,9 +48,12 @@ fun InlineTextField(
     }
 
     val style = textStyle.let { if (it.color == androidx.compose.ui.graphics.Color.Unspecified) it.copy(color = colors.onSurface) else it }
+    var focused by remember { mutableStateOf(false) }
+    var layout by remember { mutableStateOf<TextLayoutResult?>(null) }
     val fieldModifier = modifier
         .let { if (focusRequester != null) it.focusRequester(focusRequester) else it }
-        .onFocusChanged { onFocusChange(it.isFocused) }
+        .onFocusChanged { focused = it.isFocused; onFocusChange(it.isFocused) }
+        .keepCaretVisible(value.selection, layout, focused)
 
     BasicTextField(
         value = value,
@@ -64,6 +68,7 @@ fun InlineTextField(
         keyboardOptions = keyboardOptions,
         keyboardActions = keyboardActions,
         cursorBrush = SolidColor(colors.primary),
+        onTextLayout = { layout = it },
         decorationBox = { innerTextField ->
             Box {
                 if (value.text.isEmpty() && placeholder != null) {

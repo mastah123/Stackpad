@@ -7,6 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.8.0] - 2026-11-14
+
+### Added
+- **"+" chip** in the editor's add bar before Text. It opens a row with Image (gallery), Camera, Audio, Link, Table and Divider, which are no longer separate chips.
+- **Tag chip** beside Cards. It opens a scrolling row of every tag you use: the note's tags are highlighted, tapping one adds or removes it, and "+" creates a new tag.
+- **Share image and PDF**: the 3-dot menu now has one Share item with Copy, Text, Markdown, Image and PDF. Image is one tall PNG and PDF is paginated A4; both include pictures, tables (with calculated values) and checklists. A note too long for one image shows a message suggesting PDF.
+- **Caret stays visible**: the text cursor scrolls into view when it would sit behind the add bar, an option row or the keyboard.
+
+### Changed
+- The editor's "Note options" popup is gone. **Color** is now in the 3-dot menu, and tags are managed with the Tag chip; the tags above the title are chips you tap to remove.
+- The editor no longer has a folder choice (folders are managed from the note list; multi-select can still move notes).
+- Select blocks mode shows a checkbox of one fixed size in its own column instead of an icon sized relative to the block.
+- Share as Markdown, Share as plain text and Copy note moved into the Share submenu.
+
 ## [1.7.0] - 2026-11-10
 
 ### Added
