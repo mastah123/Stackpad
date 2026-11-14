@@ -8,7 +8,6 @@ import com.stackpad.app.data.db.FolderDao
 import com.stackpad.app.data.db.FolderEntity
 import com.stackpad.app.data.db.NoteDao
 import com.stackpad.app.data.db.NoteEntity
-import com.stackpad.app.data.db.escapeLike
 import com.stackpad.app.data.media.MediaStorage
 import com.stackpad.app.data.model.BlockFactory
 import com.stackpad.app.data.model.Folder
@@ -18,6 +17,7 @@ import com.stackpad.app.data.model.mediaFileName
 import com.stackpad.app.domain.backup.BackupRules
 import com.stackpad.app.domain.backup.MergeDecision
 import com.stackpad.app.domain.notes.FolderNames
+import com.stackpad.app.domain.search.SearchQuery
 import com.stackpad.app.domain.notes.TagCount
 import com.stackpad.app.domain.notes.Tags
 import com.stackpad.app.domain.notes.TrashPolicy
@@ -44,13 +44,27 @@ class NoteRepository(
     private companion object {
         /** Fresh files may belong to a note that is still being edited, so they are never swept. */
         const val ORPHAN_MIN_AGE_MS = 10 * 60 * 1000L
+
+        /** SQLite allows only so many variables per statement, so id lists are split. */
+        const val SQL_CHUNK = 500
     }
 
     // region Reading
 
     /** Notes outside the trash that match [query]. Filtering and sorting happen in the caller. */
-    fun observeSummaries(query: String): Flow<List<NoteSummary>> =
-        dao.observeActive(escapeLike(query.trim())).map { list -> list.map { it.toSummary() } }
+    fun observeSummaries(query: String): Flow<List<NoteSummary>> {
+        val words = SearchQuery.words(query)
+        return dao.observeActive("").map { list ->
+            if (words.isEmpty()) {
+                list.map { it.toSummary() }
+            } else {
+                // Every word must match somewhere; the preview becomes a snippet around the first hit.
+                list
+                    .filter { SearchQuery.matches(words, it.title, it.searchText, Tags.parse(it.tags)) }
+                    .map { it.toSummary().copy(preview = SearchQuery.snippet(it.searchText, words)) }
+            }
+        }
+    }
 
     fun observeTrashed(): Flow<List<NoteSummary>> =
         dao.observeTrashed().map { list -> list.map { it.toSummary() } }
@@ -88,6 +102,38 @@ class NoteRepository(
 
     suspend fun setPinned(id: String, pinned: Boolean) {
         writeLock.withLock { dao.setPinned(id, pinned) }
+    }
+
+    /** Pins or unpins several notes at once. */
+    suspend fun setPinned(ids: Collection<String>, pinned: Boolean) {
+        writeLock.withLock { ids.chunked(SQL_CHUNK).forEach { dao.setPinnedIn(it, pinned) } }
+    }
+
+    /** Files several notes in [folderId] (null = no folder). Their edit time is not changed. */
+    suspend fun setFolder(ids: Collection<String>, folderId: String?) {
+        writeLock.withLock { ids.chunked(SQL_CHUNK).forEach { dao.setFolderIn(it, folderId) } }
+    }
+
+    /** Adds a tag to several notes (ignored where it is invalid, a duplicate, or the note has too many). */
+    suspend fun addTag(ids: Collection<String>, rawTag: String) {
+        writeLock.withLock {
+            ids.forEach { id ->
+                val entity = dao.get(id) ?: return@forEach
+                val current = Tags.parse(entity.tags)
+                val updated = Tags.add(current, rawTag)
+                if (updated != current) dao.setTags(id, Tags.serialize(updated))
+            }
+        }
+    }
+
+    /** Moves several notes to the trash. */
+    suspend fun moveToTrash(ids: Collection<String>) {
+        ids.forEach { moveToTrash(it) }
+    }
+
+    /** Restores several notes from the trash. */
+    suspend fun restore(ids: Collection<String>) {
+        ids.forEach { restore(it) }
     }
 
     // endregion

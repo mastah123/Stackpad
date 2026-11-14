@@ -1,6 +1,8 @@
 package com.stackpad.app.ui.editor
 
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowDownward
+import androidx.compose.material.icons.filled.ArrowUpward
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.ContentCopy
 import androidx.compose.material.icons.filled.SelectAll
@@ -21,6 +23,10 @@ fun SelectionTopBar(
     selectedCount: Int,
     onClose: () -> Unit,
     onSelectAll: () -> Unit,
+    canMoveUp: Boolean,
+    canMoveDown: Boolean,
+    onMoveUp: () -> Unit,
+    onMoveDown: () -> Unit,
     onCopy: () -> Unit,
 ) {
     TopAppBar(
@@ -35,6 +41,12 @@ fun SelectionTopBar(
         actions = {
             IconButton(onClick = onSelectAll) {
                 Icon(Icons.Filled.SelectAll, contentDescription = stringResource(R.string.action_select_all))
+            }
+            IconButton(onClick = onMoveUp, enabled = canMoveUp) {
+                Icon(Icons.Filled.ArrowUpward, contentDescription = stringResource(R.string.action_move_up))
+            }
+            IconButton(onClick = onMoveDown, enabled = canMoveDown) {
+                Icon(Icons.Filled.ArrowDownward, contentDescription = stringResource(R.string.action_move_down))
             }
             IconButton(onClick = onCopy, enabled = selectedCount > 0) {
                 Icon(Icons.Filled.ContentCopy, contentDescription = stringResource(R.string.action_copy_selected))

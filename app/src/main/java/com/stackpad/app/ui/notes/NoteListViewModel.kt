@@ -75,6 +75,7 @@ class NoteListViewModel(
             folder = if (folderOk) folder else FolderFilter.All,
             tag = if (tagOk) filter.tag else null,
             pinnedOnly = filter.pinnedOnly,
+            color = filter.color,
         )
         NoteListUiState(
             notes = NoteOrganizer.organize(notes, sort, effective),
@@ -103,6 +104,42 @@ class NoteListViewModel(
         }
     }
 
+    /** Emits the ids of several notes that were just trashed together, so the screen can offer Undo. */
+    private val _trashedMany = MutableSharedFlow<List<String>>(extraBufferCapacity = 4)
+    val trashedMany: SharedFlow<List<String>> = _trashedMany.asSharedFlow()
+
+    /** Pins the selected notes, or unpins them when they are all pinned already. */
+    fun togglePinned(ids: Set<String>) {
+        val selected = state.value.notes.orEmpty().filter { it.id in ids }
+        if (selected.isEmpty()) return
+        val pin = !selected.all { it.pinned }
+        viewModelScope.launch { repository.setPinned(ids, pin) }
+    }
+
+    fun setFolder(ids: Set<String>, folderId: String?) {
+        viewModelScope.launch { repository.setFolder(ids, folderId) }
+    }
+
+    fun addTag(ids: Set<String>, tag: String) {
+        viewModelScope.launch { repository.addTag(ids, tag) }
+    }
+
+    fun moveToTrash(ids: Set<String>) {
+        viewModelScope.launch {
+            repository.moveToTrash(ids)
+            _trashedMany.emit(ids.toList())
+        }
+    }
+
+    fun restore(ids: List<String>) {
+        viewModelScope.launch { repository.restore(ids) }
+    }
+
+    /** Restricts the list to one note color, or any color when null. */
+    fun setColorFilter(color: Int?) {
+        _filter.value = _filter.value.copy(color = color)
+    }
+
     fun restore(id: String) {
         viewModelScope.launch { repository.restore(id) }
     }
@@ -123,6 +160,11 @@ class NoteListViewModel(
     /** Shows only pinned notes, or all notes again when it is already on. */
     fun togglePinnedOnly() {
         _filter.value = _filter.value.copy(pinnedOnly = !_filter.value.pinnedOnly)
+    }
+
+    /** Sets the tag filter directly (null = any tag). */
+    fun setTagFilter(tag: String?) {
+        _filter.value = _filter.value.copy(tag = tag)
     }
 
     /** Selecting the active tag again clears it. */

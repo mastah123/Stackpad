@@ -60,6 +60,15 @@ interface NoteDao {
     @Query("UPDATE notes SET pinned = :pinned WHERE id = :id")
     suspend fun setPinned(id: String, pinned: Boolean)
 
+    @Query("UPDATE notes SET pinned = :pinned WHERE id IN (:ids)")
+    suspend fun setPinnedIn(ids: List<String>, pinned: Boolean)
+
+    @Query("UPDATE notes SET folderId = :folderId WHERE id IN (:ids)")
+    suspend fun setFolderIn(ids: List<String>, folderId: String?)
+
+    @Query("UPDATE notes SET tags = :tags WHERE id = :id")
+    suspend fun setTags(id: String, tags: String)
+
     @Query("UPDATE notes SET trashedAt = :trashedAt WHERE id = :id")
     suspend fun setTrashedAt(id: String, trashedAt: Long?)
 

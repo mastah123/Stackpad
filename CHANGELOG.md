@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.7.0] - 2026-11-10
+
+### Added
+- **Reorder blocks**: in the editor's Select blocks mode, new Move up and Move down buttons move the selected blocks one step (several blocks move together and keep their order). It can be undone with the undo button.
+- **Better search**: every word you type must appear somewhere in the note (title, content or tags), in any order. Matches are highlighted in the list, and the preview shows the part of the note around the first match.
+- **Search filters**: while searching, chips under the search box narrow results by folder, tag and color, with a Clear filters button. Color is a new filter.
+- **Select several notes**: long-press a note in the list to start selecting, tap to add or remove more. The top bar offers Select all, Pin or Unpin, Move to trash (with one Undo for all), and a menu to move the selected notes to a folder or add a tag to all of them. Back or the close button leaves selection mode.
+
+### Changed
+- Searching no longer treats the whole query as one phrase; "milk buy" finds a note that says "buy some milk".
+- Locked notes still hide their content from search; only their title can match.
+
 ## [1.6.0] - 2026-11-09
 
 ### Added
@@ -128,7 +140,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - GitHub Actions workflow for tests, debug builds and signed release builds using GitHub Secrets.
 - Unit tests for formulas, span editing, URLs, list markers, table operations, waveform helpers and serialization.
 
-[Unreleased]: https://github.com/mastah123/stackpad/compare/v1.6.0...HEAD
+[Unreleased]: https://github.com/mastah123/stackpad/compare/v1.7.0...HEAD
+[1.7.0]: https://github.com/mastah123/stackpad/compare/v1.6.0...v1.7.0
 [1.6.0]: https://github.com/mastah123/stackpad/compare/v1.5.0...v1.6.0
 [1.5.0]: https://github.com/mastah123/stackpad/compare/v1.4.0...v1.5.0
 [1.4.0]: https://github.com/mastah123/stackpad/compare/v1.3.0...v1.4.0

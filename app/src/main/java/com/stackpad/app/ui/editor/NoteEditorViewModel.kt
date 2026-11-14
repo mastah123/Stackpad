@@ -18,6 +18,7 @@ import com.stackpad.app.data.model.TextBlock
 import com.stackpad.app.data.model.TextLevel
 import com.stackpad.app.data.model.isBlank
 import com.stackpad.app.data.model.mediaFileName
+import com.stackpad.app.domain.blocks.BlockOrder
 import com.stackpad.app.domain.export.ExportFormat
 import com.stackpad.app.domain.templates.BuiltInTemplates
 import com.stackpad.app.domain.templates.NoteTemplate
@@ -483,6 +484,17 @@ class NoteEditorViewModel(
             if (note != null) repository.saveAndTrash(note)
             onTrashed()
         }
+    }
+
+    /** Moves the selected blocks one step up or down (undoable). */
+    fun moveBlocks(ids: Set<String>, up: Boolean) = mutate { s ->
+        s.copy(blocks = if (up) BlockOrder.moveUp(s.blocks, ids) else BlockOrder.moveDown(s.blocks, ids))
+    }
+
+    /** Which directions the selected blocks can still move, for enabling the buttons. */
+    fun canMove(ids: Set<String>, up: Boolean): Boolean {
+        val blocks = _state.value.blocks
+        return if (up) BlockOrder.canMoveUp(blocks, ids) else BlockOrder.canMoveDown(blocks, ids)
     }
 
     /** Adds [template] to the note (it replaces the note while that is still empty). */

@@ -17,7 +17,8 @@ class NoteOrganizerTest {
         updated: Long = 0,
         folder: String? = null,
         tags: List<String> = emptyList(),
-    ) = NoteSummary(id, title, "", pinned, created, updated, folder, tags)
+        color: Int = 0,
+    ) = NoteSummary(id, title, "", pinned, created, updated, folder, tags, color)
 
     private fun ids(list: List<NoteSummary>) = list.map { it.id }
 
@@ -78,5 +79,25 @@ class NoteOrganizerTest {
         assertEquals(false, NoteFilter(pinnedOnly = true).isEmpty)
         assertEquals(false, NoteFilter(tag = "x").isEmpty)
         assertEquals(false, NoteFilter(FolderFilter.Unfiled).isEmpty)
+    }
+
+    @Test
+    fun colorFilterKeepsOnlyThatColor() {
+        val notes = listOf(note("a", color = 2), note("b", color = 3), note("c", color = 0))
+        assertEquals(listOf("b"), ids(NoteOrganizer.organize(notes, NoteSort.TITLE, NoteFilter(color = 3))))
+    }
+
+    @Test
+    fun colorFilterCombinesWithTag() {
+        val notes = listOf(note("a", color = 2, tags = listOf("x")), note("b", color = 2), note("c", tags = listOf("x")))
+        assertEquals(
+            listOf("a"),
+            ids(NoteOrganizer.organize(notes, NoteSort.TITLE, NoteFilter(tag = "x", color = 2))),
+        )
+    }
+
+    @Test
+    fun colorCountsAsAFilter() {
+        assertEquals(false, NoteFilter(color = 1).isEmpty)
     }
 }

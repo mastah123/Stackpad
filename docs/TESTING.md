@@ -96,6 +96,23 @@ Covers: formula evaluator, span editing, URL detection/validation, list markers,
 - [ ] With the widget on a locked latest note, it shows "Locked note".
 - [ ] Without any phone screen lock, Lock note says to set one first. Updating from 1.5.0 keeps all notes unlocked and nothing is lost.
 
+### Reorder blocks, search and multi-select
+- [ ] In a note with several blocks, Menu, Select blocks, select one block in the middle. Move up and Move down move it one step each time; the selection stays so you can press again. At the top, Move up is disabled; at the bottom, Move down is.
+- [ ] Select two neighbouring blocks: they move together and keep their order. Select two separate blocks: each moves one step. Undo reverses a move; Redo repeats it.
+- [ ] Move an image, a table, an audio note and a checklist: they still work and keep their content afterwards. Leave the note and reopen it: the order is kept.
+- [ ] Search with two words that are in different places (for example one in the title and one in the body, or in any order): the note is found. A word that is nowhere makes it disappear.
+- [ ] Matches are highlighted in the title, preview and tags. For a word far down a long note, the preview shows the text around it with "…".
+- [ ] Searching for `%` or `_` still matches literally.
+- [ ] While searching, the chips Folder, Tag and Color appear. Each opens a menu; picking one narrows the results; "Clear filters" removes them. A color filter also works with an empty search box (the chips stay visible while it is set).
+- [ ] In the Folders and Tags views the search chips are not shown (those views have their own bars), but search still works.
+- [ ] Searching with no results and a filter set says "No notes match … with these filters."
+- [ ] Long-press a note: selection starts, the top bar shows "1 selected", the + button and the side-menu swipe are disabled. Tap other notes to add or remove them; unselecting the last one ends selection. Back leaves selection.
+- [ ] Select all, then Pin: all become pinned (the icon changes to unpin when all selected are pinned) and selection ends.
+- [ ] More menu, Move to folder: pick a folder or "No folder"; the notes move and their order in the list does not change.
+- [ ] More menu, Add tag: type `Work`; every selected note gets `#work`. A note that already has it or has 10 tags is left alone, without errors.
+- [ ] Trash with several selected: they all go to the trash with one message "N notes moved to trash." and Undo brings all of them back.
+- [ ] A locked note can be selected, pinned, moved and trashed without being opened.
+
 ### Share
 - [ ] In a note with a title, headings, bold/italic, a list, a checklist with a due date, a table with a formula, a link, a quote, code and a divider, open the top-right menu and choose Share as Markdown. The share sheet opens; paste into a notes app: `#` title, `-` bullets, `- [ ]` checklist, a table with the calculated value, fenced code, `>` quote and `---`.
 - [ ] Share as plain text: no Markdown symbols except what you typed, lists use their own markers.

@@ -277,6 +277,10 @@ private fun NoteEditorContent(
                     selectedCount = selectedIds.size,
                     onClose = closeSelection,
                     onSelectAll = { selectedIds = state.blocks.map { it.id }.toSet() },
+                    canMoveUp = viewModel.canMove(selectedIds, up = true),
+                    canMoveDown = viewModel.canMove(selectedIds, up = false),
+                    onMoveUp = { viewModel.moveBlocks(selectedIds, up = true) },
+                    onMoveDown = { viewModel.moveBlocks(selectedIds, up = false) },
                     onCopy = {
                         val text = viewModel.exportBlocks(selectedIds)
                         if (text == null) {

@@ -1,5 +1,6 @@
 package com.stackpad.app.ui.notes
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -45,7 +46,9 @@ import com.stackpad.app.data.model.Folder
 import com.stackpad.app.data.model.NoteSummary
 import com.stackpad.app.domain.notes.FolderFilter
 import com.stackpad.app.domain.notes.FolderNames
+import com.stackpad.app.domain.notes.Tags
 import com.stackpad.app.domain.notes.TrashPolicy
+import com.stackpad.app.domain.search.SearchQuery
 import com.stackpad.app.ui.components.ConfirmDialog
 import com.stackpad.app.ui.components.TextInputDialog
 import kotlinx.coroutines.launch
@@ -70,6 +73,12 @@ fun NoteListScreen(
     var renameTarget by remember { mutableStateOf<Folder?>(null) }
     var deleteTarget by remember { mutableStateOf<Folder?>(null) }
     var mode by rememberSaveable { mutableStateOf(ListMode.ALL) }
+    // Notes picked by long-press. The list is in selection mode while this is not empty.
+    var selectedIds by remember { mutableStateOf(emptySet<String>()) }
+    val selecting = selectedIds.isNotEmpty()
+    var folderChoiceDialog by remember { mutableStateOf(false) }
+    var addTagDialog by remember { mutableStateOf(false) }
+    val searchWords = remember(query) { SearchQuery.words(query) }
     val drawerState = rememberDrawerState(DrawerValue.Closed)
     val scope = rememberCoroutineScope()
     fun closeMenu(then: () -> Unit) {
@@ -88,8 +97,27 @@ fun NoteListScreen(
         }
     }
 
+    // Several notes trashed together: one snackbar, one Undo for all of them.
+    LaunchedEffect(viewModel) {
+        viewModel.trashedMany.collect { ids ->
+            val result = snackbar.showSnackbar(
+                message = context.resources.getQuantityString(R.plurals.msg_notes_moved_to_trash, ids.size, ids.size),
+                actionLabel = context.getString(R.string.action_undo),
+            )
+            if (result == SnackbarResult.ActionPerformed) viewModel.restore(ids)
+        }
+    }
+
+    // Drop selected notes that disappeared (trashed, or filtered out).
+    LaunchedEffect(ui.notes) {
+        val visible = ui.notes?.map { it.id }?.toSet() ?: return@LaunchedEffect
+        if (selectedIds.any { it !in visible }) selectedIds = selectedIds.filter { it in visible }.toSet()
+    }
+    BackHandler(enabled = selecting) { selectedIds = emptySet() }
+
     ModalNavigationDrawer(
         drawerState = drawerState,
+        gesturesEnabled = !selecting,
         drawerContent = {
             NoteMenu(
                 mode = mode,
@@ -110,7 +138,25 @@ fun NoteListScreen(
     ) {
         Scaffold(
             topBar = {
-                TopAppBar(
+                if (selecting) {
+                    val chosen = ui.notes.orEmpty().filter { it.id in selectedIds }
+                    NoteSelectionBar(
+                        count = selectedIds.size,
+                        allPinned = chosen.isNotEmpty() && chosen.all { it.pinned },
+                        onClose = { selectedIds = emptySet() },
+                        onSelectAll = { selectedIds = ui.notes.orEmpty().map { it.id }.toSet() },
+                        onTogglePin = {
+                            viewModel.togglePinned(selectedIds)
+                            selectedIds = emptySet()
+                        },
+                        onTrash = {
+                            viewModel.moveToTrash(selectedIds)
+                            selectedIds = emptySet()
+                        },
+                        onMoveToFolder = { folderChoiceDialog = true },
+                        onAddTag = { addTagDialog = true },
+                    )
+                } else TopAppBar(
                     navigationIcon = {
                         IconButton(onClick = { scope.launch { drawerState.open() } }) {
                             Icon(Icons.Filled.Menu, contentDescription = stringResource(R.string.cd_open_menu))
@@ -125,8 +171,10 @@ fun NoteListScreen(
             },
             snackbarHost = { SnackbarHost(snackbar) },
             floatingActionButton = {
-                FloatingActionButton(onClick = onNewNote) {
-                    Icon(Icons.Filled.Add, contentDescription = stringResource(R.string.cd_new_note))
+                if (!selecting) {
+                    FloatingActionButton(onClick = onNewNote) {
+                        Icon(Icons.Filled.Add, contentDescription = stringResource(R.string.cd_new_note))
+                    }
                 }
             },
         ) { padding ->
@@ -136,6 +184,17 @@ fun NoteListScreen(
                     onQueryChange = viewModel::setQuery,
                     modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
                 )
+                if ((query.isNotBlank() || ui.filter.color != null) && (mode == ListMode.ALL || mode == ListMode.PINNED)) {
+                    SearchFilterRow(
+                        folders = ui.folders,
+                        tags = ui.tags,
+                        filter = ui.filter,
+                        onFolder = viewModel::selectFolder,
+                        onTag = viewModel::setTagFilter,
+                        onColor = viewModel::setColorFilter,
+                        modifier = Modifier.padding(bottom = 4.dp),
+                    )
+                }
                 when (mode) {
                     ListMode.FOLDERS -> FolderGrid(
                         folders = ui.folders,
@@ -169,7 +228,13 @@ fun NoteListScreen(
                     current.isEmpty() -> EmptyState(query = query, filtered = !ui.filter.isEmpty)
                     else -> NoteList(
                         notes = current,
-                        onOpen = onOpenNote,
+                        highlight = searchWords,
+                        selecting = selecting,
+                        selectedIds = selectedIds,
+                        onOpen = { id ->
+                            if (selecting) selectedIds = toggled(selectedIds, id) else onOpenNote(id)
+                        },
+                        onLongPress = { id -> selectedIds = selectedIds + id },
                         onTogglePin = viewModel::togglePin,
                         onTrash = { pendingTrash = it },
                     )
@@ -177,6 +242,33 @@ fun NoteListScreen(
             }
         }
 
+    }
+
+    if (folderChoiceDialog) {
+        FolderChoiceDialog(
+            folders = ui.folders,
+            onChoose = { folderId ->
+                viewModel.setFolder(selectedIds, folderId)
+                folderChoiceDialog = false
+                selectedIds = emptySet()
+            },
+            onDismiss = { folderChoiceDialog = false },
+        )
+    }
+
+    if (addTagDialog) {
+        TextInputDialog(
+            title = stringResource(R.string.dialog_add_tag_title),
+            placeholder = stringResource(R.string.tag_hint),
+            confirmLabel = stringResource(R.string.action_create),
+            maxLength = Tags.MAX_LENGTH,
+            onConfirm = {
+                viewModel.addTag(selectedIds, it)
+                addTagDialog = false
+                selectedIds = emptySet()
+            },
+            onDismiss = { addTagDialog = false },
+        )
     }
 
     pendingTrash?.let { note ->
@@ -253,15 +345,34 @@ private fun sectionTitle(ui: NoteListUiState, mode: ListMode): String {
     }
 }
 
+private fun toggled(selected: Set<String>, id: String): Set<String> =
+    if (id in selected) selected - id else selected + id
+
 @Composable
 private fun NoteList(
     notes: List<NoteSummary>,
+    highlight: List<String>,
+    selecting: Boolean,
+    selectedIds: Set<String>,
     onOpen: (String) -> Unit,
+    onLongPress: (String) -> Unit,
     onTogglePin: (NoteSummary) -> Unit,
     onTrash: (NoteSummary) -> Unit,
 ) {
     val pinned = notes.filter { it.pinned }
     val others = notes.filterNot { it.pinned }
+
+    @Composable
+    fun card(note: NoteSummary) = NoteCard(
+        note = note,
+        onClick = { onOpen(note.id) },
+        onTogglePin = { onTogglePin(note) },
+        onDelete = { onTrash(note) },
+        highlight = highlight,
+        selecting = selecting,
+        selected = note.id in selectedIds,
+        onLongClick = { onLongPress(note.id) },
+    )
 
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
@@ -270,16 +381,12 @@ private fun NoteList(
     ) {
         if (pinned.isNotEmpty()) {
             item(key = "header_pinned") { SectionLabel(stringResource(R.string.section_pinned)) }
-            items(pinned, key = { it.id }) { note ->
-                NoteCard(note, { onOpen(note.id) }, { onTogglePin(note) }, { onTrash(note) })
-            }
+            items(pinned, key = { it.id }) { note -> card(note) }
             if (others.isNotEmpty()) {
                 item(key = "header_notes") { SectionLabel(stringResource(R.string.section_notes)) }
             }
         }
-        items(others, key = { it.id }) { note ->
-            NoteCard(note, { onOpen(note.id) }, { onTogglePin(note) }, { onTrash(note) })
-        }
+        items(others, key = { it.id }) { note -> card(note) }
     }
 }
 
@@ -298,6 +405,7 @@ private fun EmptyState(query: String, filtered: Boolean) {
     Box(modifier = Modifier.fillMaxSize().padding(32.dp), contentAlignment = Alignment.Center) {
         Text(
             text = when {
+                query.isNotBlank() && filtered -> stringResource(R.string.empty_search_filtered, query)
                 query.isNotBlank() -> stringResource(R.string.empty_search, query)
                 filtered -> stringResource(R.string.empty_filtered)
                 else -> stringResource(R.string.empty_notes)

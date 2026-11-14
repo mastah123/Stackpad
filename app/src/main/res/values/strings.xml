@@ -246,4 +246,21 @@
     <string name="gate_title">This note is locked</string>
     <string name="gate_message">Unlock with your fingerprint, face or screen lock to read it.</string>
     <string name="widget_locked_note">Locked note</string>
+    <string name="action_move_up">Move selected blocks up</string>
+    <string name="action_move_down">Move selected blocks down</string>
+    <string name="filter_folder">Folder</string>
+    <string name="filter_tag">Tag</string>
+    <string name="filter_color">Color</string>
+    <string name="filter_any">Any</string>
+    <string name="filter_clear">Clear filters</string>
+    <string name="action_move_to_folder">Move to folder</string>
+    <string name="action_add_tag_to_notes">Add tag</string>
+    <string name="dialog_add_tag_title">Add a tag to the selected notes</string>
+    <string name="dialog_choose_folder_title">Move to folder</string>
+    <string name="cd_selected_notes_more">More actions for selected notes</string>
+    <string name="empty_search_filtered" formatted="true">No notes match “%1$s” with these filters.</string>
+    <plurals name="msg_notes_moved_to_trash">
+        <item quantity="one">%d note moved to trash.</item>
+        <item quantity="other">%d notes moved to trash.</item>
+    </plurals>
 </resources>

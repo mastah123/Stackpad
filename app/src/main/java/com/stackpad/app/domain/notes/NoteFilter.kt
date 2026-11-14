@@ -12,7 +12,9 @@ data class NoteFilter(
     val folder: FolderFilter = FolderFilter.All,
     val tag: String? = null,
     val pinnedOnly: Boolean = false,
+    /** Palette index (1 and up) to show, or null for any color. */
+    val color: Int? = null,
 ) {
     /** True when nothing is restricted, i.e. the list shows every note. */
-    val isEmpty: Boolean get() = folder == FolderFilter.All && tag == null && !pinnedOnly
+    val isEmpty: Boolean get() = folder == FolderFilter.All && tag == null && !pinnedOnly && color == null
 }
