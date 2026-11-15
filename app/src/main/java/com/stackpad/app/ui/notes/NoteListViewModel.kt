@@ -66,10 +66,10 @@ class NoteListViewModel(
         summaries,
         repository.observeFolders(),
         repository.observeTagCounts(),
-        listPreferences.sort,
-        listPreferences.layout,
+        // combine() only has typed overloads up to five flows, so sort and layout travel as a pair.
+        combine(listPreferences.sort, listPreferences.layout) { sort, layout -> sort to layout },
         _filter,
-    ) { notes, folders, tags, sort, layout, filter ->
+    ) { notes, folders, tags, (sort, layout), filter ->
         // A filter pointing at a deleted folder or an unused tag quietly falls back to "all".
         val folder = filter.folder
         val folderOk = folder !is FolderFilter.InFolder || folders.any { it.id == folder.id }
