@@ -46,6 +46,8 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.stackpad.app.R
 import com.stackpad.app.data.backup.BackupError
+import com.stackpad.app.data.importing.ImportError
+import com.stackpad.app.data.importing.ImportSummary
 import com.stackpad.app.domain.backup.BackupRules
 import com.stackpad.app.security.AppLockController
 import com.stackpad.app.security.LockChangeResult
@@ -70,6 +72,10 @@ fun SettingsScreen(
     val restoreLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.OpenDocument(),
     ) { uri -> uri?.let { viewModel.restoreFrom(context.contentResolver, it) } }
+
+    val keepLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.OpenDocument(),
+    ) { uri -> uri?.let { viewModel.importKeepFrom(context.contentResolver, it) } }
 
     LaunchedEffect(viewModel) {
         viewModel.messages.collect { message -> snackbar.showSnackbar(describe(context, message)) }
@@ -118,6 +124,14 @@ fun SettingsScreen(
                 subtitle = R.string.settings_restore_subtitle,
                 enabled = !busy,
                 onClick = { restoreLauncher.launch(arrayOf("application/zip", "application/octet-stream")) },
+            )
+            SectionHeader(R.string.settings_section_import)
+            ActionRow(
+                icon = Icons.Filled.FileDownload,
+                title = R.string.settings_import_keep_title,
+                subtitle = R.string.settings_import_keep_subtitle,
+                enabled = !busy,
+                onClick = { keepLauncher.launch(arrayOf("application/zip", "application/x-zip-compressed", "application/octet-stream")) },
             )
             if (busy) {
                 Row(
@@ -221,6 +235,20 @@ private fun RowTextContent(title: Int, subtitle: Int, enabled: Boolean) {
     )
 }
 
+/** "Imported 12 notes with 3 pictures. 2 already imported, 1 in Keep's trash skipped." */
+private fun describeImport(context: Context, s: ImportSummary): String {
+    val parts = ArrayList<String>()
+    parts += context.resources.getQuantityString(R.plurals.msg_imported_notes, s.imported, s.imported)
+    if (s.pictures > 0) parts += context.resources.getQuantityString(R.plurals.msg_imported_pictures, s.pictures, s.pictures)
+    val head = parts.joinToString(" ") + "."
+    val extras = ArrayList<String>()
+    if (s.alreadyImported > 0) extras += context.getString(R.string.msg_import_already, s.alreadyImported)
+    if (s.skippedTrashed > 0) extras += context.getString(R.string.msg_import_trashed, s.skippedTrashed)
+    if (s.skippedAttachments > 0) extras += context.getString(R.string.msg_import_attachments, s.skippedAttachments)
+    if (s.unreadable > 0) extras += context.getString(R.string.msg_import_unreadable, s.unreadable)
+    return (listOf(head) + extras).joinToString(" ")
+}
+
 private fun versionName(context: Context): String =
     runCatching { context.packageManager.getPackageInfo(context.packageName, 0).versionName }
         .getOrNull().orEmpty()
@@ -233,6 +261,15 @@ private fun describe(context: Context, message: SettingsMessage): String = when 
         message.summary.added,
         message.summary.updated,
         message.summary.skipped,
+    )
+    is SettingsMessage.Imported -> describeImport(context, message.summary)
+    is SettingsMessage.ImportFailed -> context.getString(
+        when (message.error) {
+            ImportError.NOT_AN_EXPORT -> R.string.msg_import_not_zip
+            ImportError.NOTHING_FOUND -> R.string.msg_import_nothing
+            ImportError.TOO_LARGE -> R.string.msg_import_too_large
+            ImportError.IO -> R.string.msg_import_io
+        },
     )
     is SettingsMessage.Failed -> context.getString(
         when (message.error) {

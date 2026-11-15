@@ -234,6 +234,28 @@ class NoteRepository(
 
     // endregion
 
+    // region Import
+
+    /** True when a note with [id] exists (in the trash too). */
+    suspend fun exists(id: String): Boolean = dao.get(id) != null
+
+    /**
+     * Adds notes read from another app, keeping their own creation and edit times. A note whose id
+     * already exists is left alone, so importing the same file twice never overwrites later edits.
+     * Returns how many were added.
+     */
+    suspend fun importNotes(notes: List<Note>): Int = writeLock.withLock {
+        var added = 0
+        for (note in notes) {
+            if (dao.get(note.id) != null) continue
+            dao.upsert(note.toEntity(updatedAt = note.updatedAt))
+            added++
+        }
+        added
+    }
+
+    // endregion
+
     // region Backup
 
     /** Every note (trash included) and folder, as written to a backup. */

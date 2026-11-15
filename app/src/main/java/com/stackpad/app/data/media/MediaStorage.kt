@@ -51,6 +51,18 @@ class MediaStorage(private val context: Context) {
         }
     }
 
+    /** Copies an image file from elsewhere into app storage under a new name. Returns that name, or null on failure. */
+    fun importFile(source: File): String? {
+        val name = newImageName()
+        return try {
+            source.copyTo(file(name), overwrite = true)
+            name
+        } catch (e: IOException) {
+            delete(name)
+            null
+        }
+    }
+
     /** Copies [source] into the media folder unless a file with that name is already there. */
     fun install(fileName: String, source: File) {
         val target = file(fileName)

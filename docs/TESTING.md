@@ -6,7 +6,7 @@
 ./gradlew testDebugUnitTest
 ```
 
-Covers: formula evaluator, span editing, URL detection/validation, list markers, table operations, waveform helpers, block JSON serialization, table functions, due dates and reminder planning, image zoom limits, audio speed, note sorting and filtering, tags, trash timing, and undo history, word counting, note previews, note export, and the image/PDF layout and pagination.
+Covers: formula evaluator, span editing, URL detection/validation, list markers, table operations, waveform helpers, block JSON serialization, table functions, due dates and reminder planning, image zoom limits, audio speed, note sorting and filtering, tags, trash timing, and undo history, word counting, note previews, Keep import rules, note export, and the image/PDF layout and pagination.
 
 ## Manual checklist (run on a device or emulator, Android 8.0+)
 
@@ -54,6 +54,15 @@ Covers: formula evaluator, span editing, URL detection/validation, list markers,
 - [ ] Note cards have a pin button but no delete button. Long-press, select, and the trash icon in the selection bar still move notes to the trash with Undo.
 - [ ] Editor: under the title a small faded line shows "N words · Created <date, time>". Typing updates the count; "1 word" is singular. Old notes show their original creation date.
 - [ ] Block colors: checklist green, table teal, link blue, prompt purple, quote amber, code slate, audio rose. Check both light and dark themes: text stays readable.
+
+### Google Keep import
+- [ ] Export Keep from takeout.google.com (only Keep) and copy the zip to the phone. Settings > Import > Google Keep > pick the zip. A message says how many notes and pictures were imported.
+- [ ] Text notes keep title and text; list notes become a checklist with the same ticks; labels become tags; colors map (red, orange, yellow, green, teal, blue/cerulean, purple, pink; others have no color); pinned notes are pinned; links appear as link blocks; photos appear at the top of the note.
+- [ ] Dates: sort by last edited and open a note's info line: they show Keep's original dates, not today.
+- [ ] Import the same zip again: "0 imported, N already imported"; nothing is duplicated and edits you made after the first import stay.
+- [ ] Notes in Keep's trash, audio notes and drawings are skipped and counted in the message. Archived notes are imported.
+- [ ] Choose a non-zip file (a photo, a Stackpad backup): a clear error and no new notes. Choose a Stackpad backup zip: "No Google Keep notes were found".
+- [ ] Imported notes with photos show thumbnails in the list and open normally; deleting an imported note leaves no stray files.
 
 ### Note previews
 - [ ] A note with a heading, bold text, a bullet list, a checklist, a quote, code, a prompt, a link, a table, an audio clip and a picture shows each of them in its own style on its card (checklist green with boxes, table teal grid, quote amber bar, code slate, prompt purple, link blue, audio rose pill). Done checklist items are struck through.

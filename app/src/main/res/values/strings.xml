@@ -280,4 +280,23 @@
     <string name="msg_image_save_failed">Could not save to the gallery. You can still share the image.</string>
     <string name="msg_pdf_saved">PDF saved</string>
     <string name="msg_pdf_save_failed">Could not save the PDF there. Nothing was shared.</string>
+    <string name="settings_section_import">Import</string>
+    <string name="settings_import_keep_title">Google Keep</string>
+    <string name="settings_import_keep_subtitle">Choose the Takeout .zip with your Keep notes. Text, lists, labels, colors, pictures and dates are kept.</string>
+    <plurals name="msg_imported_notes">
+        <item quantity="one">Imported %d note</item>
+        <item quantity="other">Imported %d notes</item>
+    </plurals>
+    <plurals name="msg_imported_pictures">
+        <item quantity="one">with %d picture</item>
+        <item quantity="other">with %d pictures</item>
+    </plurals>
+    <string name="msg_import_already">%d were already imported.</string>
+    <string name="msg_import_trashed">%d in Keep\'s trash were skipped.</string>
+    <string name="msg_import_attachments">%d audio or drawing attachments could not be imported.</string>
+    <string name="msg_import_unreadable">%d files could not be read.</string>
+    <string name="msg_import_not_zip">That is not a Takeout zip file.</string>
+    <string name="msg_import_nothing">No Google Keep notes were found in that file.</string>
+    <string name="msg_import_too_large">That file is too large to import.</string>
+    <string name="msg_import_io">Could not read the file. Nothing was imported.</string>
 </resources>

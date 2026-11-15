@@ -11,6 +11,10 @@ import com.stackpad.app.data.backup.BackupError
 import com.stackpad.app.data.backup.BackupException
 import com.stackpad.app.data.backup.BackupManager
 import com.stackpad.app.data.backup.RestoreSummary
+import com.stackpad.app.data.importing.ImportError
+import com.stackpad.app.data.importing.ImportException
+import com.stackpad.app.data.importing.ImportSummary
+import com.stackpad.app.data.importing.KeepImporter
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -27,9 +31,14 @@ sealed interface SettingsMessage {
     data class Exported(val notes: Int) : SettingsMessage
     data class Restored(val summary: RestoreSummary) : SettingsMessage
     data class Failed(val error: BackupError) : SettingsMessage
+    data class Imported(val summary: ImportSummary) : SettingsMessage
+    data class ImportFailed(val error: ImportError) : SettingsMessage
 }
 
-class SettingsViewModel(private val backup: BackupManager) : ViewModel() {
+class SettingsViewModel(
+    private val backup: BackupManager,
+    private val keepImporter: KeepImporter,
+) : ViewModel() {
     private val _busy = MutableStateFlow(false)
     val busy: StateFlow<Boolean> = _busy.asStateFlow()
 
@@ -52,6 +61,14 @@ class SettingsViewModel(private val backup: BackupManager) : ViewModel() {
         SettingsMessage.Restored(summary)
     }
 
+    fun importKeepFrom(resolver: ContentResolver, uri: Uri) = runBusy {
+        val summary = withContext(Dispatchers.IO) {
+            val input = resolver.openInputStream(uri) ?: throw ImportException(ImportError.IO)
+            input.use { keepImporter.import(it) }
+        }
+        SettingsMessage.Imported(summary)
+    }
+
     private fun runBusy(block: suspend () -> SettingsMessage) {
         if (_busy.value) return
         _busy.value = true
@@ -60,6 +77,8 @@ class SettingsViewModel(private val backup: BackupManager) : ViewModel() {
                 block()
             } catch (e: BackupException) {
                 SettingsMessage.Failed(e.error)
+            } catch (e: ImportException) {
+                SettingsMessage.ImportFailed(e.error)
             } catch (e: IOException) {
                 SettingsMessage.Failed(BackupError.IO)
             } catch (e: SecurityException) {
@@ -72,7 +91,7 @@ class SettingsViewModel(private val backup: BackupManager) : ViewModel() {
 
     companion object {
         fun factory(container: AppContainer) = viewModelFactory {
-            initializer { SettingsViewModel(container.backupManager) }
+            initializer { SettingsViewModel(container.backupManager, container.keepImporter) }
         }
     }
 }

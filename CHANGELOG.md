@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.2.0] - 2026-11-16
+
+### Added
+- **Import from Google Keep** (Settings > Import > Google Keep): choose a Google Takeout zip. Text notes, list notes (as checklists), labels (as tags), colors, pinned state, links, pictures and the original created and edited dates are imported. Notes in Keep's trash are skipped, and so are audio and drawing attachments (counted in the result message).
+- Importing the same zip twice never duplicates notes or overwrites later edits.
+- The importer is built so other sources (Markdown, plain text, other apps) can be added later.
+
 ## [2.1.0] - 2026-11-15
 
 ### Added
