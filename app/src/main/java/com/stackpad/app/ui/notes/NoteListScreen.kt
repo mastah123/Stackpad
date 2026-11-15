@@ -388,6 +388,8 @@ private fun NoteList(
         selected = note.id in selectedIds,
         onLongClick = { onLongPress(note.id) },
         previewLines = if (grid) GRID_PREVIEW_LINES else LIST_PREVIEW_LINES,
+        previewMaxHeight = if (grid) GRID_PREVIEW_HEIGHT else LIST_PREVIEW_HEIGHT,
+        previewItems = if (grid) GRID_PREVIEW_ITEMS else LIST_PREVIEW_ITEMS,
     )
 
     if (grid) {
@@ -432,6 +434,10 @@ private fun NoteList(
 
 private const val LIST_PREVIEW_LINES = 2
 private const val GRID_PREVIEW_LINES = 6
+private val LIST_PREVIEW_HEIGHT = 96.dp
+private val GRID_PREVIEW_HEIGHT = 200.dp
+private const val LIST_PREVIEW_ITEMS = 5
+private const val GRID_PREVIEW_ITEMS = 9
 
 @Composable
 private fun SectionLabel(text: String) {

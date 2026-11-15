@@ -2,6 +2,8 @@ package com.stackpad.app.ui.navigation
 
 import android.net.Uri
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import com.stackpad.app.ui.components.LocalThumbnails
 import androidx.compose.runtime.LaunchedEffect
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavType
@@ -45,6 +47,7 @@ fun AppNavigation(
         }
     }
 
+    CompositionLocalProvider(LocalThumbnails provides container.thumbnailStore) {
     NavHost(navController = navController, startDestination = ROUTE_NOTES) {
         composable(ROUTE_NOTES) {
             val viewModel: NoteListViewModel = viewModel(factory = NoteListViewModel.factory(container))
@@ -94,5 +97,6 @@ fun AppNavigation(
                 onBack = { navController.popBackStack() },
             )
         }
+    }
     }
 }

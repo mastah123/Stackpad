@@ -8,7 +8,7 @@ import androidx.compose.ui.graphics.luminance
 import com.stackpad.app.domain.blocks.BlockTone
 
 /** Editor blocks that are drawn as cards, each tinted by [BlockTone] so its color hints at what it is for. */
-enum class BlockAccent(tone: BlockTone) {
+enum class BlockAccent(val tone: BlockTone) {
     CHECKLIST(BlockTone.CHECKLIST),
     TABLE(BlockTone.TABLE),
     LINK(BlockTone.LINK),
@@ -23,10 +23,13 @@ enum class BlockAccent(tone: BlockTone) {
 /** The accent itself, for icons, bars and borders. */
 fun BlockAccent.tint(): Color = color
 
-/** Card background: the accent washed lightly over the normal surface, stronger in dark theme. */
+/** Card background: the tone washed lightly over the normal surface, stronger in dark theme. */
 @Composable
-fun BlockAccent.container(): Color {
+fun BlockTone.container(): Color {
     val colors = MaterialTheme.colorScheme
     val dark = colors.surface.luminance() < 0.5f
-    return color.copy(alpha = if (dark) 0.22f else 0.13f).compositeOver(colors.surfaceVariant)
+    return Color(argb).copy(alpha = if (dark) 0.22f else 0.13f).compositeOver(colors.surfaceVariant)
 }
+
+@Composable
+fun BlockAccent.container(): Color = tone.container()

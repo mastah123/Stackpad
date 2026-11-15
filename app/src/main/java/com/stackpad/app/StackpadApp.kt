@@ -11,6 +11,7 @@ import com.stackpad.app.data.db.MIGRATION_1_2
 import com.stackpad.app.data.db.MIGRATION_2_3
 import com.stackpad.app.data.db.StackpadDatabase
 import com.stackpad.app.data.media.MediaStorage
+import com.stackpad.app.data.media.ThumbnailStore
 import com.stackpad.app.data.prefs.ListPreferences
 import com.stackpad.app.data.prefs.SecurityPreferences
 import com.stackpad.app.data.prefs.TemplatePreferences
@@ -36,6 +37,7 @@ class AppContainer(context: Context) {
             .build()
 
     val mediaStorage = MediaStorage(appContext)
+    val thumbnailStore = ThumbnailStore(appContext, mediaStorage)
     val repository = NoteRepository(
         database.noteDao(),
         database.folderDao(),

@@ -32,6 +32,8 @@ data class NoteSummary(
     val trashedAt: Long? = null,
     /** True for a locked note: the preview is empty. */
     val locked: Boolean = false,
+    /** The note's blocks as stored, for formatted previews. Empty for a locked note. */
+    val blocksJson: String = "",
 )
 
 /** A user-created folder that notes can be filed in. A note is in at most one folder. */

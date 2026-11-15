@@ -6,7 +6,7 @@
 ./gradlew testDebugUnitTest
 ```
 
-Covers: formula evaluator, span editing, URL detection/validation, list markers, table operations, waveform helpers, block JSON serialization, table functions, due dates and reminder planning, image zoom limits, audio speed, note sorting and filtering, tags, trash timing, and undo history, word counting, note export, and the image/PDF layout and pagination.
+Covers: formula evaluator, span editing, URL detection/validation, list markers, table operations, waveform helpers, block JSON serialization, table functions, due dates and reminder planning, image zoom limits, audio speed, note sorting and filtering, tags, trash timing, and undo history, word counting, note previews, note export, and the image/PDF layout and pagination.
 
 ## Manual checklist (run on a device or emulator, Android 8.0+)
 
@@ -54,6 +54,13 @@ Covers: formula evaluator, span editing, URL detection/validation, list markers,
 - [ ] Note cards have a pin button but no delete button. Long-press, select, and the trash icon in the selection bar still move notes to the trash with Undo.
 - [ ] Editor: under the title a small faded line shows "N words · Created <date, time>". Typing updates the count; "1 word" is singular. Old notes show their original creation date.
 - [ ] Block colors: checklist green, table teal, link blue, prompt purple, quote amber, code slate, audio rose. Check both light and dark themes: text stays readable.
+
+### Note previews
+- [ ] A note with a heading, bold text, a bullet list, a checklist, a quote, code, a prompt, a link, a table, an audio clip and a picture shows each of them in its own style on its card (checklist green with boxes, table teal grid, quote amber bar, code slate, prompt purple, link blue, audio rose pill). Done checklist items are struck through.
+- [ ] Long notes are cut off with a fade at the bottom; grid cards show more than list cards. Very long tables show only the first rows, long checklists the first four tasks.
+- [ ] A note with a photo shows a small cropped picture; scroll quickly through 50+ notes with photos: no stutter, and pictures appear within a moment. The first time is slower (thumbnails are made), later times are instant.
+- [ ] Rotated camera photos appear upright in the preview.
+- [ ] Edit a note and go back: its preview updates. Locked notes show only the lock icon and title. While searching, cards show the highlighted text snippet instead.
 
 ### Folders, tags and colors
 - [ ] The 3-dot menu has no Note options and no folder choice. Color opens in place below the dots, with a Back row; picking a color applies it and closes the menu.

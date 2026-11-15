@@ -53,6 +53,7 @@ internal fun NoteEntity.toSummary(): NoteSummary = NoteSummary(
     color = color,
     trashedAt = trashedAt,
     locked = locked,
+    blocksJson = if (locked) "" else blocksJson,
 )
 
 internal fun FolderEntity.toFolder(): Folder = Folder(id = id, name = name)

@@ -10,7 +10,7 @@
 
 <p align="center">
   <a href="https://github.com/mastah123/stackpad/actions/workflows/android.yml"><img alt="Build" src="https://github.com/mastah123/stackpad/actions/workflows/android.yml/badge.svg"></a>
-  <img alt="Version" src="https://img.shields.io/badge/version-2.0.0-4F46E5">
+  <img alt="Version" src="https://img.shields.io/badge/version-2.1.0-4F46E5">
   <img alt="Platform" src="https://img.shields.io/badge/platform-Android%208.0%2B-3DDC84">
   <img alt="Kotlin" src="https://img.shields.io/badge/Kotlin-2.0-7F52FF">
   <img alt="License" src="https://img.shields.io/badge/license-MIT-blue">
@@ -44,7 +44,7 @@ Also:
 - **App lock** with your fingerprint, face or screen lock, plus a hidden preview in recent apps.
 - **Home-screen widget** with a new-note button and your latest note.
 - **Undo / redo** in the editor.
-- **List or grid**: a button in the note list switches between a list and a two-column staggered grid (remembered).
+- **List or grid**: a button in the note list switches between a list and a two-column staggered grid (remembered). Note cards show a **formatted preview** of the start of each note (headings, bold, lists, checklists, quotes, code, tables, audio and a small picture), cut off with a fade. Pictures use small cached thumbnails so scrolling stays smooth.
 - A small faded line under the editor title shows the **word count** and when the note was created.
 - Cards have colors that match their job: checklist green, table teal, link blue, prompt purple, quote amber, code slate, audio rose.
 - **Folders** (managed from the note list; rename and delete are icons in the top bar when a folder is selected; a new note made while a folder is selected goes into it), **tags** and **colors** to organize notes, with filters in the note list.
@@ -121,7 +121,7 @@ To enable signed builds, add four repository secrets. Step-by-step instructions 
 
 ## Testing
 
-Unit tests cover the formula evaluator, span editing, URL handling, list markers, table operations, waveform helpers, block serialization, table functions, due dates and reminder planning, image zoom limits, audio speed, note sorting and filtering, tags, trash timing, undo history, word counting, note export (text, image/PDF layout and pagination), backup rules and app-lock timing. A manual checklist for everything else (UI, audio, camera) is in [docs/TESTING.md](docs/TESTING.md).
+Unit tests cover the formula evaluator, span editing, URL handling, list markers, table operations, waveform helpers, block serialization, table functions, due dates and reminder planning, image zoom limits, audio speed, note sorting and filtering, tags, trash timing, undo history, word counting, note previews, note export (text, image/PDF layout and pagination), backup rules and app-lock timing. A manual checklist for everything else (UI, audio, camera) is in [docs/TESTING.md](docs/TESTING.md).
 
 ## Known limitations
 

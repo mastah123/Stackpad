@@ -25,6 +25,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.stackpad.app.R
 import com.stackpad.app.data.model.NoteSummary
@@ -47,8 +48,12 @@ fun NoteCard(
     selecting: Boolean = false,
     selected: Boolean = false,
     onLongClick: () -> Unit = {},
-    /** Lines of preview to show; the grid shows more so cards differ in height. */
+    /** Lines of plain preview shown while searching (matches are highlighted). */
     previewLines: Int = 2,
+    /** Tallest the formatted preview may grow; the grid allows more than the list. */
+    previewMaxHeight: Dp = 96.dp,
+    /** How many blocks the formatted preview shows at most. */
+    previewItems: Int = 5,
 ) {
     val colors = MaterialTheme.colorScheme
     val mark = colors.tertiary.copy(alpha = 0.3f)
@@ -86,7 +91,21 @@ fun NoteCard(
                         overflow = TextOverflow.Ellipsis,
                     )
                 }
-                if (note.preview.isNotBlank()) {
+                val formatted = if (highlight.isEmpty() && !note.locked && note.blocksJson.isNotBlank()) {
+                    rememberPreviewItems(note, previewItems)
+                } else {
+                    null
+                }
+                if (formatted != null) {
+                    if (formatted.isNotEmpty()) {
+                        NotePreviewView(
+                            items = formatted,
+                            maxHeight = previewMaxHeight,
+                            fadeInto = if (selected) colors.primaryContainer else noteCardColor(note.color),
+                            modifier = Modifier.padding(top = 2.dp),
+                        )
+                    }
+                } else if (note.preview.isNotBlank()) {
                     Text(
                         text = highlightMatches(note.preview, highlight, mark),
                         style = MaterialTheme.typography.bodySmall,

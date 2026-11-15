@@ -25,7 +25,14 @@ object DocItems {
     fun from(note: Note): List<DocItem> {
         val items = ArrayList<DocItem>()
         if (note.title.isNotBlank()) items += DocItem.Heading(TextLevel.H1, note.title.trim())
-        note.blocks.filterNot { it.isBlank() }.forEach { block ->
+        items += blocks(note.blocks)
+        return items
+    }
+
+    /** The items for [blocks] alone, without a title. Used by note previews too. */
+    fun blocks(blocks: List<com.stackpad.app.data.model.Block>): List<DocItem> {
+        val items = ArrayList<DocItem>()
+        blocks.filterNot { it.isBlank() }.forEach { block ->
             when (block) {
                 is TextBlock -> items += if (block.level == TextLevel.PARAGRAPH) {
                     DocItem.Paragraph(block.text, block.spans)

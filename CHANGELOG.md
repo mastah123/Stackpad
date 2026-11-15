@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.1.0] - 2026-11-15
+
+### Added
+- **Formatted note previews** in the list and grid: the first blocks of each note appear as they look in the editor, with headings, bold/italic/underline, list markers, checklists with boxes, quotes, code, prompts, links, tables (first rows), audio and a picture. A fade marks where a preview is cut off. The grid shows taller previews than the list.
+- **Picture thumbnails**: previews use small JPEG copies (480 px, kept in the cache folder and re-made if the system clears them), so lists with many photos stay smooth.
+
+### Changed
+- While searching, cards still show a plain text snippet with the matches highlighted. Locked notes show no preview.
+
 ## [2.0.0] - 2026-11-15
 
 ### Changed
