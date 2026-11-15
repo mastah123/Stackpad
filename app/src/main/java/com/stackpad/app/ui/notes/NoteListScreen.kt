@@ -1,6 +1,7 @@
 package com.stackpad.app.ui.notes
 
 import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -9,8 +10,16 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
+import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
+import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridItemSpan
+import androidx.compose.foundation.lazy.staggeredgrid.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.GridView
+import androidx.compose.material.icons.filled.ViewAgenda
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -44,6 +53,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.stackpad.app.R
 import com.stackpad.app.data.model.Folder
 import com.stackpad.app.data.model.NoteSummary
+import com.stackpad.app.data.prefs.ListLayout
 import com.stackpad.app.domain.notes.FolderFilter
 import com.stackpad.app.domain.notes.FolderNames
 import com.stackpad.app.domain.notes.Tags
@@ -58,7 +68,8 @@ import kotlinx.coroutines.launch
 fun NoteListScreen(
     viewModel: NoteListViewModel,
     onOpenNote: (String) -> Unit,
-    onNewNote: () -> Unit,
+    /** Called with the folder selected in the list (or null), so a new note starts in it. */
+    onNewNote: (folderId: String?) -> Unit,
     onOpenTrash: () -> Unit,
     onOpenSettings: () -> Unit,
 ) {
@@ -68,7 +79,6 @@ fun NoteListScreen(
     val context = LocalContext.current
     val snackbar = remember { SnackbarHostState() }
 
-    var pendingTrash by remember { mutableStateOf<NoteSummary?>(null) }
     var newFolderDialog by remember { mutableStateOf(false) }
     var renameTarget by remember { mutableStateOf<Folder?>(null) }
     var deleteTarget by remember { mutableStateOf<Folder?>(null) }
@@ -76,6 +86,10 @@ fun NoteListScreen(
     // Notes picked by long-press. The list is in selection mode while this is not empty.
     var selectedIds by remember { mutableStateOf(emptySet<String>()) }
     val selecting = selectedIds.isNotEmpty()
+    // The folder shown right now; new notes start in it, and its rename/delete icons show in the top bar.
+    val currentFolder = (ui.filter.folder as? FolderFilter.InFolder)?.let { selected ->
+        ui.folders.firstOrNull { it.id == selected.id }
+    }
     var folderChoiceDialog by remember { mutableStateOf(false) }
     var addTagDialog by remember { mutableStateOf(false) }
     val searchWords = remember(query) { SearchQuery.words(query) }
@@ -164,6 +178,21 @@ fun NoteListScreen(
                     },
                     title = { Text(sectionTitle(ui, mode), style = MaterialTheme.typography.titleMedium, maxLines = 1) },
                     actions = {
+                        currentFolder?.let { folder ->
+                            IconButton(onClick = { renameTarget = folder }) {
+                                Icon(Icons.Filled.Edit, contentDescription = stringResource(R.string.folder_rename))
+                            }
+                            IconButton(onClick = { deleteTarget = folder }) {
+                                Icon(Icons.Filled.Delete, contentDescription = stringResource(R.string.folder_delete))
+                            }
+                        }
+                        val grid = ui.layout == ListLayout.GRID
+                        IconButton(onClick = { viewModel.setLayout(if (grid) ListLayout.LIST else ListLayout.GRID) }) {
+                            Icon(
+                                imageVector = if (grid) Icons.Filled.ViewAgenda else Icons.Filled.GridView,
+                                contentDescription = stringResource(if (grid) R.string.cd_layout_list else R.string.cd_layout_grid),
+                            )
+                        }
                         SortMenu(current = ui.sort, onSelect = viewModel::setSort)
                         ThemeMenu(current = themeMode, onSelect = viewModel::setThemeMode)
                     },
@@ -172,7 +201,7 @@ fun NoteListScreen(
             snackbarHost = { SnackbarHost(snackbar) },
             floatingActionButton = {
                 if (!selecting) {
-                    FloatingActionButton(onClick = onNewNote) {
+                    FloatingActionButton(onClick = { onNewNote(currentFolder?.id) }) {
                         Icon(Icons.Filled.Add, contentDescription = stringResource(R.string.cd_new_note))
                     }
                 }
@@ -201,8 +230,6 @@ fun NoteListScreen(
                         selected = ui.filter.folder,
                         onSelect = viewModel::selectFolder,
                         onNewFolder = { newFolderDialog = true },
-                        onRenameFolder = { renameTarget = it },
-                        onDeleteFolder = { deleteTarget = it },
                         modifier = Modifier.padding(bottom = 4.dp),
                     )
                     ListMode.TAGS -> if (ui.tags.isEmpty()) {
@@ -228,6 +255,7 @@ fun NoteListScreen(
                     current.isEmpty() -> EmptyState(query = query, filtered = !ui.filter.isEmpty)
                     else -> NoteList(
                         notes = current,
+                        layout = ui.layout,
                         highlight = searchWords,
                         selecting = selecting,
                         selectedIds = selectedIds,
@@ -236,7 +264,6 @@ fun NoteListScreen(
                         },
                         onLongPress = { id -> selectedIds = selectedIds + id },
                         onTogglePin = viewModel::togglePin,
-                        onTrash = { pendingTrash = it },
                     )
                 }
             }
@@ -268,19 +295,6 @@ fun NoteListScreen(
                 selectedIds = emptySet()
             },
             onDismiss = { addTagDialog = false },
-        )
-    }
-
-    pendingTrash?.let { note ->
-        ConfirmDialog(
-            title = stringResource(R.string.dialog_trash_note_title),
-            message = stringResource(R.string.dialog_trash_note_message, TrashPolicy.RETENTION_DAYS),
-            confirmLabel = stringResource(R.string.action_move_to_trash),
-            onConfirm = {
-                viewModel.moveToTrash(note.id)
-                pendingTrash = null
-            },
-            onDismiss = { pendingTrash = null },
         )
     }
 
@@ -348,47 +362,76 @@ private fun sectionTitle(ui: NoteListUiState, mode: ListMode): String {
 private fun toggled(selected: Set<String>, id: String): Set<String> =
     if (id in selected) selected - id else selected + id
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun NoteList(
     notes: List<NoteSummary>,
+    layout: ListLayout,
     highlight: List<String>,
     selecting: Boolean,
     selectedIds: Set<String>,
     onOpen: (String) -> Unit,
     onLongPress: (String) -> Unit,
     onTogglePin: (NoteSummary) -> Unit,
-    onTrash: (NoteSummary) -> Unit,
 ) {
     val pinned = notes.filter { it.pinned }
     val others = notes.filterNot { it.pinned }
+    val grid = layout == ListLayout.GRID
 
     @Composable
     fun card(note: NoteSummary) = NoteCard(
         note = note,
         onClick = { onOpen(note.id) },
         onTogglePin = { onTogglePin(note) },
-        onDelete = { onTrash(note) },
         highlight = highlight,
         selecting = selecting,
         selected = note.id in selectedIds,
         onLongClick = { onLongPress(note.id) },
+        previewLines = if (grid) GRID_PREVIEW_LINES else LIST_PREVIEW_LINES,
     )
 
-    LazyColumn(
-        modifier = Modifier.fillMaxSize(),
-        contentPadding = PaddingValues(start = 12.dp, end = 12.dp, top = 4.dp, bottom = 88.dp),
-        verticalArrangement = Arrangement.spacedBy(6.dp),
-    ) {
-        if (pinned.isNotEmpty()) {
-            item(key = "header_pinned") { SectionLabel(stringResource(R.string.section_pinned)) }
-            items(pinned, key = { it.id }) { note -> card(note) }
-            if (others.isNotEmpty()) {
-                item(key = "header_notes") { SectionLabel(stringResource(R.string.section_notes)) }
+    if (grid) {
+        // Two columns of cards at their natural height; section labels span both.
+        LazyVerticalStaggeredGrid(
+            columns = StaggeredGridCells.Fixed(2),
+            modifier = Modifier.fillMaxSize(),
+            contentPadding = PaddingValues(start = 12.dp, end = 12.dp, top = 4.dp, bottom = 88.dp),
+            verticalItemSpacing = 6.dp,
+            horizontalArrangement = Arrangement.spacedBy(6.dp),
+        ) {
+            if (pinned.isNotEmpty()) {
+                item(key = "header_pinned", span = StaggeredGridItemSpan.FullLine) {
+                    SectionLabel(stringResource(R.string.section_pinned))
+                }
+                items(pinned, key = { it.id }) { note -> card(note) }
+                if (others.isNotEmpty()) {
+                    item(key = "header_notes", span = StaggeredGridItemSpan.FullLine) {
+                        SectionLabel(stringResource(R.string.section_notes))
+                    }
+                }
             }
+            items(others, key = { it.id }) { note -> card(note) }
         }
-        items(others, key = { it.id }) { note -> card(note) }
+    } else {
+        LazyColumn(
+            modifier = Modifier.fillMaxSize(),
+            contentPadding = PaddingValues(start = 12.dp, end = 12.dp, top = 4.dp, bottom = 88.dp),
+            verticalArrangement = Arrangement.spacedBy(6.dp),
+        ) {
+            if (pinned.isNotEmpty()) {
+                item(key = "header_pinned") { SectionLabel(stringResource(R.string.section_pinned)) }
+                items(pinned, key = { it.id }) { note -> card(note) }
+                if (others.isNotEmpty()) {
+                    item(key = "header_notes") { SectionLabel(stringResource(R.string.section_notes)) }
+                }
+            }
+            items(others, key = { it.id }) { note -> card(note) }
+        }
     }
 }
+
+private const val LIST_PREVIEW_LINES = 2
+private const val GRID_PREVIEW_LINES = 6
 
 @Composable
 private fun SectionLabel(text: String) {

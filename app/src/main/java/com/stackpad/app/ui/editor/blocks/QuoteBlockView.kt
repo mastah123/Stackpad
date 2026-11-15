@@ -1,5 +1,8 @@
 package com.stackpad.app.ui.editor.blocks
 
+import com.stackpad.app.ui.theme.tint
+import com.stackpad.app.ui.theme.container
+import com.stackpad.app.ui.theme.BlockAccent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.IntrinsicSize
@@ -50,7 +53,11 @@ fun QuoteBlockView(
     }
 
     Row(
-        modifier = modifier.fillMaxWidth().height(IntrinsicSize.Min),
+        modifier = modifier
+            .fillMaxWidth()
+            .height(IntrinsicSize.Min)
+            .clip(RoundedCornerShape(8.dp))
+            .background(BlockAccent.QUOTE.container()),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Box(
@@ -58,7 +65,7 @@ fun QuoteBlockView(
                 .width(3.dp)
                 .fillMaxHeight()
                 .clip(RoundedCornerShape(2.dp))
-                .background(colors.primary.copy(alpha = 0.7f)),
+                .background(BlockAccent.QUOTE.tint()),
         )
         InlineTextField(
             text = block.text,

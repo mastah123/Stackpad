@@ -1,5 +1,8 @@
 package com.stackpad.app.ui.editor.blocks
 
+import com.stackpad.app.ui.theme.tint
+import com.stackpad.app.ui.theme.container
+import com.stackpad.app.ui.theme.BlockAccent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectHorizontalDragGestures
@@ -73,7 +76,7 @@ fun AudioBlockView(
     Surface(
         modifier = modifier.fillMaxWidth(),
         shape = RoundedCornerShape(24.dp),
-        color = colors.surfaceVariant,
+        color = BlockAccent.AUDIO.container(),
     ) {
         Row(
             modifier = Modifier.padding(start = 4.dp, end = 2.dp, top = 3.dp, bottom = 3.dp),
@@ -83,7 +86,7 @@ fun AudioBlockView(
                 modifier = Modifier
                     .size(32.dp)
                     .clip(CircleShape)
-                    .background(if (available) colors.primary else colors.outline)
+                    .background(if (available) BlockAccent.AUDIO.tint() else colors.outline)
                     .clickable(enabled = available, role = Role.Button, onClick = onTogglePlay),
                 contentAlignment = Alignment.Center,
             ) {
@@ -100,7 +103,7 @@ fun AudioBlockView(
                 levels = block.waveform,
                 progress = progress,
                 playing = playing,
-                activeColor = colors.primary,
+                activeColor = BlockAccent.AUDIO.tint(),
                 inactiveColor = colors.outlineVariant,
                 modifier = Modifier
                     .weight(1f)

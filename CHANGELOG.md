@@ -7,6 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.9.0] - 2026-11-15
+
+### Added
+- **List / Grid** button in the note list's top bar. Grid shows two columns of cards at their natural height, with longer previews. The choice is remembered.
+- **Info line** under the editor title: word count and the date and time the note was created, small and faded.
+- **Block colors by function**: checklist green, table teal, link blue, prompt purple, quote amber, code slate, audio rose.
+- A note created while a folder is selected starts in that folder.
+
+### Changed
+- Folder **rename** and **delete** are now icons next to the sort button while a folder is selected; the "Edit" tile is gone.
+
+### Removed
+- The delete button on note cards. Use long-press to select notes and move them to the trash (with Undo), or delete from inside the note.
+
 ## [1.8.0] - 2026-11-14
 
 ### Added

@@ -6,7 +6,7 @@
 ./gradlew testDebugUnitTest
 ```
 
-Covers: formula evaluator, span editing, URL detection/validation, list markers, table operations, waveform helpers, block JSON serialization, table functions, due dates and reminder planning, image zoom limits, audio speed, note sorting and filtering, tags, trash timing, and undo history, note export, and the image/PDF layout and pagination.
+Covers: formula evaluator, span editing, URL detection/validation, list markers, table operations, waveform helpers, block JSON serialization, table functions, due dates and reminder planning, image zoom limits, audio speed, note sorting and filtering, tags, trash timing, and undo history, word counting, note export, and the image/PDF layout and pagination.
 
 ## Manual checklist (run on a device or emulator, Android 8.0+)
 
@@ -49,10 +49,17 @@ Covers: formula evaluator, span editing, URL detection/validation, list markers,
 - [ ] Add a Divider: a thin line appears and the "x" removes it. A note that only has a divider is saved.
 - [ ] Quote and code text is found by search.
 
+### List and grid, cards, info line
+- [ ] Note list top bar: the layout button switches between list and a two-column grid. Cards in the grid have different heights (longer previews). Pinned and Notes labels span both columns. Selection by long-press, pin and opening work in both. The choice survives restarting the app.
+- [ ] Note cards have a pin button but no delete button. Long-press, select, and the trash icon in the selection bar still move notes to the trash with Undo.
+- [ ] Editor: under the title a small faded line shows "N words · Created <date, time>". Typing updates the count; "1 word" is singular. Old notes show their original creation date.
+- [ ] Block colors: checklist green, table teal, link blue, prompt purple, quote amber, code slate, audio rose. Check both light and dark themes: text stays readable.
+
 ### Folders, tags and colors
 - [ ] The 3-dot menu has no Note options and no folder choice. Color opens in place below the dots, with a Back row; picking a color applies it and closes the menu.
 - [ ] Side menu, Folders: a small grid of tiles (All, No folder, each folder, New folder) appears above the notes, with no tag row. Selecting a tile filters the list and the title shows the folder name.
-- [ ] With a folder selected, the Edit tile offers Rename and Delete. After deleting, its notes remain under "No folder".
+- [ ] With a folder selected, Rename and Delete icons appear in the top bar next to the sort button (there is no Edit tile). Rename changes the title; Delete asks first, and afterwards its notes remain under "No folder". The icons are gone when no folder is selected.
+- [ ] With a folder selected, tap the + button and type something: the new note is in that folder (check in the list). Leaving the new note empty saves nothing. With All or No folder selected, new notes have no folder.
 - [ ] With many folders the grid scrolls on its own without pushing the notes off screen.
 - [ ] Add tags to a note (type and press Done or Add; also try `#Work` and `Two Words`). They appear lowercase as `#work` and `#two-words`. Adding the same tag again does nothing. The 11th tag cannot be added. Tapping a tag above the title (its X) removes it.
 - [ ] A note with tags shows them as chips in a row above its title; tapping one removes it.
@@ -64,7 +71,7 @@ Covers: formula evaluator, span editing, URL detection/validation, list markers,
 - [ ] An empty filter result shows "No notes here. Try another folder or tag."
 
 ### Trash
-- [ ] Delete from the list: a confirmation appears; the note leaves the list and a snackbar offers Undo. Undo brings it back.
+- [ ] Long-press a note and tap the trash icon in the selection bar: the note leaves the list and a snackbar offers Undo. Undo brings it back.
 - [ ] Delete from the editor: a confirmation appears, then you return to the list and the note is in the trash.
 - [ ] Open Trash from the top bar. The note shows how many days are left (30 days for a fresh one).
 - [ ] Restore returns the note to the list with its content, images, audio, folder, tags and color.

@@ -1,5 +1,6 @@
 package com.stackpad.app.ui.editor.blocks
 
+import com.stackpad.app.ui.theme.BlockAccent
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -55,7 +56,7 @@ fun CodeBlockView(
         }
     }
 
-    BlockSurface(modifier = modifier.fillMaxWidth(), color = colors.surfaceVariant) {
+    BlockSurface(modifier = modifier.fillMaxWidth(), accent = BlockAccent.CODE) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             Icon(
                 imageVector = Icons.Filled.Code,

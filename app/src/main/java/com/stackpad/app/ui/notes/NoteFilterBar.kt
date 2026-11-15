@@ -21,25 +21,16 @@ import androidx.compose.ui.semantics.selected
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Folder
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -50,8 +41,8 @@ import com.stackpad.app.domain.notes.FolderFilter
 import com.stackpad.app.domain.notes.TagCount
 
 /**
- * Small grid of folder tiles: All, No folder, every folder and "New folder". The selected folder
- * gets an extra "Edit" tile with rename and delete. Scrolls on its own when there are many folders.
+ * Small grid of folder tiles: All, No folder, every folder and "New folder". Rename and delete of the
+ * selected folder are icons in the top bar. Scrolls on its own when there are many folders.
  */
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
@@ -60,8 +51,6 @@ fun FolderGrid(
     selected: FolderFilter,
     onSelect: (FolderFilter) -> Unit,
     onNewFolder: () -> Unit,
-    onRenameFolder: (Folder) -> Unit,
-    onDeleteFolder: (Folder) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     FlowRow(
@@ -84,10 +73,6 @@ fun FolderGrid(
                 folder.name,
                 (selected as? FolderFilter.InFolder)?.id == folder.id,
             ) { onSelect(FolderFilter.InFolder(folder.id)) }
-        }
-        val current = folders.firstOrNull { (selected as? FolderFilter.InFolder)?.id == it.id }
-        if (current != null) {
-            FolderEditTile({ onRenameFolder(current) }, { onDeleteFolder(current) })
         }
         FolderTile(Icons.Filled.Add, stringResource(R.string.folder_new), false, onClick = onNewFolder)
     }
@@ -118,27 +103,6 @@ private fun FolderTile(icon: ImageVector, label: String, selected: Boolean, onCl
 }
 
 private val TILE_WIDTH = 104.dp
-
-/** Tile that opens the rename / delete menu of the selected folder. */
-@Composable
-private fun FolderEditTile(onRename: () -> Unit, onDelete: () -> Unit) {
-    var open by remember { mutableStateOf(false) }
-    Box {
-        FolderTile(Icons.Filled.Edit, stringResource(R.string.cd_folder_options), false) { open = true }
-        DropdownMenu(expanded = open, onDismissRequest = { open = false }) {
-            DropdownMenuItem(
-                text = { Text(stringResource(R.string.folder_rename)) },
-                leadingIcon = { Icon(Icons.Filled.Edit, contentDescription = null) },
-                onClick = { open = false; onRename() },
-            )
-            DropdownMenuItem(
-                text = { Text(stringResource(R.string.folder_delete)) },
-                leadingIcon = { Icon(Icons.Filled.Delete, contentDescription = null) },
-                onClick = { open = false; onDelete() },
-            )
-        }
-    }
-}
 
 /** Scrollable chips for filtering by tag. Tap the selected tag again to clear it. */
 @Composable

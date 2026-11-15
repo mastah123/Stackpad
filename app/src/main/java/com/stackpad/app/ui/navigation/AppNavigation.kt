@@ -1,5 +1,6 @@
 package com.stackpad.app.ui.navigation
 
+import android.net.Uri
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -24,7 +25,8 @@ private const val ROUTE_NOTES = "notes"
 private const val ROUTE_TRASH = "trash"
 private const val ROUTE_SETTINGS = "settings"
 private const val ARG_NOTE_ID = "noteId"
-private const val ROUTE_EDITOR = "editor/{$ARG_NOTE_ID}"
+private const val ARG_FOLDER_ID = "folderId"
+private const val ROUTE_EDITOR = "editor/{$ARG_NOTE_ID}?$ARG_FOLDER_ID={$ARG_FOLDER_ID}"
 
 @Composable
 fun AppNavigation(
@@ -49,7 +51,12 @@ fun AppNavigation(
             NoteListScreen(
                 viewModel = viewModel,
                 onOpenNote = { id -> navController.navigate("editor/$id") },
-                onNewNote = { navController.navigate("editor/${BlockFactory.newId()}") },
+                onNewNote = { folderId ->
+                    val id = BlockFactory.newId()
+                    navController.navigate(
+                        if (folderId == null) "editor/$id" else "editor/$id?$ARG_FOLDER_ID=${Uri.encode(folderId)}",
+                    )
+                },
                 onOpenTrash = { navController.navigate(ROUTE_TRASH) },
                 onOpenSettings = { navController.navigate(ROUTE_SETTINGS) },
             )
@@ -64,12 +71,20 @@ fun AppNavigation(
         }
         composable(
             route = ROUTE_EDITOR,
-            arguments = listOf(navArgument(ARG_NOTE_ID) { type = NavType.StringType }),
+            arguments = listOf(
+                navArgument(ARG_NOTE_ID) { type = NavType.StringType },
+                navArgument(ARG_FOLDER_ID) {
+                    type = NavType.StringType
+                    nullable = true
+                    defaultValue = null
+                },
+            ),
         ) { entry ->
             val noteId = entry.arguments?.getString(ARG_NOTE_ID) ?: return@composable
+            val folderId = entry.arguments?.getString(ARG_FOLDER_ID)
             val viewModel: NoteEditorViewModel = viewModel(
                 key = noteId,
-                factory = NoteEditorViewModel.factory(container, noteId),
+                factory = NoteEditorViewModel.factory(container, noteId, folderId),
             )
             NoteEditorScreen(
                 viewModel = viewModel,

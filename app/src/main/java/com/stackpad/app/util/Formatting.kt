@@ -16,3 +16,9 @@ fun formatDuration(ms: Long): String {
 
 /** Locale-aware medium date, e.g. "Nov 6, 2026". */
 fun formatDate(epochMillis: Long): String = dateFormatter.format(Instant.ofEpochMilli(epochMillis))
+
+private val dateTimeFormatter: DateTimeFormatter =
+    DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM, FormatStyle.SHORT).withZone(ZoneId.systemDefault())
+
+/** Locale-aware date and time, e.g. "Nov 6, 2026, 9:31 PM". */
+fun formatDateTime(epochMillis: Long): String = dateTimeFormatter.format(Instant.ofEpochMilli(epochMillis))

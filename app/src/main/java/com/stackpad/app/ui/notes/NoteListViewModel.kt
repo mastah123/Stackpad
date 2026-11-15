@@ -8,6 +8,7 @@ import com.stackpad.app.AppContainer
 import com.stackpad.app.data.NoteRepository
 import com.stackpad.app.data.model.Folder
 import com.stackpad.app.data.model.NoteSummary
+import com.stackpad.app.data.prefs.ListLayout
 import com.stackpad.app.data.prefs.ListPreferences
 import com.stackpad.app.data.prefs.ThemeMode
 import com.stackpad.app.data.prefs.ThemePreferences
@@ -37,6 +38,7 @@ data class NoteListUiState(
     val folders: List<Folder> = emptyList(),
     val tags: List<TagCount> = emptyList(),
     val sort: NoteSort = NoteSort.LAST_EDITED,
+    val layout: ListLayout = ListLayout.LIST,
     val filter: NoteFilter = NoteFilter(),
 )
 
@@ -65,8 +67,9 @@ class NoteListViewModel(
         repository.observeFolders(),
         repository.observeTagCounts(),
         listPreferences.sort,
+        listPreferences.layout,
         _filter,
-    ) { notes, folders, tags, sort, filter ->
+    ) { notes, folders, tags, sort, layout, filter ->
         // A filter pointing at a deleted folder or an unused tag quietly falls back to "all".
         val folder = filter.folder
         val folderOk = folder !is FolderFilter.InFolder || folders.any { it.id == folder.id }
@@ -82,6 +85,7 @@ class NoteListViewModel(
             folders = folders,
             tags = tags,
             sort = sort,
+            layout = layout,
             filter = effective,
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(STOP_TIMEOUT_MS), NoteListUiState())
@@ -146,6 +150,10 @@ class NoteListViewModel(
 
     fun setSort(sort: NoteSort) {
         viewModelScope.launch { listPreferences.setSort(sort) }
+    }
+
+    fun setLayout(layout: ListLayout) {
+        viewModelScope.launch { listPreferences.setLayout(layout) }
     }
 
     fun selectFolder(folder: FolderFilter) {

@@ -1,5 +1,7 @@
 package com.stackpad.app.ui.components
 
+import com.stackpad.app.ui.theme.container
+import com.stackpad.app.ui.theme.BlockAccent
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
@@ -21,12 +23,14 @@ fun BlockSurface(
     shape: Shape = RoundedCornerShape(12.dp),
     color: Color = MaterialTheme.colorScheme.surfaceVariant,
     border: BorderStroke? = null,
+    /** When set, the card takes this block type's color instead of [color]. */
+    accent: BlockAccent? = null,
     content: @Composable ColumnScope.() -> Unit,
 ) {
     Surface(
         modifier = modifier.fillMaxWidth(),
         shape = shape,
-        color = color,
+        color = accent?.container() ?: color,
         border = border,
     ) {
         Column(

@@ -1,5 +1,6 @@
 package com.stackpad.app.ui.editor.blocks
 
+import com.stackpad.app.ui.theme.BlockAccent
 import com.stackpad.app.ui.components.keepCaretVisible
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.background
@@ -118,7 +119,7 @@ fun ChecklistBlockView(
         }
     }
 
-    BlockSurface(modifier = modifier, shape = RoundedCornerShape(14.dp)) {
+    BlockSurface(modifier = modifier, shape = RoundedCornerShape(14.dp), accent = BlockAccent.CHECKLIST) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             InlineTextField(
                 text = block.title,

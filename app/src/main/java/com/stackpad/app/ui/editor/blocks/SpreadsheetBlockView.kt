@@ -1,5 +1,6 @@
 package com.stackpad.app.ui.editor.blocks
 
+import com.stackpad.app.ui.theme.BlockAccent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -76,7 +77,7 @@ fun SpreadsheetBlockView(
     val rows = block.rowCount
     val columns = block.columnCount
 
-    BlockSurface(modifier = modifier) {
+    BlockSurface(modifier = modifier, accent = BlockAccent.TABLE) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             Text(
                 text = stringResource(R.string.block_table),

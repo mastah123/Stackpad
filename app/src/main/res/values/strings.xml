@@ -90,7 +90,6 @@
     <string name="block_code">CODE</string>
     <string name="cd_copy_code">Copy code</string>
     <string name="cd_erase_note">Delete note forever</string>
-    <string name="cd_folder_options">Folder options</string>
     <string name="cd_open_link">Open link</string>
     <string name="cd_redo">Redo</string>
     <string name="cd_remove_code">Remove code block</string>
@@ -269,4 +268,12 @@
     <string name="msg_share_render_failed">Could not create the file. Nothing was shared.</string>
     <string name="msg_share_too_tall">This note is too long for one image. Share it as PDF instead.</string>
     <string name="action_back">Back</string>
+    <plurals name="editor_word_count">
+        <item quantity="one">%d word</item>
+        <item quantity="other">%d words</item>
+    </plurals>
+    <string name="editor_created">Created %s</string>
+    <string name="editor_info_separator">%1$s · %2$s</string>
+    <string name="cd_layout_grid">Show as grid</string>
+    <string name="cd_layout_list">Show as list</string>
 </resources>

@@ -1,5 +1,7 @@
 package com.stackpad.app.ui.editor.blocks
 
+import com.stackpad.app.ui.theme.tint
+import com.stackpad.app.ui.theme.BlockAccent
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -56,15 +58,15 @@ fun PromptBlockView(
 
     BlockSurface(
         modifier = modifier.fillMaxWidth(),
-        color = colors.primaryContainer.copy(alpha = 0.35f),
-        border = BorderStroke(1.dp, colors.primary.copy(alpha = 0.35f)),
+        accent = BlockAccent.PROMPT,
+        border = BorderStroke(1.dp, BlockAccent.PROMPT.tint().copy(alpha = 0.4f)),
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             Icon(
                 imageVector = Icons.Filled.AutoAwesome,
                 contentDescription = null,
                 modifier = Modifier.size(14.dp),
-                tint = colors.primary,
+                tint = BlockAccent.PROMPT.tint(),
             )
             Spacer(Modifier.width(6.dp))
             Text(

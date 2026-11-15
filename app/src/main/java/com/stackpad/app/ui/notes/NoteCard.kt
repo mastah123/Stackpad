@@ -11,7 +11,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CheckBox
 import androidx.compose.material.icons.filled.CheckBoxOutlineBlank
-import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.PushPin
 import androidx.compose.material.icons.outlined.PushPin
@@ -35,20 +34,21 @@ import com.stackpad.app.ui.theme.noteCardColor
 import com.stackpad.app.util.formatDate
 
 @OptIn(ExperimentalFoundationApi::class)
-/** Compact row for one note: title, two-line preview, tags, date, and pin/trash actions. */
+/** Compact row for one note: title, preview, tags, date and a pin button (notes are trashed from selection mode). */
 @Composable
 fun NoteCard(
     note: NoteSummary,
     onClick: () -> Unit,
     onTogglePin: () -> Unit,
-    onDelete: () -> Unit,
     modifier: Modifier = Modifier,
     /** Search words to mark in the title, preview and tags. */
     highlight: List<String> = emptyList(),
-    /** True while several notes are being selected: the card shows a checkbox instead of pin and trash. */
+    /** True while several notes are being selected: the card shows a checkbox instead of the pin button. */
     selecting: Boolean = false,
     selected: Boolean = false,
     onLongClick: () -> Unit = {},
+    /** Lines of preview to show; the grid shows more so cards differ in height. */
+    previewLines: Int = 2,
 ) {
     val colors = MaterialTheme.colorScheme
     val mark = colors.tertiary.copy(alpha = 0.3f)
@@ -91,7 +91,7 @@ fun NoteCard(
                         text = highlightMatches(note.preview, highlight, mark),
                         style = MaterialTheme.typography.bodySmall,
                         color = colors.onSurfaceVariant,
-                        maxLines = 2,
+                        maxLines = previewLines,
                         overflow = TextOverflow.Ellipsis,
                     )
                 }
@@ -125,11 +125,6 @@ fun NoteCard(
                 contentDescription = stringResource(if (note.pinned) R.string.cd_unpin else R.string.cd_pin),
                 onClick = onTogglePin,
                 tint = if (note.pinned) colors.primary else colors.onSurfaceVariant,
-            )
-            SmallIconButton(
-                icon = Icons.Filled.Delete,
-                contentDescription = stringResource(R.string.cd_trash_note),
-                onClick = onDelete,
             )
             }
         }

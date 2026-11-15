@@ -1,5 +1,6 @@
 package com.stackpad.app.ui.editor.blocks
 
+import com.stackpad.app.ui.theme.BlockAccent
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -43,7 +44,7 @@ fun LinkBlockView(
     val validUrl = UrlUtils.normalize(block.url)
     val invalid = block.url.isNotBlank() && validUrl == null
 
-    BlockSurface(modifier = modifier) {
+    BlockSurface(modifier = modifier, accent = BlockAccent.LINK) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             Icon(
                 imageVector = Icons.Filled.Link,

@@ -16,6 +16,8 @@ data class EditorUiState(
     val color: Int = 0,
     /** True when the note needs the phone's screen lock to open. */
     val locked: Boolean = false,
+    /** When the note was first created (epoch millis); 0 until loaded. */
+    val createdAt: Long = 0L,
     /** Block that should grab keyboard focus once it is on screen. */
     val focusBlockId: String? = null,
     /** Caret position to use when focusing [focusBlockId]; null means the end of the text. */

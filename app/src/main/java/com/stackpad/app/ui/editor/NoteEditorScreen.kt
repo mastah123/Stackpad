@@ -74,6 +74,7 @@ import com.stackpad.app.ui.components.InlineTextField
 import com.stackpad.app.util.openAppSettings
 import com.stackpad.app.util.openUrl
 import com.stackpad.app.util.shareText
+import com.stackpad.app.domain.text.WordCount
 import com.stackpad.app.util.shareFile
 import com.stackpad.app.data.export.NoteFileExporter
 import com.stackpad.app.data.export.NoteTooTallException
@@ -231,7 +232,7 @@ private fun NoteEditorContent(
         snapshotFlow { state.focusBlockId }.filterNotNull().collectLatest { id ->
             withFrameNanos { }
             val index = state.blocks.indexOfFirst { it.id == id }
-            val itemIndex = index + (if (state.tags.isEmpty()) 1 else 2) // the optional tags row and the title come first
+            val itemIndex = index + (if (state.tags.isEmpty()) 2 else 3) // the optional tags row, the title and the info line come first
             if (index >= 0 && listState.layoutInfo.visibleItemsInfo.none { it.index == itemIndex }) {
                 listState.animateScrollToItem(itemIndex)
             }
@@ -463,6 +464,13 @@ private fun NoteEditorContent(
                         ),
                         keyboardActions = KeyboardActions(onNext = { focusManager.moveFocus(FocusDirection.Down) }),
                         modifier = Modifier.padding(bottom = 4.dp),
+                    )
+                }
+                item(key = "info") {
+                    NoteInfoLine(
+                        wordCount = remember(state.title, state.blocks) { WordCount.of(state.title, state.blocks) },
+                        createdAt = state.createdAt,
+                        modifier = Modifier.padding(bottom = 8.dp),
                     )
                 }
                 items(state.blocks, key = { it.id }) { block ->

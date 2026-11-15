@@ -49,6 +49,8 @@ import kotlinx.coroutines.launch
 class NoteEditorViewModel(
     private val container: AppContainer,
     private val noteId: String,
+    /** Folder a brand-new note starts in (the one selected in the note list); ignored for existing notes. */
+    private val initialFolderId: String? = null,
 ) : ViewModel() {
 
     private val repository = container.repository
@@ -119,9 +121,15 @@ class NoteEditorViewModel(
                     tags = note.tags,
                     color = note.color,
                     locked = note.locked,
+                    createdAt = note.createdAt,
                 )
             } else {
-                _state.value = EditorUiState(loaded = true, blocks = listOf(BlockFactory.text()))
+                _state.value = EditorUiState(
+                    loaded = true,
+                    blocks = listOf(BlockFactory.text()),
+                    folderId = initialFolderId,
+                    createdAt = createdAt,
+                )
             }
         }
     }
@@ -633,8 +641,8 @@ class NoteEditorViewModel(
         private const val MIN_RECORDING_MS = 600L
         private const val MAX_RECORDING_MS = 10 * 60 * 1000L
 
-        fun factory(container: AppContainer, noteId: String) = viewModelFactory {
-            initializer { NoteEditorViewModel(container, noteId) }
+        fun factory(container: AppContainer, noteId: String, folderId: String? = null) = viewModelFactory {
+            initializer { NoteEditorViewModel(container, noteId, folderId) }
         }
     }
 }
