@@ -5,29 +5,19 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.compositeOver
 import androidx.compose.ui.graphics.luminance
+import com.stackpad.app.domain.blocks.BlockTone
 
-/** Editor blocks that are drawn as cards, each with a color that hints at what it is for. */
-enum class BlockAccent(val color: Color) {
-    /** Tasks to tick off: green. */
-    CHECKLIST(Color(0xFF43A047)),
+/** Editor blocks that are drawn as cards, each tinted by [BlockTone] so its color hints at what it is for. */
+enum class BlockAccent(tone: BlockTone) {
+    CHECKLIST(BlockTone.CHECKLIST),
+    TABLE(BlockTone.TABLE),
+    LINK(BlockTone.LINK),
+    PROMPT(BlockTone.PROMPT),
+    QUOTE(BlockTone.QUOTE),
+    CODE(BlockTone.CODE),
+    AUDIO(BlockTone.AUDIO);
 
-    /** Numbers and formulas: teal. */
-    TABLE(Color(0xFF00897B)),
-
-    /** Something to open elsewhere: blue. */
-    LINK(Color(0xFF1E88E5)),
-
-    /** Text to hand to an AI: purple. */
-    PROMPT(Color(0xFF8E24AA)),
-
-    /** Words from someone else: amber. */
-    QUOTE(Color(0xFFF9A825)),
-
-    /** Code to copy: slate. */
-    CODE(Color(0xFF546E7A)),
-
-    /** A voice recording: rose. */
-    AUDIO(Color(0xFFD81B60)),
+    val color: Color = Color(tone.argb)
 }
 
 /** The accent itself, for icons, bars and borders. */

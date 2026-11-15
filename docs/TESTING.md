@@ -130,8 +130,8 @@ Covers: formula evaluator, span editing, URL detection/validation, list markers,
 - [ ] An image shows as `[Image: caption]`. An audio note shows its length.
 - [ ] Sharing an empty note shows "This note is empty" and opens nothing.
 - [ ] Share, Copy copies the whole note as plain text. Back returns to the main menu.
-- [ ] Share, Image: a single PNG opens in the share sheet. Check title, headings, bold/italic, list markers, checklist boxes (done items struck through), table with grid and calculated values, quote bar, code box, link, divider and pictures with captions. Open the shared file to confirm it.
-- [ ] Share, PDF: A4 pages; blocks are not cut in half unless taller than a page; pictures fit the page width. Try a note with many blocks (several pages) and one empty note (message, nothing shared).
+- [ ] Share, Image: a message says it was saved to the gallery, the share sheet opens, and the picture is in the gallery album "Stackpad". Check title, headings, bold/italic, list markers, checklist card (green, boxes drawn, ticks on done items struck through), table (teal header and grid, calculated values), quote (amber bar), prompt (purple outline), code (slate, monospaced), link (blue), audio (rose pill with play button), divider and pictures with captions. A colored note gives a lightly tinted page. On Android 9 or older: the storage permission is asked once; deny it and the image is still shared with a message.
+- [ ] Share, PDF: the file picker opens with the note title as the name; after choosing a place the PDF is saved there ("PDF saved") and the share sheet opens; cancelling the picker does nothing. Same look as the image. A4 pages; blocks are not cut in half unless taller than a page; pictures fit the page width. Try a note with many blocks (several pages) and one empty note (message, nothing shared).
 - [ ] A very long note shows "too long for one image" for Image and still works as PDF.
 - [ ] The menu also has Move to trash, which still asks for confirmation.
 

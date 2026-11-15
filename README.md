@@ -10,7 +10,7 @@
 
 <p align="center">
   <a href="https://github.com/mastah123/stackpad/actions/workflows/android.yml"><img alt="Build" src="https://github.com/mastah123/stackpad/actions/workflows/android.yml/badge.svg"></a>
-  <img alt="Version" src="https://img.shields.io/badge/version-1.9.0-4F46E5">
+  <img alt="Version" src="https://img.shields.io/badge/version-2.0.0-4F46E5">
   <img alt="Platform" src="https://img.shields.io/badge/platform-Android%208.0%2B-3DDC84">
   <img alt="Kotlin" src="https://img.shields.io/badge/Kotlin-2.0-7F52FF">
   <img alt="License" src="https://img.shields.io/badge/license-MIT-blue">
@@ -34,7 +34,7 @@ Every note is a stack of compact blocks, laid out tightly like chat messages.
 Also:
 
 - **Side menu** (top-left) with shortcuts for All notes, Pinned, Folders (small grid), Tags (scrolling row), Trash and Settings.
-- **Share** from the editor's 3-dot menu: copy, plain text, Markdown, a single **image** (PNG) or a **PDF** (A4 pages). The same menu sets the note **color**.
+- **Share** from the editor's 3-dot menu: copy, plain text, Markdown, a single **image** (PNG, saved to your gallery in Pictures/Stackpad, then shared) or a **PDF** (A4 pages, saved where you choose, then shared). Exports are always on a light page and match the app: block colors, the note color as a page tint, checklist boxes and table grids. The same menu sets the note **color**.
 - **Tags** are added from the Tag chip in the add bar (tap a tag to add or remove it, "+" creates one); tags show above the title and tap to remove.
 - The add bar groups blocks: **+** (image, camera, audio, link, table, divider), Text, List, Cards, Tag.
 - **Templates**: start from Meeting notes, To-do, Journal or Project plan, or save any note as your own template.

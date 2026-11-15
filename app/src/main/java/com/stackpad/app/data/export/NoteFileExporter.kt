@@ -22,8 +22,8 @@ class NoteFileExporter(private val context: Context, private val media: MediaSto
 
     private val directory: File get() = File(context.cacheDir, "exports").apply { mkdirs() }
 
-    /** One tall PNG. Throws [NoteTooTallException] when the note would not fit in [MAX_IMAGE_HEIGHT] pixels. */
-    suspend fun toPng(note: Note): File = withContext(Dispatchers.Default) {
+    /** One tall PNG on a light page ([pageTint] is the note color, or null for white). Throws [NoteTooTallException] when the note would not fit in [MAX_IMAGE_HEIGHT] pixels. */
+    suspend fun toPng(note: Note, pageTint: Int? = null): File = withContext(Dispatchers.Default) {
         val painter = DocPainter(IMAGE_WIDTH - 2 * IMAGE_MARGIN, media)
         val prepared = DocItems.from(note).map(painter::prepare)
         val height = IMAGE_MARGIN * 2 + prepared.sumOf { it.height } + painter.gap * (prepared.size - 1).coerceAtLeast(0)
@@ -32,7 +32,7 @@ class NoteFileExporter(private val context: Context, private val media: MediaSto
         val bitmap = Bitmap.createBitmap(IMAGE_WIDTH, height.coerceAtLeast(1), Bitmap.Config.ARGB_8888)
         try {
             val canvas = Canvas(bitmap)
-            canvas.drawColor(Color.WHITE)
+            canvas.drawColor(pageTint ?: Color.WHITE)
             canvas.translate(IMAGE_MARGIN.toFloat(), IMAGE_MARGIN.toFloat())
             prepared.forEach { item ->
                 item.draw(canvas)
@@ -46,8 +46,8 @@ class NoteFileExporter(private val context: Context, private val media: MediaSto
         }
     }
 
-    /** A4 pages (595 x 842 pt). Items that fit are kept whole; taller ones continue on the next page. */
-    suspend fun toPdf(note: Note): File = withContext(Dispatchers.Default) {
+    /** A4 pages (595 x 842 pt) on a light page, tinted like [toPng]. Items that fit are kept whole; taller ones continue on the next page. */
+    suspend fun toPdf(note: Note, pageTint: Int? = null): File = withContext(Dispatchers.Default) {
         val contentWidth = PAGE_WIDTH - 2 * PAGE_MARGIN
         val contentHeight = PAGE_HEIGHT - 2 * PAGE_MARGIN
         val painter = DocPainter(contentWidth, media)
@@ -59,6 +59,7 @@ class NoteFileExporter(private val context: Context, private val media: MediaSto
             pages.ifEmpty { listOf(emptyList()) }.forEachIndexed { number, slices ->
                 val page = pdf.startPage(PdfDocument.PageInfo.Builder(PAGE_WIDTH, PAGE_HEIGHT, number + 1).create())
                 val canvas = page.canvas
+                canvas.drawColor(pageTint ?: Color.WHITE)
                 canvas.translate(PAGE_MARGIN.toFloat(), PAGE_MARGIN.toFloat())
                 var top = 0
                 slices.forEach { slice ->
@@ -81,12 +82,15 @@ class NoteFileExporter(private val context: Context, private val media: MediaSto
         }
     }
 
+    /** A safe file name (no extension) for [note], used for saved and shared files. */
+    fun baseName(note: Note): String =
+        note.title.trim().replace(Regex("[^\\p{L}\\p{N} _-]"), "").trim().take(40).ifEmpty { "note" }
+
     /** Old exports are removed first so the cache never grows. */
     @Throws(IOException::class)
     private fun newFile(note: Note, extension: String): File {
         directory.listFiles()?.forEach { it.delete() }
-        val base = note.title.trim().replace(Regex("[^\\p{L}\\p{N} _-]"), "").trim().take(40).ifEmpty { "note" }
-        return File(directory, "$base.$extension")
+        return File(directory, "${baseName(note)}.$extension")
     }
 
     private companion object {

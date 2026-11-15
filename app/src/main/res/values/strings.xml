@@ -276,4 +276,8 @@
     <string name="editor_info_separator">%1$s · %2$s</string>
     <string name="cd_layout_grid">Show as grid</string>
     <string name="cd_layout_list">Show as list</string>
+    <string name="msg_image_saved">Saved to your gallery (Pictures/Stackpad)</string>
+    <string name="msg_image_save_failed">Could not save to the gallery. You can still share the image.</string>
+    <string name="msg_pdf_saved">PDF saved</string>
+    <string name="msg_pdf_save_failed">Could not save the PDF there. Nothing was shared.</string>
 </resources>

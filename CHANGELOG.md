@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.0.0] - 2026-11-15
+
+### Changed
+- **Share, Image** now saves the picture to the gallery (Pictures/Stackpad), shows a confirmation, and then opens the share sheet. On Android 9 and older the app asks for storage permission first; if you decline, the image is still shared.
+- **Share, PDF** now opens the system file picker to choose where to save the PDF, then opens the share sheet.
+- Exported images and PDFs match the app's look: cards use the block colors (checklist green, table teal, link blue, prompt purple, quote amber, code slate, audio rose), checklists have real boxes with ticks, tables have a tinted header and grid, and the note's color tints the page. Exports are always on a light page so they print and read well.
+
 ## [1.9.0] - 2026-11-15
 
 ### Added

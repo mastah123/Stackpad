@@ -1,6 +1,7 @@
 package com.stackpad.app.domain.export
 
 import com.stackpad.app.data.model.TextLevel
+import com.stackpad.app.domain.blocks.BlockTone
 import com.stackpad.app.data.model.TextSpan
 
 /** One drawable piece of a note when it is rendered as an image or a PDF page. */
@@ -10,13 +11,18 @@ sealed interface DocItem {
 
     data class Paragraph(val text: String, val spans: List<TextSpan> = emptyList()) : DocItem
 
-    /** A list or checklist row. [marker] is `•`, `1.`, `a.`, `☐` or `☑`. */
-    data class Row(val marker: String, val text: String, val done: Boolean = false) : DocItem
+    /** A list row. [marker] is `•`, `1.` or `a.`. */
+    data class Row(val marker: String, val text: String) : DocItem
+
+    /** A whole checklist, drawn as one green card with real boxes. */
+    data class Checklist(val title: String, val tasks: List<Task>) : DocItem {
+        data class Task(val text: String, val done: Boolean)
+    }
 
     data class Quote(val text: String) : DocItem
 
-    /** Prompt and code blocks, drawn monospaced on a tinted background. */
-    data class Code(val text: String) : DocItem
+    /** Prompt and code blocks on a tinted card; code is drawn monospaced. */
+    data class Code(val text: String, val tone: BlockTone = BlockTone.CODE) : DocItem
 
     data class Link(val title: String, val url: String) : DocItem
 

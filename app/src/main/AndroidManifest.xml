@@ -3,6 +3,10 @@
 
     <!-- Only requested at runtime when the user records an audio block. -->
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <!-- Only Android 9 and older need this to save pictures to the gallery. -->
+    <uses-permission
+        android:name="android.permission.WRITE_EXTERNAL_STORAGE"
+        android:maxSdkVersion="28" />
 
     <!-- Asked at runtime the first time a checklist item gets a due date. -->
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />

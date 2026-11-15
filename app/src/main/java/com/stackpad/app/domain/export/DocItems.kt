@@ -14,6 +14,7 @@ import com.stackpad.app.data.model.SheetBlock
 import com.stackpad.app.data.model.TextBlock
 import com.stackpad.app.data.model.TextLevel
 import com.stackpad.app.data.model.isBlank
+import com.stackpad.app.domain.blocks.BlockTone
 import com.stackpad.app.domain.formula.SheetEvaluator
 import com.stackpad.app.domain.text.ListMarkers
 import com.stackpad.app.util.formatDuration
@@ -35,17 +36,17 @@ object DocItems {
                     items += DocItem.Row(ListMarkers.label(block.kind, index), item.text.trim())
                 }
                 is ChecklistBlock -> {
-                    if (block.title.isNotBlank()) items += DocItem.Heading(TextLevel.H3, block.title.trim())
-                    block.items.filter { it.text.isNotBlank() }.forEach { item ->
+                    val tasks = block.items.filter { it.text.isNotBlank() }.map { item ->
                         val due = item.dueDate?.let { " ($it)" }.orEmpty()
-                        items += DocItem.Row(if (item.checked) "☑" else "☐", item.text.trim() + due, item.checked)
+                        DocItem.Checklist.Task(item.text.trim() + due, item.checked)
                     }
+                    if (tasks.isNotEmpty() || block.title.isNotBlank()) items += DocItem.Checklist(block.title.trim(), tasks)
                 }
                 is ImageBlock -> items += DocItem.Image(block.fileName, block.caption.trim())
                 is SheetBlock -> tableRows(block).takeIf { it.isNotEmpty() }?.let { items += DocItem.Table(it) }
                 is AudioBlock -> items += DocItem.Audio("Audio note ${formatDuration(block.durationMs)}")
                 is LinkBlock -> items += DocItem.Link(block.title.trim(), block.url.trim())
-                is PromptBlock -> items += DocItem.Code(block.text.trim())
+                is PromptBlock -> items += DocItem.Code(block.text.trim(), BlockTone.PROMPT)
                 is CodeBlock -> items += DocItem.Code(block.text.trimEnd())
                 is QuoteBlock -> items += DocItem.Quote(block.text.trim())
                 is DividerBlock -> items += DocItem.Divider

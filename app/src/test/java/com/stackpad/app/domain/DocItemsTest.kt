@@ -30,9 +30,17 @@ class DocItemsTest {
         assertEquals(listOf("1.", "2."), items.map { (it as DocItem.Row).marker })
     }
 
-    @Test fun checklist_shows_state() {
-        val items = DocItems.from(note("", ChecklistBlock("c", items = listOf(ChecklistItem("1", "a", true), ChecklistItem("2", "b")))))
-        assertEquals(listOf("☑", "☐"), items.map { (it as DocItem.Row).marker })
+    @Test fun checklist_is_one_card_with_states() {
+        val items = DocItems.from(note("", ChecklistBlock("c", "Todo", listOf(ChecklistItem("1", "a", true), ChecklistItem("2", "b")))))
+        assertEquals(
+            listOf(DocItem.Checklist("Todo", listOf(DocItem.Checklist.Task("a", true), DocItem.Checklist.Task("b", false)))),
+            items,
+        )
+    }
+
+    @Test fun prompt_keeps_its_tone() {
+        val items = DocItems.from(note("", com.stackpad.app.data.model.PromptBlock("p", text = "Act as a tutor")))
+        assertEquals(DocItem.Code("Act as a tutor", com.stackpad.app.domain.blocks.BlockTone.PROMPT), items[0])
     }
 
     @Test fun formulas_are_evaluated_in_tables() {

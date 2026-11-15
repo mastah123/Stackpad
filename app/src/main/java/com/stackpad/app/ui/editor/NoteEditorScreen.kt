@@ -1,5 +1,11 @@
 package com.stackpad.app.ui.editor
 
+import kotlinx.coroutines.withContext
+import kotlinx.coroutines.Dispatchers
+import com.stackpad.app.ui.theme.exportTint
+import com.stackpad.app.ui.theme.NoteColors
+import com.stackpad.app.data.model.Note
+import com.stackpad.app.data.export.GallerySaver
 import android.Manifest
 import android.content.ActivityNotFoundException
 import android.content.pm.PackageManager
@@ -172,6 +178,63 @@ private fun NoteEditorContent(
 
     val fileExporter = remember { NoteFileExporter(context, media) }
 
+    val gallerySaver = remember { GallerySaver(context) }
+    var pendingImageNote by remember { mutableStateOf<Note?>(null) }
+    var pendingPdfNote by remember { mutableStateOf<Note?>(null) }
+
+    /** Renders the note as one PNG, saves it to the gallery, then opens the share sheet. */
+    fun shareImage(note: Note, saveToGallery: Boolean) {
+        scope.launch {
+            snackbar.currentSnackbarData?.dismiss()
+            val title = note.title.ifBlank { context.getString(R.string.note_untitled) }
+            val result = runCatching { fileExporter.toPng(note, NoteColors.exportTint(note.color)) }
+            val file = result.getOrNull()
+            if (file == null) {
+                showMessage(if (result.exceptionOrNull() is NoteTooTallException) R.string.msg_share_too_tall else R.string.msg_share_render_failed)
+                return@launch
+            }
+            if (saveToGallery) {
+                val saved = gallerySaver.savePng(file, "${fileExporter.baseName(note)}-${System.currentTimeMillis()}")
+                showMessage(if (saved) R.string.msg_image_saved else R.string.msg_image_save_failed)
+            } else {
+                showMessage(R.string.msg_image_save_failed)
+            }
+            if (!shareFile(context, file, "image/png", title)) showMessage(R.string.msg_share_failed)
+        }
+    }
+
+    val storagePermission = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
+        pendingImageNote?.let { shareImage(it, saveToGallery = granted) }
+        pendingImageNote = null
+    }
+
+    // The person picks where the PDF is saved; afterwards it is shared too.
+    val pdfLauncher = rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument("application/pdf")) { uri ->
+        val note = pendingPdfNote
+        pendingPdfNote = null
+        if (uri == null || note == null) return@rememberLauncherForActivityResult
+        scope.launch {
+            val title = note.title.ifBlank { context.getString(R.string.note_untitled) }
+            val result = runCatching { fileExporter.toPdf(note, NoteColors.exportTint(note.color)) }
+            val file = result.getOrNull()
+            if (file == null) {
+                showMessage(R.string.msg_share_render_failed)
+                return@launch
+            }
+            val saved = withContext(Dispatchers.IO) {
+                runCatching {
+                    context.contentResolver.openOutputStream(uri)?.use { out -> file.inputStream().use { it.copyTo(out) } } != null
+                }.getOrDefault(false)
+            }
+            if (!saved) {
+                showMessage(R.string.msg_pdf_save_failed)
+                return@launch
+            }
+            showMessage(R.string.msg_pdf_saved)
+            if (!shareFile(context, file, "application/pdf", title)) showMessage(R.string.msg_share_failed)
+        }
+    }
+
     fun share(target: ShareTarget) {
         val title = state.title.ifBlank { context.getString(R.string.note_untitled) }
         when (target) {
@@ -192,26 +255,27 @@ private fun NoteEditorContent(
                     !shareText(context, title, text) -> showMessage(R.string.msg_share_failed)
                 }
             }
-            ShareTarget.IMAGE, ShareTarget.PDF -> {
+            ShareTarget.IMAGE -> {
+                val note = viewModel.exportNote()
+                when {
+                    note == null -> showMessage(R.string.msg_share_empty)
+                    // Android 9 and older must be allowed to write to the gallery first.
+                    Build.VERSION.SDK_INT < Build.VERSION_CODES.Q &&
+                        ContextCompat.checkSelfPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE) !=
+                        PackageManager.PERMISSION_GRANTED -> {
+                        pendingImageNote = note
+                        storagePermission.launch(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                    }
+                    else -> shareImage(note, saveToGallery = true)
+                }
+            }
+            ShareTarget.PDF -> {
                 val note = viewModel.exportNote()
                 if (note == null) {
                     showMessage(R.string.msg_share_empty)
-                    return
-                }
-                scope.launch {
-                    snackbar.currentSnackbarData?.dismiss()
-                    val result = runCatching {
-                        if (target == ShareTarget.IMAGE) fileExporter.toPng(note) else fileExporter.toPdf(note)
-                    }
-                    val file = result.getOrNull()
-                    when {
-                        file != null -> {
-                            val mime = if (target == ShareTarget.IMAGE) "image/png" else "application/pdf"
-                            if (!shareFile(context, file, mime, title)) showMessage(R.string.msg_share_failed)
-                        }
-                        result.exceptionOrNull() is NoteTooTallException -> showMessage(R.string.msg_share_too_tall)
-                        else -> showMessage(R.string.msg_share_render_failed)
-                    }
+                } else {
+                    pendingPdfNote = note
+                    pdfLauncher.launch(fileExporter.baseName(note))
                 }
             }
         }
