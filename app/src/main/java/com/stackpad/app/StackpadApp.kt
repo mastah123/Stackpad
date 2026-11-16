@@ -10,7 +10,12 @@ import com.stackpad.app.data.backup.BackupManager
 import com.stackpad.app.data.db.MIGRATION_1_2
 import com.stackpad.app.data.db.MIGRATION_2_3
 import com.stackpad.app.data.db.StackpadDatabase
+import com.stackpad.app.data.importing.DocxImporter
+import com.stackpad.app.data.importing.EvernoteImporter
+import com.stackpad.app.data.importing.Importers
 import com.stackpad.app.data.importing.KeepImporter
+import com.stackpad.app.data.importing.PdfImporter
+import com.stackpad.app.data.importing.TextFileImporter
 import com.stackpad.app.data.media.MediaStorage
 import com.stackpad.app.data.media.ThumbnailStore
 import com.stackpad.app.data.prefs.ListPreferences
@@ -52,7 +57,13 @@ class AppContainer(context: Context) {
     val templatePreferences = TemplatePreferences(appContext)
     val audioPlayer = AudioPlayer()
 
-    val keepImporter = KeepImporter(appContext, repository, mediaStorage)
+    val importers = Importers(
+        keep = KeepImporter(appContext, repository, mediaStorage),
+        text = TextFileImporter(appContext, repository, mediaStorage),
+        evernote = EvernoteImporter(appContext, repository, mediaStorage),
+        word = DocxImporter(appContext, repository, mediaStorage),
+        pdf = PdfImporter(appContext, repository, mediaStorage),
+    )
 
     val backupManager = BackupManager(
         appContext,

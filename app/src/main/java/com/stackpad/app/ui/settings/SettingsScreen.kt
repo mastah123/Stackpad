@@ -1,7 +1,9 @@
 package com.stackpad.app.ui.settings
 
 import android.content.Context
+import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.compose.ManagedActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -47,6 +49,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.stackpad.app.R
 import com.stackpad.app.data.backup.BackupError
 import com.stackpad.app.data.importing.ImportError
+import com.stackpad.app.data.importing.ImportKind
 import com.stackpad.app.data.importing.ImportSummary
 import com.stackpad.app.domain.backup.BackupRules
 import com.stackpad.app.security.AppLockController
@@ -73,9 +76,11 @@ fun SettingsScreen(
         ActivityResultContracts.OpenDocument(),
     ) { uri -> uri?.let { viewModel.restoreFrom(context.contentResolver, it) } }
 
-    val keepLauncher = rememberLauncherForActivityResult(
-        ActivityResultContracts.OpenDocument(),
-    ) { uri -> uri?.let { viewModel.importKeepFrom(context.contentResolver, it) } }
+    val keepLauncher = importLauncher(ImportKind.KEEP, viewModel)
+    val markdownLauncher = importLauncher(ImportKind.MARKDOWN, viewModel)
+    val evernoteLauncher = importLauncher(ImportKind.EVERNOTE, viewModel)
+    val wordLauncher = importLauncher(ImportKind.WORD, viewModel)
+    val pdfLauncher = importLauncher(ImportKind.PDF, viewModel)
 
     LaunchedEffect(viewModel) {
         viewModel.messages.collect { message -> snackbar.showSnackbar(describe(context, message)) }
@@ -131,7 +136,35 @@ fun SettingsScreen(
                 title = R.string.settings_import_keep_title,
                 subtitle = R.string.settings_import_keep_subtitle,
                 enabled = !busy,
-                onClick = { keepLauncher.launch(arrayOf("application/zip", "application/x-zip-compressed", "application/octet-stream")) },
+                onClick = { keepLauncher.launch(ANY_FILE) },
+            )
+            ActionRow(
+                icon = Icons.Filled.FileDownload,
+                title = R.string.settings_import_markdown_title,
+                subtitle = R.string.settings_import_markdown_subtitle,
+                enabled = !busy,
+                onClick = { markdownLauncher.launch(ANY_FILE) },
+            )
+            ActionRow(
+                icon = Icons.Filled.FileDownload,
+                title = R.string.settings_import_evernote_title,
+                subtitle = R.string.settings_import_evernote_subtitle,
+                enabled = !busy,
+                onClick = { evernoteLauncher.launch(ANY_FILE) },
+            )
+            ActionRow(
+                icon = Icons.Filled.FileDownload,
+                title = R.string.settings_import_word_title,
+                subtitle = R.string.settings_import_word_subtitle,
+                enabled = !busy,
+                onClick = { wordLauncher.launch(ANY_FILE) },
+            )
+            ActionRow(
+                icon = Icons.Filled.FileDownload,
+                title = R.string.settings_import_pdf_title,
+                subtitle = R.string.settings_import_pdf_subtitle,
+                enabled = !busy,
+                onClick = { pdfLauncher.launch(ANY_FILE) },
             )
             if (busy) {
                 Row(
@@ -235,7 +268,7 @@ private fun RowTextContent(title: Int, subtitle: Int, enabled: Boolean) {
     )
 }
 
-/** "Imported 12 notes with 3 pictures. 2 already imported, 1 in Keep's trash skipped." */
+/** "Imported 12 notes with 3 pictures. 2 already imported, 1 in the trash skipped." */
 private fun describeImport(context: Context, s: ImportSummary): String {
     val parts = ArrayList<String>()
     parts += context.resources.getQuantityString(R.plurals.msg_imported_notes, s.imported, s.imported)
@@ -280,4 +313,16 @@ private fun describe(context: Context, message: SettingsMessage): String = when 
             BackupError.IO -> R.string.msg_backup_io
         },
     )
+}
+
+/** Any file type: the system picker does not know .md, .enex or .docx reliably, so the importer checks the extension itself. */
+private val ANY_FILE = arrayOf("*/*")
+
+/** A multi-file picker that hands the chosen files to the importer for [kind]. */
+@Composable
+private fun importLauncher(kind: ImportKind, viewModel: SettingsViewModel): ManagedActivityResultLauncher<Array<String>, List<Uri>> {
+    val context = LocalContext.current
+    return rememberLauncherForActivityResult(ActivityResultContracts.OpenMultipleDocuments()) { uris ->
+        viewModel.importFrom(kind, context.contentResolver, uris)
+    }
 }

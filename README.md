@@ -10,7 +10,7 @@
 
 <p align="center">
   <a href="https://github.com/mastah123/stackpad/actions/workflows/android.yml"><img alt="Build" src="https://github.com/mastah123/stackpad/actions/workflows/android.yml/badge.svg"></a>
-  <img alt="Version" src="https://img.shields.io/badge/version-2.2.0-4F46E5">
+  <img alt="Version" src="https://img.shields.io/badge/version-2.3.0-4F46E5">
   <img alt="Platform" src="https://img.shields.io/badge/platform-Android%208.0%2B-3DDC84">
   <img alt="Kotlin" src="https://img.shields.io/badge/Kotlin-2.0-7F52FF">
   <img alt="License" src="https://img.shields.io/badge/license-MIT-blue">
@@ -35,6 +35,7 @@ Also:
 
 - **Side menu** (top-left) with shortcuts for All notes, Pinned, Folders (small grid), Tags (scrolling row), Trash and Settings.
 - **Import from Google Keep**: Settings > Import > Google Keep, then choose the Takeout `.zip` (export Keep from takeout.google.com). Text and list notes, labels (as tags), colors, pinned state, links, pictures and dates are imported; importing the same zip again adds nothing new. Audio and drawing attachments and notes in Keep's trash are skipped.
+- **More imports** (Settings > Import): Markdown and text files or zips (also Obsidian and Notion exports), Evernote `.enex`, Word `.docx` and PDF. Several files can be picked at once and importing the same file again adds nothing new. PDF text is a best-effort reading (PDFs store no structure); a scanned PDF becomes a note with its pages as pictures.
 - **Share** from the editor's 3-dot menu: copy, plain text, Markdown, a single **image** (PNG, saved to your gallery in Pictures/Stackpad, then shared) or a **PDF** (A4 pages, saved where you choose, then shared). Exports are always on a light page and match the app: block colors, the note color as a page tint, checklist boxes and table grids. The same menu sets the note **color**.
 - **Tags** are added from the Tag chip in the add bar (tap a tag to add or remove it, "+" creates one); tags show above the title and tap to remove.
 - The add bar groups blocks: **+** (image, camera, audio, link, table, divider), Text, List, Cards, Tag.
@@ -122,7 +123,7 @@ To enable signed builds, add four repository secrets. Step-by-step instructions 
 
 ## Testing
 
-Unit tests cover the formula evaluator, span editing, URL handling, list markers, table operations, waveform helpers, block serialization, table functions, due dates and reminder planning, image zoom limits, audio speed, note sorting and filtering, tags, trash timing, undo history, word counting, note previews, Keep import rules, note export (text, image/PDF layout and pagination), backup rules and app-lock timing. A manual checklist for everything else (UI, audio, camera) is in [docs/TESTING.md](docs/TESTING.md).
+Unit tests cover the formula evaluator, span editing, URL handling, list markers, table operations, waveform helpers, block serialization, table functions, due dates and reminder planning, image zoom limits, audio speed, note sorting and filtering, tags, trash timing, undo history, word counting, note previews, Keep import rules, Markdown, Evernote, Word and PDF import parsing, note export (text, image/PDF layout and pagination), backup rules and app-lock timing. A manual checklist for everything else (UI, audio, camera) is in [docs/TESTING.md](docs/TESTING.md).
 
 ## Known limitations
 
@@ -142,3 +143,5 @@ Unit tests cover the formula evaluator, span editing, URL handling, list markers
 ## License
 
 [MIT](LICENSE)
+
+PDF import uses [PdfBox-Android](https://github.com/TomRoush/PdfBox-Android) (Apache License 2.0).

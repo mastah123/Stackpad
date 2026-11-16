@@ -14,7 +14,8 @@ import com.stackpad.app.data.backup.RestoreSummary
 import com.stackpad.app.data.importing.ImportError
 import com.stackpad.app.data.importing.ImportException
 import com.stackpad.app.data.importing.ImportSummary
-import com.stackpad.app.data.importing.KeepImporter
+import com.stackpad.app.data.importing.ImportKind
+import com.stackpad.app.data.importing.Importers
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -37,7 +38,7 @@ sealed interface SettingsMessage {
 
 class SettingsViewModel(
     private val backup: BackupManager,
-    private val keepImporter: KeepImporter,
+    private val importers: Importers,
 ) : ViewModel() {
     private val _busy = MutableStateFlow(false)
     val busy: StateFlow<Boolean> = _busy.asStateFlow()
@@ -61,12 +62,9 @@ class SettingsViewModel(
         SettingsMessage.Restored(summary)
     }
 
-    fun importKeepFrom(resolver: ContentResolver, uri: Uri) = runBusy {
-        val summary = withContext(Dispatchers.IO) {
-            val input = resolver.openInputStream(uri) ?: throw ImportException(ImportError.IO)
-            input.use { keepImporter.import(it) }
-        }
-        SettingsMessage.Imported(summary)
+    fun importFrom(kind: ImportKind, resolver: ContentResolver, uris: List<Uri>) = runBusy {
+        if (uris.isEmpty()) return@runBusy SettingsMessage.ImportFailed(ImportError.NOTHING_FOUND)
+        SettingsMessage.Imported(importers.import(kind, resolver, uris))
     }
 
     private fun runBusy(block: suspend () -> SettingsMessage) {
@@ -91,7 +89,7 @@ class SettingsViewModel(
 
     companion object {
         fun factory(container: AppContainer) = viewModelFactory {
-            initializer { SettingsViewModel(container.backupManager, container.keepImporter) }
+            initializer { SettingsViewModel(container.backupManager, container.importers) }
         }
     }
 }

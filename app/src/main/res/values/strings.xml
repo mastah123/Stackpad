@@ -282,7 +282,15 @@
     <string name="msg_pdf_save_failed">Could not save the PDF there. Nothing was shared.</string>
     <string name="settings_section_import">Import</string>
     <string name="settings_import_keep_title">Google Keep</string>
-    <string name="settings_import_keep_subtitle">Choose the Takeout .zip with your Keep notes. Text, lists, labels, colors, pictures and dates are kept.</string>
+    <string name="settings_import_keep_subtitle">Choose the Takeout .zip (or several) with your Keep notes. Text, lists, labels, colors, pictures and dates are kept.</string>
+    <string name="settings_import_markdown_title">Markdown and text</string>
+    <string name="settings_import_markdown_subtitle">Choose .md or .txt files, or a .zip of them (Obsidian and Notion exports work). Headings, lists, tasks, tables, quotes, code and pictures in the zip are kept.</string>
+    <string name="settings_import_evernote_title">Evernote</string>
+    <string name="settings_import_evernote_subtitle">Choose .enex files exported from Evernote. Text, checkboxes, lists, tables, tags, dates and pictures are kept.</string>
+    <string name="settings_import_word_title">Word</string>
+    <string name="settings_import_word_subtitle">Choose .docx files. Headings, bold, italic, underline, lists, tables and pictures are kept.</string>
+    <string name="settings_import_pdf_title">PDF</string>
+    <string name="settings_import_pdf_subtitle">Choose PDFs. Text is imported as best it can be read; a scan with no text becomes a note with its pages as pictures (first 50 pages).</string>
     <plurals name="msg_imported_notes">
         <item quantity="one">Imported %d note</item>
         <item quantity="other">Imported %d notes</item>
@@ -292,11 +300,11 @@
         <item quantity="other">with %d pictures</item>
     </plurals>
     <string name="msg_import_already">%d were already imported.</string>
-    <string name="msg_import_trashed">%d in Keep\'s trash were skipped.</string>
-    <string name="msg_import_attachments">%d audio or drawing attachments could not be imported.</string>
+    <string name="msg_import_trashed">%d in the trash were skipped.</string>
+    <string name="msg_import_attachments">%d attachments (audio, drawings or missing pictures) could not be imported.</string>
     <string name="msg_import_unreadable">%d files could not be read.</string>
-    <string name="msg_import_not_zip">That is not a Takeout zip file.</string>
-    <string name="msg_import_nothing">No Google Keep notes were found in that file.</string>
+    <string name="msg_import_not_zip">That file is not a valid export.</string>
+    <string name="msg_import_nothing">No notes were found in the chosen files.</string>
     <string name="msg_import_too_large">That file is too large to import.</string>
     <string name="msg_import_io">Could not read the file. Nothing was imported.</string>
 </resources>

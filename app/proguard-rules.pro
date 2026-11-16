@@ -18,3 +18,8 @@
 -keepclasseswithmembers class com.stackpad.app.** {
     kotlinx.serialization.KSerializer serializer(...);
 }
+
+# PdfBox-Android (PDF import): optional JPEG 2000 decoder is not bundled.
+-dontwarn com.gemalto.jp2.**
+-dontwarn com.tom_roush.pdfbox.**
+-keep class com.tom_roush.pdfbox.** { *; }

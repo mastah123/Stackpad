@@ -7,6 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.3.0] - 2026-11-16
+
+### Added
+- **More imports** (Settings > Import). You can pick several files at once:
+  - **Markdown and text**: `.md` and `.txt` files, or a `.zip` of them (Obsidian vaults and Notion Markdown exports work). Headings, bold, italic, underline, lists, tasks, quotes, code, rules and tables are kept; front matter gives the title and tags; pictures are imported when they are inside the zip (a loose file's picture links cannot be reached and are counted as skipped).
+  - **Evernote**: `.enex` files. Text, checkboxes, lists, tables, tags, dates and pictures are kept; other attachments are counted as skipped.
+  - **Word**: `.docx` files. Headings, bold, italic, underline, bullet and numbered lists, tables and pictures are kept.
+  - **PDF**: text is imported as headings, paragraphs and lists (repeated page headers and page numbers are dropped). A PDF without text, such as a scan, becomes a note with its pages as pictures (first 50 pages).
+- Google Keep import accepts several Takeout zips at once.
+
+### Changed
+- Import messages no longer mention Google Keep only; the error texts are generic.
+- The app is about 5 MB larger because of the PDF text library (PdfBox-Android).
+
 ## [2.2.0] - 2026-11-16
 
 ### Added

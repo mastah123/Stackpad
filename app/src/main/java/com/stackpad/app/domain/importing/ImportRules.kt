@@ -6,6 +6,7 @@ import java.util.UUID
 object ImportRules {
     const val MAX_ENTRIES = 100_000
     const val MAX_JSON_BYTES = 8L * 1024 * 1024
+    const val MAX_XML_BYTES = 64L * 1024 * 1024
     const val MAX_PICTURE_BYTES = 100L * 1024 * 1024
     const val MAX_TOTAL_BYTES = 4L * 1024 * 1024 * 1024
 
@@ -22,6 +23,24 @@ object ImportRules {
         val parts = normalized.split('/')
         if (parts.any { it == ".." || it.isEmpty() }) return null
         return normalized
+    }
+
+    /** Lower-case extension of a file name, without the dot. */
+    fun extension(name: String): String = name.substringAfterLast('.', "").lowercase()
+
+    fun isMarkdown(name: String): Boolean = extension(name) in setOf("md", "markdown")
+
+    fun isText(name: String): Boolean = extension(name) == "txt"
+
+    /** Id for a loose file: its name plus a hash of its content, so a changed file with the same name is not "already imported". */
+    fun fileSourceId(name: String, content: ByteArray): String =
+        name + ":" + UUID.nameUUIDFromBytes(content)
+
+    /** A picture link as written in Markdown or Notion ("My%20pic.png?raw=1", "./a.png") turned into a plain relative path. */
+    fun decodeReference(reference: String): String {
+        val noQuery = reference.substringBefore('#').substringBefore('?').replace('\\', '/')
+        val decoded = runCatching { java.net.URLDecoder.decode(noQuery.replace("+", "%2B"), "UTF-8") }.getOrDefault(noQuery)
+        return decoded.removePrefix("./")
     }
 
     fun isPicture(path: String): Boolean = path.substringAfterLast('.', "").lowercase() in pictureExtensions
