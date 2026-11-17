@@ -73,6 +73,8 @@ data class ImageBlock(
     val fileName: String,
     /** Optional text shown under the image. */
     val caption: String = "",
+    /** The picture as it was before the first edit, kept so the edit can be undone later; null when never edited. */
+    val originalFileName: String? = null,
 ) : Block
 
 @Serializable

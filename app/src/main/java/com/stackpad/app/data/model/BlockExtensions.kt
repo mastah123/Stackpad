@@ -33,3 +33,10 @@ fun Block.mediaFileName(): String? = when (this) {
     is AudioBlock -> fileName
     else -> null
 }
+
+/** Every media file this block keeps on disk: an edited picture also keeps its original. */
+fun Block.mediaFileNames(): List<String> = when (this) {
+    is ImageBlock -> listOfNotNull(fileName, originalFileName)
+    is AudioBlock -> listOf(fileName)
+    else -> emptyList()
+}

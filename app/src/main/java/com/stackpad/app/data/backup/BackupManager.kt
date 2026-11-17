@@ -3,7 +3,7 @@ package com.stackpad.app.data.backup
 import android.content.Context
 import com.stackpad.app.data.NoteRepository
 import com.stackpad.app.data.media.MediaStorage
-import com.stackpad.app.data.model.mediaFileName
+import com.stackpad.app.data.model.mediaFileNames
 import com.stackpad.app.domain.backup.BackupRules
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -38,7 +38,7 @@ class BackupManager(
                 zip.write(backupJson.encodeToString(BackupFile.serializer(), backup).toByteArray(Charsets.UTF_8))
                 zip.closeEntry()
 
-                val names = backup.notes.flatMap { note -> note.blocks.mapNotNull { it.mediaFileName() } }.distinct()
+                val names = backup.notes.flatMap { note -> note.blocks.flatMap { it.mediaFileNames() } }.distinct()
                 for (name in names) {
                     if (!BackupRules.isSafeMediaName(name)) continue
                     val input = media.open(name) ?: continue

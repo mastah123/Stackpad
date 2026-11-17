@@ -44,6 +44,7 @@ enum class EditorMessage(@StringRes val resId: Int) {
     RECORD_FAILED(R.string.msg_record_failed),
     RECORDING_TOO_SHORT(R.string.msg_recording_too_short),
     IMAGE_FAILED(R.string.msg_image_failed),
+    IMAGE_EDIT_FAILED(R.string.msg_image_edit_failed),
     CAMERA_UNAVAILABLE(R.string.msg_camera_unavailable),
     AUDIO_UNAVAILABLE(R.string.msg_audio_unavailable),
     TEMPLATE_SAVED(R.string.msg_template_saved),

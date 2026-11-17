@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Crop
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
@@ -38,13 +39,14 @@ import java.io.File
 
 /**
  * Full-screen image viewer. Pinch to zoom, drag to pan when zoomed, double-tap to zoom in or
- * out. The close button or the back gesture dismisses it.
+ * out. The crop button opens the picture editor. The close button or the back gesture dismisses it.
  */
 @Composable
 fun ImageViewer(
     file: File,
     caption: String,
     onDismiss: () -> Unit,
+    onEdit: () -> Unit,
 ) {
     Dialog(
         onDismissRequest = onDismiss,
@@ -91,6 +93,16 @@ fun ImageViewer(
                         translationY = panY,
                     ),
             )
+            IconButton(
+                onClick = onEdit,
+                modifier = Modifier.align(Alignment.TopStart).safeDrawingPadding().padding(4.dp),
+            ) {
+                Icon(
+                    imageVector = Icons.Filled.Crop,
+                    contentDescription = stringResource(R.string.image_edit_menu_edit),
+                    tint = Color.White,
+                )
+            }
             IconButton(
                 onClick = onDismiss,
                 modifier = Modifier.align(Alignment.TopEnd).safeDrawingPadding().padding(4.dp),

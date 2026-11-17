@@ -6,7 +6,7 @@
 ./gradlew testDebugUnitTest
 ```
 
-Covers: formula evaluator, span editing, URL detection/validation, list markers, table operations, waveform helpers, block JSON serialization, table functions, due dates and reminder planning, image zoom limits, audio speed, note sorting and filtering, tags, trash timing, and undo history, word counting, note previews, Keep import rules, Markdown, Evernote, Word and PDF import parsing, note export, and the image/PDF layout and pagination.
+Covers: formula evaluator, span editing, URL detection/validation, list markers, table operations, waveform helpers, block JSON serialization, table functions, due dates and reminder planning, image zoom limits, audio speed, note sorting and filtering, tags, trash timing, and undo history, word counting, note previews, picture editing maths (crop, rotate, flip, straighten, undo), Keep import rules, Markdown, Evernote, Word and PDF import parsing, note export, and the image/PDF layout and pagination.
 
 ## Manual checklist (run on a device or emulator, Android 8.0+)
 
@@ -218,12 +218,26 @@ Covers: formula evaluator, span editing, URL detection/validation, list markers,
 - [ ] Check the item before the reminder time, clear its date, delete its checklist, or move the note to the trash: no notification arrives. Restore the note from the trash: the reminder is back.
 - [ ] Restart the phone with a pending reminder: it still fires.
 
+### Picture editor
+- [ ] Image block: tap the pencil. A menu shows Edit picture, Edit caption (and Restore original after an edit). Tap the picture, then the crop icon at the top left of the full-screen view: the editor opens too.
+- [ ] Crop, free: drag a corner, an edge and the inside of the frame. It cannot leave the picture or become tiny. The area outside is dimmed and a thirds grid shows.
+- [ ] Crop shapes: choose 1:1, 4:3, 3:4, 16:9, 9:16 and Original. The frame takes that shape; only the corners resize it and the shape holds. Free allows any shape again.
+- [ ] Rotate left and right, flip horizontally and vertically on a photo with text: each does what the icon says, the crop frame follows the picture, and a fixed shape stays selected.
+- [ ] Straighten: drag the slider both ways. The picture turns, never shows empty corners, and the label shows the angle; near 0 it snaps to 0°. Flipping after straightening keeps the picture level the same way.
+- [ ] Undo steps back one change at a time; Reset returns to the opened picture and can itself be undone. Save is disabled until something changed.
+- [ ] Save: the note shows the edited picture (also in the list and grid previews and in image/PDF exports). Edit it again and save: still works.
+- [ ] Restore original: the first picture is back; the edit can be undone with the note's undo. After restoring, edit and save again: works.
+- [ ] Close the editor with unsaved changes (X or back): "Discard changes?" appears; Keep editing stays, Discard closes.
+- [ ] A phone photo taken in portrait (with EXIF rotation) opens upright in the editor and saves upright.
+- [ ] A very large photo (12 MP or more) saves without the app closing; if memory runs out a message says the picture could not be saved.
+- [ ] Back up and restore: an edited picture comes back edited, and Restore original still works. Delete the note: no stray picture files are left.
+
 ### Image
 - [ ] Add from the gallery. The image is full width.
 - [ ] Add from the camera. Cancelling the camera adds nothing.
 - [ ] The "x" removes the image.
 - [ ] Tap the image: it opens full screen. Pinch to zoom, drag to pan while zoomed (the image cannot be dragged away from the screen edges), double-tap to zoom in and out. Close button and the back gesture both close it.
-- [ ] Tap the pencil: a caption field appears and is focused. The caption stays under the image, shows in the full-screen view, and is found by search. Clearing it and leaving the field hides the field again.
+- [ ] Tap the pencil, then Edit caption: a caption field appears and is focused. The caption stays under the image, shows in the full-screen view, and is found by search. Clearing it and leaving the field hides the field again.
 
 ### Table
 - [ ] Tap a cell and type `2`, in another `3`, in a third `=A1+B1`. The result shows `5` when not editing.

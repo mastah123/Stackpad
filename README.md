@@ -10,7 +10,7 @@
 
 <p align="center">
   <a href="https://github.com/mastah123/stackpad/actions/workflows/android.yml"><img alt="Build" src="https://github.com/mastah123/stackpad/actions/workflows/android.yml/badge.svg"></a>
-  <img alt="Version" src="https://img.shields.io/badge/version-2.3.0-4F46E5">
+  <img alt="Version" src="https://img.shields.io/badge/version-2.4.0-4F46E5">
   <img alt="Platform" src="https://img.shields.io/badge/platform-Android%208.0%2B-3DDC84">
   <img alt="Kotlin" src="https://img.shields.io/badge/Kotlin-2.0-7F52FF">
   <img alt="License" src="https://img.shields.io/badge/license-MIT-blue">
@@ -24,7 +24,7 @@ Every note is a stack of compact blocks, laid out tightly like chat messages.
 | --- | --- |
 | **Text** | One line per block, so each line can be H1, H2, H3 or normal. **Bold**, *italic*, underline. URLs are highlighted and open when tapped. |
 | **List** (menu) | **Bullets**, **Numbers** and **Letters**: long items wrap under the text, never under the marker. **Checklist**: rounded card with a progress tracker, drag handles to reorder, a sort button (done items last), due dates with reminder notifications, and an "x" to remove it. |
-| **Image** (+ menu) | Full width, from the gallery or camera. Tap for full-screen zoom, add a caption, or remove it with the "x". |
+| **Image** (+ menu) | Full width, from the gallery or camera. Tap for full-screen zoom, edit it (crop, rotate, flip, straighten, restore original), add a caption, or remove it with the "x". |
 | **Table** (+ menu) | Small spreadsheet with `+ - * /`, parentheses, cell references such as `=A1+B1*2`, and `SUM`, `AVERAGE`, `MIN`, `MAX`, `COUNT` over ranges such as `=SUM(A1:A5)`. |
 | **Audio** (+ menu) | Voice-message style row: play, animated waveform you can tap or drag to seek, duration, 1x / 1.5x / 2x speed, and "x". Recorded in app. |
 | **Link** (+ menu) | Title and URL with validation; opens in the browser. |
@@ -79,7 +79,7 @@ app/src/main/java/com/stackpad/app/
 │   ├── export/      Markdown and plain-text note export
 │   ├── formula/     Spreadsheet formula evaluator
 │   ├── history/     Undo/redo stacks
-│   ├── image/       Zoom and pan limits
+│   ├── image/       Zoom and pan limits, picture editing maths (crop, rotate, flip, straighten)
 │   ├── reminders/   Due dates and reminder planning
 │   ├── notes/       Sorting, filtering, tags, folder names, trash policy
 │   ├── security/    When the app lock re-locks
@@ -123,7 +123,7 @@ To enable signed builds, add four repository secrets. Step-by-step instructions 
 
 ## Testing
 
-Unit tests cover the formula evaluator, span editing, URL handling, list markers, table operations, waveform helpers, block serialization, table functions, due dates and reminder planning, image zoom limits, audio speed, note sorting and filtering, tags, trash timing, undo history, word counting, note previews, Keep import rules, Markdown, Evernote, Word and PDF import parsing, note export (text, image/PDF layout and pagination), backup rules and app-lock timing. A manual checklist for everything else (UI, audio, camera) is in [docs/TESTING.md](docs/TESTING.md).
+Unit tests cover the formula evaluator, span editing, URL handling, list markers, table operations, waveform helpers, block serialization, table functions, due dates and reminder planning, image zoom limits, audio speed, note sorting and filtering, tags, trash timing, undo history, word counting, note previews, picture editing maths, Keep import rules, Markdown, Evernote, Word and PDF import parsing, note export (text, image/PDF layout and pagination), backup rules and app-lock timing. A manual checklist for everything else (UI, audio, camera) is in [docs/TESTING.md](docs/TESTING.md).
 
 ## Known limitations
 

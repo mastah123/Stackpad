@@ -13,7 +13,7 @@ import com.stackpad.app.data.model.BlockFactory
 import com.stackpad.app.data.model.Folder
 import com.stackpad.app.data.model.Note
 import com.stackpad.app.data.model.NoteSummary
-import com.stackpad.app.data.model.mediaFileName
+import com.stackpad.app.data.model.mediaFileNames
 import com.stackpad.app.domain.backup.BackupRules
 import com.stackpad.app.domain.backup.MergeDecision
 import com.stackpad.app.domain.notes.FolderNames
@@ -190,7 +190,7 @@ class NoteRepository(
         notes.forEach { entity ->
             val note = entity.toNote()
             ReminderPlanner.dueKeys(note).forEach(reminders::cancel)
-            note.blocks.forEach { block -> block.mediaFileName()?.let(media::delete) }
+            note.blocks.flatMap { it.mediaFileNames() }.forEach(media::delete)
             dao.delete(entity.id)
         }
     }
@@ -200,7 +200,7 @@ class NoteRepository(
         writeLock.withLock {
             val referenced = dao.allBlocksJson()
                 .flatMap { BlockJsonCodec.decode(it) }
-                .mapNotNull { it.mediaFileName() }
+                .flatMap { it.mediaFileNames() }
                 .toSet()
             media.listNames(minAgeMs = ORPHAN_MIN_AGE_MS).filterNot { it in referenced }.forEach(media::delete)
         }
@@ -294,7 +294,7 @@ class NoteRepository(
                     continue
                 }
                 val note = incoming.toNote(folderKnown = incoming.folderId in knownFolders)
-                note.blocks.mapNotNull { it.mediaFileName() }.distinct().forEach(installMedia)
+                note.blocks.flatMap { it.mediaFileNames() }.distinct().forEach(installMedia)
                 dao.upsert(note.toEntity(updatedAt = incoming.updatedAt))
                 if (decision == MergeDecision.ADD) added++ else updated++
             }

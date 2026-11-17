@@ -16,7 +16,10 @@ import com.stackpad.app.data.model.SpanType
 import com.stackpad.app.data.model.TextBlock
 import com.stackpad.app.data.model.TextLevel
 import com.stackpad.app.data.model.isBlank
+import com.stackpad.app.data.model.ImageBlock
 import com.stackpad.app.data.model.mediaFileName
+import com.stackpad.app.data.model.mediaFileNames
+import com.stackpad.app.domain.image.ImageEdit
 import com.stackpad.app.domain.blocks.BlockOrder
 import com.stackpad.app.domain.export.ExportFormat
 import com.stackpad.app.domain.templates.BuiltInTemplates
@@ -352,6 +355,38 @@ class NoteEditorViewModel(
 
     // region Images
 
+    /**
+     * Saves [change] as a new picture file for the image block [id] and points the block at it.
+     * The first edit keeps the untouched picture so it can be restored. Returns false (and shows a message) on failure.
+     */
+    suspend fun saveImageEdit(id: String, change: ImageEdit): Boolean {
+        val block = _state.value.blocks.firstOrNull { it.id == id } as? ImageBlock ?: return false
+        val saved = container.imageEditSaver.save(block.fileName, change)
+        if (saved == null) {
+            emit(EditorMessage.IMAGE_EDIT_FAILED)
+            return false
+        }
+        // The previous file stays until the editor closes, so undo can bring it back.
+        replaceImageBlock(id) { it.copy(fileName = saved, originalFileName = it.originalFileName ?: it.fileName) }
+        return true
+    }
+
+    /** Puts the untouched picture back in the image block [id]. */
+    fun restoreOriginalImage(id: String) {
+        val block = _state.value.blocks.firstOrNull { it.id == id } as? ImageBlock ?: return
+        val original = block.originalFileName
+        if (original == null || !media.exists(original)) {
+            emit(EditorMessage.IMAGE_EDIT_FAILED)
+            return
+        }
+        replaceImageBlock(id) { it.copy(fileName = original, originalFileName = null) }
+    }
+
+    /** Changes an image block as its own undo step (not merged with caption typing). */
+    private fun replaceImageBlock(id: String, transform: (ImageBlock) -> ImageBlock) = mutate { s ->
+        s.copy(blocks = s.blocks.map { if (it.id == id && it is ImageBlock) transform(it) else it })
+    }
+
     fun importImage(source: Uri) {
         viewModelScope.launch {
             val name = media.importImage(source)
@@ -627,7 +662,7 @@ class NoteEditorViewModel(
 
     /** Deletes media of blocks that were removed (kept until now so undo could restore them). */
     private fun deleteUnusedMedia() {
-        fun names(blocks: List<Block>) = blocks.mapNotNull { it.mediaFileName() }.toSet()
+        fun names(blocks: List<Block>) = blocks.flatMap { it.mediaFileNames() }.toSet()
         val inUse = names(_state.value.blocks)
         val everSeen = history.snapshots().flatMap { names(it.blocks) }.toSet()
         (everSeen - inUse).forEach(media::delete)

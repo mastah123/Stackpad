@@ -16,6 +16,7 @@ import com.stackpad.app.data.importing.Importers
 import com.stackpad.app.data.importing.KeepImporter
 import com.stackpad.app.data.importing.PdfImporter
 import com.stackpad.app.data.importing.TextFileImporter
+import com.stackpad.app.data.media.ImageEditSaver
 import com.stackpad.app.data.media.MediaStorage
 import com.stackpad.app.data.media.ThumbnailStore
 import com.stackpad.app.data.prefs.ListPreferences
@@ -44,6 +45,7 @@ class AppContainer(context: Context) {
 
     val mediaStorage = MediaStorage(appContext)
     val thumbnailStore = ThumbnailStore(appContext, mediaStorage)
+    val imageEditSaver = ImageEditSaver(mediaStorage)
     val repository = NoteRepository(
         database.noteDao(),
         database.folderDao(),

@@ -12,7 +12,11 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Crop
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.Restore
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -34,18 +38,23 @@ import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.stackpad.app.R
+import com.stackpad.app.domain.image.ImageEdit
 import com.stackpad.app.ui.components.InlineTextField
 import java.io.File
 
 /**
- * Full-width image. Tap it to view full screen with zoom. The pencil adds or edits a caption
- * shown under the image, and the "x" removes the image (and its file).
+ * Full-width image. Tap it to view full screen with zoom. The pencil opens a menu: edit the picture
+ * (crop, rotate, flip, straighten), add or edit a caption shown under it, or restore the original
+ * after an edit. The "x" removes the image (and its file).
  */
 @Composable
 fun ImageBlockView(
     file: File,
     caption: String,
+    hasOriginal: Boolean,
     onCaptionChange: (String) -> Unit,
+    onSaveEdit: suspend (ImageEdit) -> Boolean,
+    onRestoreOriginal: () -> Unit,
     onBlockFocused: () -> Unit,
     onRemove: () -> Unit,
     modifier: Modifier = Modifier,
@@ -54,6 +63,8 @@ fun ImageBlockView(
     val available = remember(file) { file.exists() && file.length() > 0 }
     var viewing by remember { mutableStateOf(false) }
     var editingCaption by remember { mutableStateOf(false) }
+    var menuOpen by remember { mutableStateOf(false) }
+    var editingPicture by remember { mutableStateOf(false) }
     val captionFocus = remember { FocusRequester() }
     val showCaption = caption.isNotEmpty() || editingCaption
 
@@ -91,12 +102,34 @@ fun ImageBlockView(
                     )
                 }
             }
-            OverlayButton(
-                icon = Icons.Filled.Edit,
-                description = stringResource(R.string.cd_edit_caption),
-                onClick = { editingCaption = true },
-                modifier = Modifier.align(Alignment.TopStart),
-            )
+            Box(modifier = Modifier.align(Alignment.TopStart)) {
+                OverlayButton(
+                    icon = Icons.Filled.Edit,
+                    description = stringResource(R.string.cd_image_options),
+                    onClick = { menuOpen = true },
+                )
+                DropdownMenu(expanded = menuOpen, onDismissRequest = { menuOpen = false }) {
+                    if (available) {
+                        DropdownMenuItem(
+                            text = { Text(stringResource(R.string.image_edit_menu_edit)) },
+                            leadingIcon = { Icon(Icons.Filled.Crop, contentDescription = null) },
+                            onClick = { menuOpen = false; editingPicture = true },
+                        )
+                    }
+                    DropdownMenuItem(
+                        text = { Text(stringResource(R.string.cd_edit_caption)) },
+                        leadingIcon = { Icon(Icons.Filled.Edit, contentDescription = null) },
+                        onClick = { menuOpen = false; editingCaption = true },
+                    )
+                    if (hasOriginal) {
+                        DropdownMenuItem(
+                            text = { Text(stringResource(R.string.image_edit_restore_original)) },
+                            leadingIcon = { Icon(Icons.Filled.Restore, contentDescription = null) },
+                            onClick = { menuOpen = false; onRestoreOriginal() },
+                        )
+                    }
+                }
+            }
             OverlayButton(
                 icon = Icons.Filled.Close,
                 description = stringResource(R.string.cd_remove_image),
@@ -122,7 +155,17 @@ fun ImageBlockView(
         }
     }
 
-    if (viewing) ImageViewer(file = file, caption = caption, onDismiss = { viewing = false })
+    if (viewing) {
+        ImageViewer(
+            file = file,
+            caption = caption,
+            onDismiss = { viewing = false },
+            onEdit = { viewing = false; editingPicture = true },
+        )
+    }
+    if (editingPicture) {
+        ImageEditorDialog(file = file, onDismiss = { editingPicture = false }, onSave = onSaveEdit)
+    }
 }
 
 @Composable

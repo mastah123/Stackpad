@@ -89,7 +89,10 @@ fun EditorBlockItem(
         is ImageBlock -> ImageBlockView(
             file = media.file(block.fileName),
             caption = block.caption,
+            hasOriginal = block.originalFileName != null,
             onCaptionChange = { text -> viewModel.edit<ImageBlock>(id) { it.copy(caption = text) } },
+            onSaveEdit = { change -> viewModel.saveImageEdit(id, change) },
+            onRestoreOriginal = { viewModel.restoreOriginalImage(id) },
             onBlockFocused = onBlockFocused,
             onRemove = onRemove,
             modifier = modifier,

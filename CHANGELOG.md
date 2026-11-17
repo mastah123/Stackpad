@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.4.0] - 2026-11-17
+
+### Added
+- **Picture editor.** The pencil on an image now opens a menu with **Edit picture**; the full-screen viewer has an edit button too.
+  - **Crop** with draggable corners and edges, a thirds grid, and shapes: Free, Original, 1:1, 4:3, 3:4, 16:9, 9:16 (fixed shapes resize by the corners).
+  - **Rotate** left and right, **flip** horizontally and vertically, and **straighten** from -45° to 45° (the picture is cut so there are no empty corners).
+  - **Undo** each step and **Reset** to the opened picture. Closing with unsaved edits asks first.
+  - **Save** writes the result as a new JPEG in the note. The first time, the untouched picture is kept, and **Restore original** in the image menu brings it back. Backups include the original too.
+
+### Changed
+- Pictures in thumbnails and the editor share one decoder that respects the photo's rotation.
+
 ## [2.3.0] - 2026-11-16
 
 ### Added
