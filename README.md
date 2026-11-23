@@ -10,7 +10,7 @@
 
 <p align="center">
   <a href="https://github.com/mastah123/stackpad/actions/workflows/android.yml"><img alt="Build" src="https://github.com/mastah123/stackpad/actions/workflows/android.yml/badge.svg"></a>
-  <img alt="Version" src="https://img.shields.io/badge/version-2.6.0-4F46E5">
+  <img alt="Version" src="https://img.shields.io/badge/version-2.7.0-4F46E5">
   <img alt="Platform" src="https://img.shields.io/badge/platform-Android%208.0%2B-3DDC84">
   <img alt="Kotlin" src="https://img.shields.io/badge/Kotlin-2.0-7F52FF">
   <img alt="License" src="https://img.shields.io/badge/license-MIT-blue">
@@ -38,6 +38,9 @@ Also:
 - **More imports** (Settings > Import): Markdown and text files or zips (also Obsidian and Notion exports), Evernote `.enex`, Word `.docx` and PDF. Several files can be picked at once and importing the same file again adds nothing new. PDF text is a best-effort reading (PDFs store no structure); a scanned PDF becomes a note with its pages as pictures.
 - **Share** from the editor's 3-dot menu: copy, plain text, Markdown, a single **image** (PNG, saved to your gallery in Pictures/Stackpad, then shared) or a **PDF** (saved where you choose, then shared). Image and PDF copy the note's layout: the app's text sizes, list markers, full-width pictures, block colors, checklist cards with progress, and table grids, without any buttons or handles. **Share options** (a sheet before sharing, with "Don't show this again" and a Share options row in the menu) let you pick a light, dark or match-app page, note color, text size, PDF page size and page numbers, hide completed tasks or pictures, leave out empty lines, list items, checklists, tables and cards, and add the title, word count, dates, tags or a footer. The same menu sets the note **color**.
 - **Tags** are added from the Tag chip in the add bar (tap a tag to add or remove it, "+" creates one); tags show above the title and tap to remove.
+- **Share into Stackpad**: choose Stackpad in another app's share menu to save text, links or pictures as a new note (web addresses become link cards; a shared page title becomes the note title).
+- **Export all notes as Markdown** (Settings): one zip with a `.md` file per note, a folder per Stackpad folder and a shared `media/` folder with pictures. Locked and trashed notes are left out; audio is not included.
+- **Automatic backup** (Settings): pick a folder and a daily or weekly schedule; Stackpad writes `stackpad-auto-<date>.zip` there and keeps the last 7. "Back up now" runs it on demand. Android decides the exact time, and backups are not encrypted.
 - The add bar groups blocks: **+** (image, camera, audio, link, table, divider), Text, List, Cards, Tag.
 - **Templates**: start from Meeting notes, To-do, Journal or Project plan, or save any note as your own template.
 - **Select blocks** to copy them as text or move them up and down, or copy the whole note.
@@ -123,7 +126,7 @@ To enable signed builds, add four repository secrets. Step-by-step instructions 
 
 ## Testing
 
-Unit tests cover the formula evaluator, span editing, URL handling, list markers, table operations, waveform helpers, block serialization, table functions, due dates and reminder planning, image zoom limits, audio speed, note sorting and filtering, tags, trash timing, undo history, word counting, note previews, picture editing maths, Keep import rules, Markdown, Evernote, Word and PDF import parsing, CSV reading and writing, checklist sorting and counting, note export (text, image/PDF layout and pagination), backup rules and app-lock timing. A manual checklist for everything else (UI, audio, camera) is in [docs/TESTING.md](docs/TESTING.md).
+Unit tests cover the formula evaluator, span editing, URL handling, list markers, table operations, waveform helpers, block serialization, table functions, due dates and reminder planning, image zoom limits, audio speed, note sorting and filtering, tags, trash timing, undo history, word counting, note previews, picture editing maths, Keep import rules, Markdown, Evernote, Word and PDF import parsing, CSV reading and writing, share-in planning, Markdown archive naming, backup retention, checklist sorting and counting, note export (text, image/PDF layout and pagination), backup rules and app-lock timing. A manual checklist for everything else (UI, audio, camera) is in [docs/TESTING.md](docs/TESTING.md).
 
 ## Known limitations
 

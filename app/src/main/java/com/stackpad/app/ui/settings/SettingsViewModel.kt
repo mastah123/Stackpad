@@ -11,6 +11,12 @@ import com.stackpad.app.data.backup.BackupError
 import com.stackpad.app.data.backup.BackupException
 import com.stackpad.app.data.backup.BackupManager
 import com.stackpad.app.data.backup.RestoreSummary
+import com.stackpad.app.data.backup.AutoBackupManager
+import com.stackpad.app.data.export.NotesArchiveExporter
+import com.stackpad.app.data.prefs.AutoBackupSettings
+import com.stackpad.app.domain.backup.BackupFrequency
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.stateIn
 import com.stackpad.app.data.importing.ImportError
 import com.stackpad.app.data.importing.ImportException
 import com.stackpad.app.data.importing.ImportSummary
@@ -32,6 +38,8 @@ sealed interface SettingsMessage {
     data class Exported(val notes: Int) : SettingsMessage
     data class Restored(val summary: RestoreSummary) : SettingsMessage
     data class Failed(val error: BackupError) : SettingsMessage
+    data class ArchiveExported(val notes: Int, val skippedLocked: Int) : SettingsMessage
+    data class AutoBackupRan(val success: Boolean) : SettingsMessage
     data class Imported(val summary: ImportSummary) : SettingsMessage
     data class ImportFailed(val error: ImportError) : SettingsMessage
 }
@@ -39,7 +47,38 @@ sealed interface SettingsMessage {
 class SettingsViewModel(
     private val backup: BackupManager,
     private val importers: Importers,
+    private val archive: NotesArchiveExporter,
+    private val autoBackup: AutoBackupManager,
 ) : ViewModel() {
+    val autoBackupSettings: StateFlow<AutoBackupSettings> = autoBackup.settings
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), AutoBackupSettings())
+
+    fun exportAllAsMarkdown(resolver: ContentResolver, uri: Uri) = runBusy {
+        val result = withContext(Dispatchers.IO) {
+            val out = resolver.openOutputStream(uri, "wt") ?: throw BackupException(BackupError.IO)
+            out.use { archive.export(it) }
+        }
+        SettingsMessage.ArchiveExported(result.exported, result.skippedLocked)
+    }
+
+    fun setAutoBackupEnabled(enabled: Boolean) {
+        viewModelScope.launch { autoBackup.setEnabled(enabled) }
+    }
+
+    fun setBackupFrequency(frequency: BackupFrequency) {
+        viewModelScope.launch { autoBackup.setFrequency(frequency) }
+    }
+
+    /** Remembers the picked folder; with [enable] the switch is turned on as well. */
+    fun setBackupFolder(uri: String, enable: Boolean) {
+        viewModelScope.launch {
+            autoBackup.setFolder(uri)
+            if (enable) autoBackup.setEnabled(true)
+        }
+    }
+
+    fun backUpNow() = runBusy { SettingsMessage.AutoBackupRan(autoBackup.runNow()) }
+
     private val _busy = MutableStateFlow(false)
     val busy: StateFlow<Boolean> = _busy.asStateFlow()
 
@@ -89,7 +128,7 @@ class SettingsViewModel(
 
     companion object {
         fun factory(container: AppContainer) = viewModelFactory {
-            initializer { SettingsViewModel(container.backupManager, container.importers) }
+            initializer { SettingsViewModel(container.backupManager, container.importers, container.notesArchiveExporter, container.autoBackup) }
         }
     }
 }

@@ -35,7 +35,11 @@ object NoteExporter {
     fun exportBlocks(blocks: List<Block>, format: ExportFormat): String =
         export(Note(id = "", title = "", blocks = blocks, pinned = false, createdAt = 0, updatedAt = 0), format)
 
-    fun export(note: Note, format: ExportFormat): String {
+    /**
+     * [imagePath] gives a picture's relative file path for Markdown (an archive that includes the
+     * pictures); without it, or when it returns null, pictures stay a placeholder.
+     */
+    fun export(note: Note, format: ExportFormat, imagePath: ((ImageBlock) -> String?)? = null): String {
         val markdown = format == ExportFormat.MARKDOWN
         val parts = ArrayList<Pair<String, Boolean>>() // text, isPlainTextLine
 
@@ -43,7 +47,7 @@ object NoteExporter {
             parts += (if (markdown) "# ${note.title.trim()}" else note.title.trim()) to false
         }
         note.blocks.filterNot { it.isBlank() }.forEach { block ->
-            parts += render(block, markdown) to (block is TextBlock && !markdown)
+            parts += render(block, markdown, imagePath) to (block is TextBlock && !markdown)
         }
 
         val out = StringBuilder()
@@ -54,11 +58,15 @@ object NoteExporter {
         return out.toString().trim()
     }
 
-    private fun render(block: Block, markdown: Boolean): String = when (block) {
+    private fun render(block: Block, markdown: Boolean, imagePath: ((ImageBlock) -> String?)?): String = when (block) {
         is TextBlock -> renderText(block, markdown)
         is ListBlock -> renderList(block, markdown)
         is ChecklistBlock -> renderChecklist(block, markdown)
-        is ImageBlock -> if (markdown) "*[Image]*" else "[Image]"
+        is ImageBlock -> when {
+            markdown && imagePath?.invoke(block) != null -> "![Image](${imagePath(block)})"
+            markdown -> "*[Image]*"
+            else -> "[Image]"
+        }
         is SheetBlock -> renderSheet(block, markdown)
         is AudioBlock -> "[Audio note ${formatDuration(block.durationMs)}]"
         is LinkBlock -> renderLink(block, markdown)

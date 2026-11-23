@@ -26,7 +26,7 @@ class BackupManager(
     private val context: Context,
     private val repository: NoteRepository,
     private val media: MediaStorage,
-    private val appVersion: String,
+    val appVersion: String,
 ) {
 
     /** Writes a backup to [out]. Returns how many notes were included. Throws [BackupException]. */

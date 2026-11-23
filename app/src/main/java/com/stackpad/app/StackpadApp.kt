@@ -6,7 +6,12 @@ import androidx.room.Room
 import com.stackpad.app.audio.AudioPlayer
 import com.stackpad.app.audio.AudioRecorder
 import com.stackpad.app.data.NoteRepository
+import com.stackpad.app.data.backup.AutoBackupManager
+import com.stackpad.app.data.backup.AutoBackupWriter
 import com.stackpad.app.data.backup.BackupManager
+import com.stackpad.app.data.export.NotesArchiveExporter
+import com.stackpad.app.data.prefs.AutoBackupPreferences
+import com.stackpad.app.data.share.SharedNoteCreator
 import com.stackpad.app.data.db.MIGRATION_1_2
 import com.stackpad.app.data.db.MIGRATION_2_3
 import com.stackpad.app.data.db.StackpadDatabase
@@ -76,6 +81,16 @@ class AppContainer(context: Context) {
         runCatching { appContext.packageManager.getPackageInfo(appContext.packageName, 0).versionName }
             .getOrNull().orEmpty(),
     )
+
+    val notesArchiveExporter = NotesArchiveExporter(repository, mediaStorage, backupManager.appVersion)
+
+    val autoBackup = AutoBackupManager(
+        appContext,
+        AutoBackupPreferences(appContext),
+        AutoBackupWriter(appContext, backupManager),
+    )
+
+    val sharedNoteCreator = SharedNoteCreator(repository, mediaStorage)
 
     /** Redraws the home-screen widget with the latest note (or "Locked"). [onDone] runs afterwards. */
     fun refreshWidget(onDone: () -> Unit = {}) {

@@ -3,6 +3,10 @@ package com.stackpad.app
 import android.graphics.Color
 import android.content.Intent
 import android.os.Bundle
+import android.widget.Toast
+import androidx.lifecycle.lifecycleScope
+import com.stackpad.app.ui.share.toIncomingShare
+import kotlinx.coroutines.launch
 import androidx.activity.SystemBarStyle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -35,7 +39,10 @@ class MainActivity : FragmentActivity() {
         val container = (application as StackpadApp).container
         appLock = AppLockController(this, container.securityPreferences)
         // Only on a fresh launch: after a rotation the saved navigation state already has the note.
-        if (savedInstanceState == null) noteToOpen = noteFrom(intent)
+        if (savedInstanceState == null) {
+            noteToOpen = noteFrom(intent)
+            receiveShare(intent)
+        }
 
         setContent {
             val mode by container.themePreferences.themeMode
@@ -91,6 +98,23 @@ class MainActivity : FragmentActivity() {
         super.onNewIntent(intent)
         setIntent(intent)
         noteFrom(intent)?.let { noteToOpen = it }
+        receiveShare(intent)
+    }
+
+    /** Saves content shared from another app as a new note and opens it. */
+    private fun receiveShare(intent: Intent?) {
+        val share = intent?.toIncomingShare() ?: return
+        // Handled once: a recreated activity must not save the same share again.
+        intent.action = null
+        val creator = (application as StackpadApp).container.sharedNoteCreator
+        lifecycleScope.launch {
+            val id = creator.create(share.subject, share.text, share.pictures)
+            if (id == null) {
+                Toast.makeText(this@MainActivity, R.string.msg_share_nothing, Toast.LENGTH_SHORT).show()
+            } else {
+                noteToOpen = id
+            }
+        }
     }
 
     /** The note a launch intent asks for: a reminder's note, the widget's latest note, or a new one. */

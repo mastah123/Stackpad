@@ -72,6 +72,11 @@ fun SettingsScreen(
         ActivityResultContracts.CreateDocument("application/zip"),
     ) { uri -> uri?.let { viewModel.exportTo(context.contentResolver, it) } }
 
+    val archiveLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.CreateDocument("application/zip"),
+    ) { uri -> uri?.let { viewModel.exportAllAsMarkdown(context.contentResolver, it) } }
+    val autoBackup by viewModel.autoBackupSettings.collectAsStateWithLifecycle()
+
     val restoreLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.OpenDocument(),
     ) { uri -> uri?.let { viewModel.restoreFrom(context.contentResolver, it) } }
@@ -124,12 +129,20 @@ fun SettingsScreen(
                 onClick = { exportLauncher.launch(BackupRules.fileName(System.currentTimeMillis())) },
             )
             ActionRow(
+                icon = Icons.Filled.FileUpload,
+                title = R.string.settings_export_markdown_title,
+                subtitle = R.string.settings_export_markdown_subtitle,
+                enabled = !busy,
+                onClick = { archiveLauncher.launch("stackpad-notes-${java.time.LocalDate.now()}.zip") },
+            )
+            ActionRow(
                 icon = Icons.Filled.FileDownload,
                 title = R.string.settings_restore_title,
                 subtitle = R.string.settings_restore_subtitle,
                 enabled = !busy,
                 onClick = { restoreLauncher.launch(arrayOf("application/zip", "application/octet-stream")) },
             )
+            AutoBackupSection(settings = autoBackup, busy = busy, viewModel = viewModel)
             SectionHeader(R.string.settings_section_import)
             ActionRow(
                 icon = Icons.Filled.FileDownload,
@@ -207,7 +220,7 @@ fun SettingsScreen(
 }
 
 @Composable
-private fun SectionHeader(title: Int) {
+internal fun SectionHeader(title: Int) {
     Text(
         text = stringResource(title),
         style = MaterialTheme.typography.labelLarge,
@@ -217,7 +230,7 @@ private fun SectionHeader(title: Int) {
 }
 
 @Composable
-private fun ActionRow(icon: ImageVector, title: Int, subtitle: Int, enabled: Boolean, onClick: () -> Unit) {
+internal fun ActionRow(icon: ImageVector, title: Int, subtitle: Int, enabled: Boolean, onClick: () -> Unit) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -232,7 +245,7 @@ private fun ActionRow(icon: ImageVector, title: Int, subtitle: Int, enabled: Boo
 }
 
 @Composable
-private fun SwitchRow(icon: ImageVector, title: Int, subtitle: Int, checked: Boolean, onCheckedChange: (Boolean) -> Unit) {
+internal fun SwitchRow(icon: ImageVector, title: Int, subtitle: Int, checked: Boolean, onCheckedChange: (Boolean) -> Unit) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -289,6 +302,11 @@ private fun versionName(context: Context): String =
 private fun describe(context: Context, message: SettingsMessage): String = when (message) {
     is SettingsMessage.Exported ->
         context.resources.getQuantityString(R.plurals.msg_exported, message.notes, message.notes)
+    is SettingsMessage.ArchiveExported -> context.resources.getQuantityString(
+        R.plurals.msg_archive_exported, message.notes, message.notes,
+    ) + if (message.skippedLocked > 0) " " + context.getString(R.string.msg_archive_locked, message.skippedLocked) else ""
+    is SettingsMessage.AutoBackupRan ->
+        context.getString(if (message.success) R.string.msg_auto_backup_ok else R.string.msg_auto_backup_failed)
     is SettingsMessage.Restored -> context.getString(
         R.string.msg_restored,
         message.summary.added,

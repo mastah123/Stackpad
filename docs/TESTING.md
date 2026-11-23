@@ -286,6 +286,14 @@ Covers: formula evaluator, span editing, URL detection/validation, list markers,
 - [ ] Link block: enter a title and `example.com`. The open button works. `not a url` shows an error and disables open.
 - [ ] Prompt: write text, tap copy, paste somewhere else. The text matches.
 
+### Share into Stackpad, export all, automatic backup
+- [ ] In a browser, share a page to Stackpad: a new note opens with the page title as its title and a link card. Share plain text from another app: the text is in a new note. Share one and several pictures from the gallery: they appear as images.
+- [ ] Share while the app lock is on: the note opens after unlocking.
+- [ ] Settings, **Export all notes as Markdown**: save the zip, unzip it. Each note is a `.md` file, folder notes are in folders, pictures show in a Markdown viewer, locked notes are missing and the message says how many were left out.
+- [ ] Settings, **Back up automatically**: turning it on asks for a folder first. After picking, **Back up now** creates `stackpad-auto-<today>.zip` there and the status shows the time. Running it twice on one day leaves one file for that day.
+- [ ] Switch Daily/Weekly; the choice stays after reopening. Switch the feature off: no new backups. After a few days the folder holds at most 7 automatic backups and other files in it are untouched.
+- [ ] Delete the folder or revoke access, then Back up now: the status says the backup failed. Restore from an automatic backup using Restore backup.
+
 ### Appearance
 - [ ] Theme menu: System, Light and Dark each apply immediately and persist after restarting the app.
 - [ ] Spacing is compact; text is small but readable; layouts fit in portrait and landscape.

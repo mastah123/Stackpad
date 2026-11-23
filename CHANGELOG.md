@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.7.0] - 2026-11-23
+
+### Added
+- **Share into Stackpad**: text, links and pictures shared from other apps become a new note that opens right away. A line that is only a web address becomes a link card.
+- **Export all notes as Markdown** in Settings: zip with one `.md` per note, a folder per Stackpad folder, and a `media/` folder with pictures. Tags are added as `#tag` at the end of each note. Locked and trashed notes are skipped.
+- **Automatic backup** in Settings: choose a folder and a daily or weekly schedule, with "Back up now" and the last result shown. Keeps the 7 newest automatic backups.
+
+### Changed
+- Added the AndroidX WorkManager library for the scheduled backup.
+
 ## [2.6.0] - 2026-11-23
 
 ### Added
