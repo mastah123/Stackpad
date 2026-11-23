@@ -54,6 +54,16 @@ import com.stackpad.app.domain.sheet.SheetOps.withRowAdded
 import com.stackpad.app.ui.components.BlockSurface
 import com.stackpad.app.ui.components.InlineTextField
 import com.stackpad.app.ui.components.SmallIconButton
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.ui.platform.LocalContext
+import com.stackpad.app.data.export.CsvFiles
+import com.stackpad.app.domain.sheet.CsvCodec
+import com.stackpad.app.ui.editor.EditorMessage
+import com.stackpad.app.util.shareFile
 
 private val CellWidth = 76.dp
 private val CellHeight = 28.dp
@@ -68,6 +78,9 @@ fun SpreadsheetBlockView(
     block: SheetBlock,
     onBlockFocused: () -> Unit,
     onEdit: ((SheetBlock) -> SheetBlock) -> Unit,
+    onEditStep: ((SheetBlock) -> SheetBlock) -> Unit,
+    onOfferUndo: (messageRes: Int) -> Unit,
+    onMessage: (EditorMessage) -> Unit,
     onRemove: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -76,6 +89,27 @@ fun SpreadsheetBlockView(
     var editing by remember { mutableStateOf<Pair<Int, Int>?>(null) }
     val rows = block.rowCount
     val columns = block.columnCount
+    val context = LocalContext.current
+    val importLauncher = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
+        if (uri == null) return@rememberLauncherForActivityResult
+        val parsed = CsvFiles.read(context.contentResolver, uri)?.let { CsvCodec.parse(it) }
+        if (parsed == null) {
+            onMessage(EditorMessage.CSV_FAILED)
+        } else {
+            editing = null
+            onEditStep { it.copy(cells = parsed.cells) }
+            onOfferUndo(if (parsed.truncated) R.string.msg_csv_truncated else R.string.msg_csv_imported)
+        }
+    }
+    val exportTitle = stringResource(R.string.block_table)
+    val exportCsv = {
+        val values = List(rows) { r -> List(columns) { c -> evaluator.display(r, c) } }
+        val file = CsvFiles.write(context, "table.csv", CsvCodec.encode(values))
+        if (file == null || !shareFile(context, file, "text/csv", exportTitle)) {
+            onMessage(EditorMessage.CSV_EXPORT_FAILED)
+        }
+    }
+    var menuOpen by remember { mutableStateOf(false) }
 
     BlockSurface(modifier = modifier, accent = BlockAccent.TABLE) {
         Row(verticalAlignment = Alignment.CenterVertically) {
@@ -98,6 +132,31 @@ fun SpreadsheetBlockView(
             SheetAction(stringResource(R.string.table_remove_column), columns > 1) {
                 editing = null
                 onEdit { it.withLastColumnRemoved() }
+            }
+            Box {
+                SmallIconButton(
+                    icon = Icons.Filled.MoreVert,
+                    contentDescription = stringResource(R.string.table_menu),
+                    onClick = { menuOpen = true },
+                    size = 28.dp,
+                    iconSize = 16.dp,
+                )
+                DropdownMenu(expanded = menuOpen, onDismissRequest = { menuOpen = false }) {
+                    DropdownMenuItem(
+                        text = { Text(stringResource(R.string.table_import_csv)) },
+                        onClick = {
+                            menuOpen = false
+                            importLauncher.launch(arrayOf("*/*"))
+                        },
+                    )
+                    DropdownMenuItem(
+                        text = { Text(stringResource(R.string.table_export_csv)) },
+                        onClick = {
+                            menuOpen = false
+                            exportCsv()
+                        },
+                    )
+                }
             }
             SmallIconButton(
                 icon = Icons.Filled.Close,

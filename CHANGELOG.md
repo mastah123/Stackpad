@@ -7,6 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.6.0] - 2026-11-23
+
+### Added
+- **Checklist menu** (three dots on the card):
+  - **Auto-sort done items**: ticking an item slides it to the bottom with a short animation; new items are added above the done ones.
+  - **Hide completed**: done items fold away and a "N done · Show" line brings them back. They stay in the note.
+  - **Sort by due date**: soonest first, undated items next, done items last.
+  - **Uncheck all** and **Delete completed**, each its own undo step with an Undo button in the message.
+- A **percentage** next to the done count (for example `2/5 · 40%`).
+- **Table CSV**: import a CSV file (comma, semicolon or tab separated; quoted fields and line breaks inside quotes are supported; up to 50 rows and 12 columns) and export the table as a CSV you can share.
+
+### Changed
+- The checklist sort button moved into the checklist menu as "Done items to the bottom".
+
 ## [2.5.0] - 2026-11-18
 
 ### Added

@@ -63,6 +63,10 @@ data class ChecklistBlock(
     override val id: String,
     val title: String = "",
     val items: List<ChecklistItem>,
+    /** When on, done items drop to the bottom as they are ticked. */
+    val autoSort: Boolean = false,
+    /** When on, done items are folded away (they stay in the note). */
+    val hideCompleted: Boolean = false,
 ) : Block
 
 @Serializable

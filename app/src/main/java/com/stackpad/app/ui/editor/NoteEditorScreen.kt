@@ -321,6 +321,17 @@ private fun NoteEditorContent(
         viewModel.messages.collect { message -> snackbar.showSnackbar(context.getString(message.resId)) }
     }
 
+    LaunchedEffect(viewModel) {
+        viewModel.undoOffers.collect { messageRes ->
+            val result = snackbar.showSnackbar(
+                message = context.getString(messageRes),
+                actionLabel = context.getString(R.string.action_undo),
+                duration = SnackbarDuration.Long,
+            )
+            if (result == SnackbarResult.ActionPerformed) viewModel.undo()
+        }
+    }
+
     // Bring a newly added block into view.
     LaunchedEffect(listState) {
         snapshotFlow { state.focusBlockId }.filterNotNull().collectLatest { id ->

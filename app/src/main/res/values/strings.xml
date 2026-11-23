@@ -45,7 +45,23 @@
     <string name="cd_underline">Underline</string>
     <string name="cd_unpin">Unpin note</string>
     <string name="checklist_add_item">Add item</string>
-    <string name="checklist_progress" formatted="true">%1$d/%2$d</string>
+    <string name="checklist_progress" formatted="true">%1$d/%2$d · %3$d%%</string>
+    <string name="checklist_auto_sort">Auto-sort done items</string>
+    <string name="checklist_hide_completed">Hide completed</string>
+    <string name="checklist_sort_due">Sort by due date</string>
+    <string name="checklist_uncheck_all">Uncheck all</string>
+    <string name="checklist_delete_completed">Delete completed</string>
+    <string name="checklist_done_hidden" formatted="true">%1$d done · Show</string>
+    <string name="cd_checklist_menu">Checklist options</string>
+    <string name="msg_checklist_unchecked">All items unchecked</string>
+    <string name="msg_completed_deleted">Completed items deleted</string>
+    <string name="table_menu">Table options</string>
+    <string name="table_import_csv">Import CSV</string>
+    <string name="table_export_csv">Export CSV</string>
+    <string name="msg_csv_imported">Table imported</string>
+    <string name="msg_csv_truncated">Table imported; extra rows or columns were left out</string>
+    <string name="msg_csv_failed">Could not read that file as a table</string>
+    <string name="msg_csv_export_failed">Could not share the table</string>
     <string name="checklist_title_hint">Checklist</string>
     <string name="editor_start_writing">Start writing…</string>
     <string name="editor_title">Note</string>

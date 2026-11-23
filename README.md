@@ -10,7 +10,7 @@
 
 <p align="center">
   <a href="https://github.com/mastah123/stackpad/actions/workflows/android.yml"><img alt="Build" src="https://github.com/mastah123/stackpad/actions/workflows/android.yml/badge.svg"></a>
-  <img alt="Version" src="https://img.shields.io/badge/version-2.5.0-4F46E5">
+  <img alt="Version" src="https://img.shields.io/badge/version-2.6.0-4F46E5">
   <img alt="Platform" src="https://img.shields.io/badge/platform-Android%208.0%2B-3DDC84">
   <img alt="Kotlin" src="https://img.shields.io/badge/Kotlin-2.0-7F52FF">
   <img alt="License" src="https://img.shields.io/badge/license-MIT-blue">
@@ -23,9 +23,9 @@ Every note is a stack of compact blocks, laid out tightly like chat messages.
 | Block | What it does |
 | --- | --- |
 | **Text** | One line per block, so each line can be H1, H2, H3 or normal. **Bold**, *italic*, underline. URLs are highlighted and open when tapped. |
-| **List** (menu) | **Bullets**, **Numbers** and **Letters**: long items wrap under the text, never under the marker. **Checklist**: rounded card with a progress tracker, drag handles to reorder, a sort button (done items last), due dates with reminder notifications, and an "x" to remove it. |
+| **List** (menu) | **Bullets**, **Numbers** and **Letters**: long items wrap under the text, never under the marker. **Checklist**: rounded card with a progress tracker, drag handles to reorder, a percentage, due dates with reminder notifications (overdue dates are highlighted), and an "x" to remove it. The checklist menu has **Auto-sort done items** (animated), **Hide completed** (with a "N done" line), **Done items to the bottom**, **Sort by due date**, **Uncheck all** and **Delete completed**; Uncheck all and Delete completed offer Undo. |
 | **Image** (+ menu) | Full width, from the gallery or camera. Tap for full-screen zoom, edit it (crop, rotate, flip, straighten, restore original), or remove it with the "x". |
-| **Table** (+ menu) | Small spreadsheet with `+ - * /`, parentheses, cell references such as `=A1+B1*2`, and `SUM`, `AVERAGE`, `MIN`, `MAX`, `COUNT` over ranges such as `=SUM(A1:A5)`. |
+| **Table** (+ menu) | Small spreadsheet with `+ - * /`, parentheses, cell references such as `=A1+B1*2`, and `SUM`, `AVERAGE`, `MIN`, `MAX`, `COUNT` over ranges such as `=SUM(A1:A5)`. The table menu **imports a CSV file** (comma, semicolon or tab separated; replaces the table, with Undo) and **exports the table as a CSV** you can share (formulas are exported as their results). |
 | **Audio** (+ menu) | Voice-message style row: play, animated waveform you can tap or drag to seek, duration, 1x / 1.5x / 2x speed, and "x". Recorded in app. |
 | **Link** (+ menu) | Title and URL with validation; opens in the browser. |
 | **Cards** (menu) | **Prompt**: monospace card with a one-tap copy button. **Quote**: indented italic quotation with an accent bar. **Code**: monospace block with a copy button. |
@@ -123,7 +123,7 @@ To enable signed builds, add four repository secrets. Step-by-step instructions 
 
 ## Testing
 
-Unit tests cover the formula evaluator, span editing, URL handling, list markers, table operations, waveform helpers, block serialization, table functions, due dates and reminder planning, image zoom limits, audio speed, note sorting and filtering, tags, trash timing, undo history, word counting, note previews, picture editing maths, Keep import rules, Markdown, Evernote, Word and PDF import parsing, note export (text, image/PDF layout and pagination), backup rules and app-lock timing. A manual checklist for everything else (UI, audio, camera) is in [docs/TESTING.md](docs/TESTING.md).
+Unit tests cover the formula evaluator, span editing, URL handling, list markers, table operations, waveform helpers, block serialization, table functions, due dates and reminder planning, image zoom limits, audio speed, note sorting and filtering, tags, trash timing, undo history, word counting, note previews, picture editing maths, Keep import rules, Markdown, Evernote, Word and PDF import parsing, CSV reading and writing, checklist sorting and counting, note export (text, image/PDF layout and pagination), backup rules and app-lock timing. A manual checklist for everything else (UI, audio, camera) is in [docs/TESTING.md](docs/TESTING.md).
 
 ## Known limitations
 

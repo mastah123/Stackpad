@@ -50,4 +50,6 @@ enum class EditorMessage(@StringRes val resId: Int) {
     TEMPLATE_SAVED(R.string.msg_template_saved),
     TEMPLATE_EMPTY(R.string.msg_template_empty),
     TEMPLATE_LIMIT(R.string.msg_template_limit),
+    CSV_FAILED(R.string.msg_csv_failed),
+    CSV_EXPORT_FAILED(R.string.msg_csv_export_failed),
 }

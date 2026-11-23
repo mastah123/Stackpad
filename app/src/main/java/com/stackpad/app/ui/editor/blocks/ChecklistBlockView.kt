@@ -2,6 +2,7 @@ package com.stackpad.app.ui.editor.blocks
 
 import com.stackpad.app.ui.theme.BlockAccent
 import com.stackpad.app.ui.components.keepCaretVisible
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -18,7 +19,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.Sort
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.DragHandle
@@ -83,6 +83,9 @@ fun ChecklistBlockView(
     onFocusHandled: () -> Unit,
     onBlockFocused: () -> Unit,
     onEdit: ((ChecklistBlock) -> ChecklistBlock) -> Unit,
+    /** Like [onEdit] but recorded as its own undo step. */
+    onEditStep: ((ChecklistBlock) -> ChecklistBlock) -> Unit,
+    onOfferUndo: (messageRes: Int) -> Unit,
     onDueDateSet: () -> Unit,
     onRemove: () -> Unit,
     modifier: Modifier = Modifier,
@@ -91,6 +94,7 @@ fun ChecklistBlockView(
     var dueEditId by remember { mutableStateOf<String?>(null) }
     val done = block.items.count { it.checked }
     val total = block.items.size
+    val percent = ChecklistOps.percent(done, total)
     val progress by animateFloatAsState(
         targetValue = if (total == 0) 0f else done / total.toFloat(),
         label = "checklistProgress",
@@ -131,18 +135,40 @@ fun ChecklistBlockView(
                 modifier = Modifier.weight(1f),
             )
             Text(
-                text = stringResource(R.string.checklist_progress, done, total),
+                text = stringResource(R.string.checklist_progress, done, total, percent),
                 style = MaterialTheme.typography.labelMedium,
                 color = colors.onSurfaceVariant,
                 modifier = Modifier.padding(horizontal = 6.dp),
             )
-            SmallIconButton(
-                icon = Icons.AutoMirrored.Filled.Sort,
-                contentDescription = stringResource(R.string.cd_sort_checklist),
-                onClick = { onEdit { it.copy(items = ChecklistOps.uncheckedFirst(it.items)) } },
-                enabled = ChecklistOps.canSort(block.items),
-                size = 28.dp,
-                iconSize = 16.dp,
+            ChecklistMenu(
+                state = ChecklistMenuState(
+                    autoSort = block.autoSort,
+                    hideCompleted = block.hideCompleted,
+                    canMoveDoneDown = ChecklistOps.canSort(block.items),
+                    canSortByDate = ChecklistOps.canSortByDueDate(block.items),
+                    hasDone = done > 0,
+                ),
+                actions = ChecklistMenuActions(
+                    onAutoSort = { on ->
+                        onEditStep { b ->
+                            b.copy(
+                                autoSort = on,
+                                items = if (on) ChecklistOps.uncheckedFirst(b.items) else b.items,
+                            )
+                        }
+                    },
+                    onHideCompleted = { on -> onEditStep { it.copy(hideCompleted = on) } },
+                    onMoveDoneDown = { onEditStep { it.copy(items = ChecklistOps.uncheckedFirst(it.items)) } },
+                    onSortByDate = { onEditStep { it.copy(items = ChecklistOps.sortedByDueDate(it.items)) } },
+                    onUncheckAll = {
+                        onEditStep { it.copy(items = ChecklistOps.uncheckAll(it.items)) }
+                        onOfferUndo(R.string.msg_checklist_unchecked)
+                    },
+                    onDeleteCompleted = {
+                        onEditStep { it.copy(items = ChecklistOps.removeCompleted(it.items)) }
+                        onOfferUndo(R.string.msg_completed_deleted)
+                    },
+                ),
             )
             SmallIconButton(
                 icon = Icons.Filled.Close,
@@ -166,8 +192,10 @@ fun ChecklistBlockView(
         block.items.forEachIndexed { index, item ->
             key(item.id) {
                 val isDragging = draggingId == item.id
+                AnimatedVisibility(visible = !(block.hideCompleted && item.checked)) {
                 ChecklistRow(
                     item = item,
+                    animateMoves = draggingId == null,
                     isDragging = isDragging,
                     dragOffsetProvider = { dragOffset },
                     focusRequester = requesters.getOrPut(item.id) { FocusRequester() },
@@ -175,7 +203,7 @@ fun ChecklistBlockView(
                     onEditDueDate = { dueEditId = item.id },
                     onFocused = onBlockFocused,
                     onCheckedChange = { checked ->
-                        onEdit { b -> b.copy(items = b.items.map { if (it.id == item.id) it.copy(checked = checked) else it }) }
+                        onEdit { b -> b.copy(items = ChecklistOps.withChecked(b.items, item.id, checked, b.autoSort)) }
                     },
                     onTextChange = { text ->
                         onEdit { b -> b.copy(items = b.items.map { if (it.id == item.id) it.copy(text = text) else it }) }
@@ -230,6 +258,7 @@ fun ChecklistBlockView(
                     onMoveUp = { move(item.id, -1) },
                     onMoveDown = { move(item.id, +1) },
                 )
+                }
                 DisposableEffect(item.id) {
                     onDispose {
                         requesters.remove(item.id)
@@ -239,13 +268,24 @@ fun ChecklistBlockView(
             }
         }
 
+        if (block.hideCompleted && done > 0) {
+            Text(
+                text = stringResource(R.string.checklist_done_hidden, done),
+                style = MaterialTheme.typography.labelMedium,
+                color = colors.onSurfaceVariant,
+                modifier = Modifier
+                    .clip(RoundedCornerShape(8.dp))
+                    .clickable { onEditStep { it.copy(hideCompleted = false) } }
+                    .padding(horizontal = 4.dp, vertical = 4.dp),
+            )
+        }
         Row(
             modifier = Modifier
                 .clip(RoundedCornerShape(8.dp))
                 .clickable {
                     val newItem = ChecklistItem(BlockFactory.newId())
                     pendingFocusId = newItem.id
-                    onEdit { it.copy(items = it.items + newItem) }
+                    onEdit { it.copy(items = ChecklistOps.withNewItem(it.items, newItem, it.autoSort)) }
                 }
                 .padding(horizontal = 4.dp, vertical = 4.dp),
             verticalAlignment = Alignment.CenterVertically,
@@ -303,6 +343,7 @@ fun ChecklistBlockView(
 @Composable
 private fun ChecklistRow(
     item: ChecklistItem,
+    animateMoves: Boolean,
     isDragging: Boolean,
     dragOffsetProvider: () -> Float,
     focusRequester: FocusRequester,
@@ -345,6 +386,7 @@ private fun ChecklistRow(
         modifier = Modifier
             .fillMaxWidth()
             .onSizeChanged { onHeight(it.height) }
+            .slideOnReorder(animateMoves)
             .zIndex(if (isDragging) 1f else 0f)
             .graphicsLayer { translationY = if (isDragging) dragOffsetProvider() else 0f }
             .background(

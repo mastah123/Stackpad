@@ -81,6 +81,8 @@ fun EditorBlockItem(
             onFocusHandled = onFocusHandled,
             onBlockFocused = onBlockFocused,
             onEdit = { transform -> viewModel.edit<ChecklistBlock>(id, transform) },
+            onEditStep = { transform -> viewModel.editStep<ChecklistBlock>(id, transform) },
+            onOfferUndo = { viewModel.offerUndo(it) },
             onDueDateSet = onDueDateSet,
             onRemove = onRemove,
             modifier = modifier,
@@ -99,6 +101,9 @@ fun EditorBlockItem(
             block = block,
             onBlockFocused = onBlockFocused,
             onEdit = { transform -> viewModel.edit<SheetBlock>(id, transform) },
+            onEditStep = { transform -> viewModel.editStep<SheetBlock>(id, transform) },
+            onOfferUndo = { viewModel.offerUndo(it) },
+            onMessage = { viewModel.notify(it) },
             onRemove = onRemove,
             modifier = modifier,
         )

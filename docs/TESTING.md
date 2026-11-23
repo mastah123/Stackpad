@@ -220,6 +220,12 @@ Covers: formula evaluator, span editing, URL detection/validation, list markers,
 - [ ] Drag an item by its handle to reorder; the order is kept after reopening the note.
 - [ ] "Add item" and Enter add items; Backspace on an empty item removes it.
 - [ ] The "x" removes the whole checklist.
+- [ ] The count shows a percentage, e.g. `2/5 · 40%`, and an empty checklist shows `0/0 · 0%`.
+- [ ] Three-dot menu, **Auto-sort done items** on: ticking an item slides it to the bottom; unticking brings it back above the done ones; "Add item" adds above the done items. Switch it off: ticking no longer moves items.
+- [ ] **Hide completed** on: done items fold away and "N done · Show" appears; tapping it shows them again. Ticking an item hides it right away. The items are still there after reopening, in share and in search.
+- [ ] **Done items to the bottom** is disabled when already sorted. **Sort by due date** orders by date (undated after dated, done last) and is disabled when already in that order.
+- [ ] **Uncheck all** and **Delete completed** are disabled when nothing is done. After either, the message has an Undo button that restores the items; the top Undo does the same.
+- [ ] Dragging an item still works with auto-sort on and off.
 - [ ] Tap the calendar button on an item, pick a date and Save. Android 13+: a notification permission prompt appears the first time. The date chip shows "Today", "Tomorrow" or e.g. `Nov 20`.
 - [ ] Tap the chip to change the date, and "Remove date" to clear it.
 - [ ] Set a past date on an unchecked item: the chip is highlighted as overdue. Check the item: the highlight goes away.
@@ -253,6 +259,9 @@ Covers: formula evaluator, span editing, URL detection/validation, list markers,
 - [ ] Tap a cell and type `2`, in another `3`, in a third `=A1+B1`. The result shows `5` when not editing.
 - [ ] Try `=2+3*4` (14), `=(2+3)*4` (20), `=1/0` (`#DIV/0!`), `=A1` inside A1 (`#CYCLE!`), `=2+` (`#ERR!`).
 - [ ] Add/remove rows and columns. The table scrolls sideways when wide.
+- [ ] Three-dot menu, **Export CSV**: the share sheet opens with `table.csv`. Open it in a spreadsheet app: values match (formulas show their results, text with commas and quotes is intact, accents are correct).
+- [ ] **Import CSV**: pick a comma, a semicolon and a tab separated file; the table is replaced and shows the data. A message offers Undo, which restores the old table.
+- [ ] Import a file with more than 50 rows or 12 columns: the message says extra rows or columns were left out. Import an empty file or a picture: "Could not read that file as a table" and the table is unchanged.
 - [ ] Put `1`, `2`, `3`, `4` in A1:A4 and `=SUM(A1:A4)` elsewhere: `10`. Try `=AVERAGE(A1:A4)` (2.5), `=MIN(A1:A4)`, `=MAX(A1:A4)`, `=COUNT(A1:A4)` (4), and lower-case `=sum(a1:a4)`.
 - [ ] Mixed arguments: `=SUM(A1:A4, 5, A1*2)` (17). Nested: `=MAX(SUM(A1:A2), A4)`. A text or blank cell inside a range is skipped.
 - [ ] Errors: `=FOO(A1)` shows `#NAME?`, `=SUM(A1:A4` shows `#ERR!`, `=SUM(A1:A99)` shows `#REF!`, `=AVERAGE(B1:B2)` over blank cells shows `#DIV/0!`, a range that includes its own cell shows `#CYCLE!`.
@@ -271,7 +280,7 @@ Covers: formula evaluator, span editing, URL detection/validation, list markers,
 - [ ] The add bar order is +, Text, List, Cards, Tag. The + chip opens Image, Camera, Audio, Link, Table and Divider; each adds its block and closes the row. Audio is hidden while recording.
 - [ ] The add bar has a Cards chip instead of separate Prompt, Quote and Code chips. Tapping it opens a row with Prompt, Quote and Code; each adds its block and closes the row.
 - [ ] While the +, List, Cards or Tag row is open, the text formatting row (H1, H2, H3, B, I, U) is hidden; it returns when the row closes. It is also hidden while recording audio.
-- [ ] In a checklist with a mix of done and open items, the sort button moves done items to the bottom, keeping the order inside each group. The button is disabled when already sorted. Undo restores the order.
+- [ ] In a checklist with a mix of done and open items, the menu entry "Done items to the bottom" moves done items down, keeping the order inside each group. It is disabled when already sorted. Undo restores the order.
 
 ### Link and prompt
 - [ ] Link block: enter a title and `example.com`. The open button works. `not a url` shows an error and disables open.

@@ -106,6 +106,9 @@ class NoteEditorViewModel(
     private val _messages = MutableSharedFlow<EditorMessage>(extraBufferCapacity = 8)
     val messages: SharedFlow<EditorMessage> = _messages.asSharedFlow()
 
+    private val _undoOffers = MutableSharedFlow<Int>(extraBufferCapacity = 4)
+    val undoOffers: SharedFlow<Int> = _undoOffers.asSharedFlow()
+
     private var createdAt = System.currentTimeMillis()
     private var existsInDb = false
     private var dirty = false
@@ -205,6 +208,19 @@ class NoteEditorViewModel(
     /** Edits the block [id] if it is a [T]; other types are left untouched. */
     inline fun <reified T : Block> edit(id: String, crossinline transform: (T) -> T) =
         updateBlock(id) { block -> if (block is T) transform(block) else block }
+
+    /** Like [edit], but always its own undo step (never merged with typing). */
+    inline fun <reified T : Block> editStep(id: String, crossinline transform: (T) -> T) =
+        replaceBlock(id) { block -> if (block is T) transform(block) else block }
+
+    fun replaceBlock(id: String, transform: (Block) -> Block) = mutate { s ->
+        s.copy(blocks = s.blocks.map { if (it.id == id) transform(it) else it })
+    }
+
+    /** Asks the screen to show [messageRes] with an Undo button. */
+    fun offerUndo(@androidx.annotation.StringRes messageRes: Int) {
+        _undoOffers.tryEmit(messageRes)
+    }
 
     /**
      * Inserts [block] after the block that was last focused (or at the end). An empty text block
@@ -659,6 +675,8 @@ class NoteEditorViewModel(
     }
 
     // endregion
+
+    fun notify(message: EditorMessage) = emit(message)
 
     private fun emit(message: EditorMessage) {
         _messages.tryEmit(message)
