@@ -20,7 +20,6 @@ object WordCount {
         is TextBlock -> words(block.text)
         is ListBlock -> block.items.sumOf { words(it.text) }
         is ChecklistBlock -> words(block.title) + block.items.sumOf { words(it.text) }
-        is ImageBlock -> words(block.caption)
         is LinkBlock -> words(block.title)
         is PromptBlock -> words(block.text)
         is CodeBlock -> words(block.text)

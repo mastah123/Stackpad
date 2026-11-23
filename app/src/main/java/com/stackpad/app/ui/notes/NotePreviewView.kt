@@ -213,6 +213,7 @@ private fun PreviewItem(item: DocItem) {
             }
             Text(item.label, style = body, color = colors.onSurface, modifier = Modifier.padding(horizontal = 6.dp), maxLines = 1)
         }
+        DocItem.Spacer, is DocItem.Meta -> Unit // only made for exports
         DocItem.Divider -> HorizontalDivider(color = colors.outlineVariant, modifier = Modifier.padding(vertical = 2.dp))
     }
 }

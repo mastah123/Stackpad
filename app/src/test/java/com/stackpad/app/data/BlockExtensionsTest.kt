@@ -38,8 +38,8 @@ class BlockExtensionsTest {
     }
 
     @Test
-    fun imageCaptionIsSearchableButImageIsNeverBlank() {
-        assertEquals("sunset", ImageBlock("i", "a.jpg", "sunset").searchableText())
+    fun imageHasNoSearchableTextAndIsNeverBlank() {
+        assertEquals("", ImageBlock("i", "a.jpg", "old hidden caption").searchableText())
         assertEquals("", ImageBlock("i", "a.jpg").searchableText())
         assertFalse(ImageBlock("i", "a.jpg").isBlank())
         assertEquals("a.jpg", ImageBlock("i", "a.jpg", "x").mediaFileName())

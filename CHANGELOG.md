@@ -7,6 +7,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.5.0] - 2026-11-18
+
+### Added
+- **Share options** for image and PDF, in a sheet with three collapsible sections and one tick per choice:
+  - **Look:** page Light, Dark or Match app; note color on the page; text size (small, medium, large); include pictures; hide completed tasks; PDF page size (A4 or Letter); PDF page numbers.
+  - **Clean up:** empty lines, empty list items, empty checklist items and checklists, empty table rows and tables, empty quote/prompt/code/link cards.
+  - **Details:** title, word count, dates (created and edited), tags, and a "Made with Stackpad" footer.
+  - The sheet opens before sharing. **Don't show this again** makes later shares use the saved choices; **Share > Share options** (below PDF) opens it again. Choices are remembered.
+
+### Changed
+- **Image and PDF copy the note's layout:** the app's text and heading sizes, the list marker column (right-aligned markers, long items wrap under the text), full-width pictures with rounded corners (small pictures are enlarged), checklist cards with the done count and progress bar. No buttons, "x" or drag handles appear.
+- Empty lines, empty list items and empty cards are now kept by default, as in the note; use the Clean up ticks to remove them.
+- The image chips are now **Gallery** and **Photo**.
+
+### Removed
+- **Image captions.** The pencil on an image now opens the picture editor (or, after an edit, a menu with Edit picture and Restore original). Old captions are no longer shown, exported or searched; their text stays in the data.
+
+### Fixed
+- Pictures in exported images and PDFs are upright for photos taken with the camera turned (rotation is respected).
+
 ## [2.4.0] - 2026-11-17
 
 ### Added

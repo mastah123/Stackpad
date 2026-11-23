@@ -11,6 +11,8 @@ import com.stackpad.app.data.model.SheetBlock
 import com.stackpad.app.data.model.TextBlock
 import com.stackpad.app.domain.export.DocItem
 import com.stackpad.app.domain.export.DocItems
+import com.stackpad.app.domain.share.ShareCleanUp
+import com.stackpad.app.domain.share.ShareOptions
 import org.junit.Assert.assertEquals
 import org.junit.Test
 
@@ -18,11 +20,17 @@ class DocItemsTest {
     private fun note(title: String, vararg blocks: com.stackpad.app.data.model.Block) =
         Note(id = "n", title = title, blocks = blocks.toList(), pinned = false, createdAt = 0, updatedAt = 0)
 
-    @Test fun title_becomes_heading_and_blank_blocks_are_skipped() {
-        val items = DocItems.from(note("Plan", TextBlock("a", text = ""), TextBlock("b", text = "Hi")))
+    @Test fun title_becomes_heading_and_blank_blocks_are_skipped_when_cleaning_up() {
+        val items = DocItems.from(note("Plan", TextBlock("a", text = ""), TextBlock("b", text = "Hi")), ShareOptions(cleanUp = ShareCleanUp.ALL))
         assertEquals(2, items.size)
         assertEquals("Plan", (items[0] as DocItem.Heading).text)
         assertEquals("Hi", (items[1] as DocItem.Paragraph).text)
+    }
+
+    @Test fun list_rows_know_the_widest_marker_of_their_list() {
+        val items = DocItems.from(note("", ListBlock("l", ListKind.NUMBERED, (1..10).map { ListItem("$it", "x") })))
+        assertEquals(10, items.size)
+        assertEquals(setOf(3), items.map { (it as DocItem.Row).markerChars }.toSet())
     }
 
     @Test fun list_rows_use_markers() {

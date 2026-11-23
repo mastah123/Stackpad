@@ -75,9 +75,9 @@ class BlockAssembler {
     }
 
     /** An image whose file is named [ref] inside the source; the installer swaps it for a stored file. */
-    fun image(ref: String, caption: String = "") {
+    fun image(ref: String) {
         flushLists()
-        blocks += ImageBlock(BlockFactory.newId(), ref, caption.trim())
+        blocks += ImageBlock(BlockFactory.newId(), ref)
     }
 
     fun link(title: String, url: String) {

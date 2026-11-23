@@ -2,8 +2,8 @@ package com.stackpad.app.ui.editor
 
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.Dispatchers
-import com.stackpad.app.ui.theme.exportTint
 import com.stackpad.app.ui.theme.NoteColors
+import com.stackpad.app.domain.share.ShareOptions
 import com.stackpad.app.data.model.Note
 import com.stackpad.app.data.export.GallerySaver
 import android.Manifest
@@ -59,6 +59,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.graphics.luminance
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
@@ -155,6 +157,9 @@ private fun NoteEditorContent(
     val canRedo by viewModel.canRedo.collectAsStateWithLifecycle()
     val knownTags by viewModel.knownTags.collectAsStateWithLifecycle()
     val playback by audioPlayer.state.collectAsStateWithLifecycle()
+    val shareOptions by viewModel.shareOptions.collectAsStateWithLifecycle()
+    val askBeforeSharing by viewModel.askBeforeSharing.collectAsStateWithLifecycle()
+    val appIsDark = MaterialTheme.colorScheme.surface.luminance() < 0.5f
 
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
@@ -181,13 +186,19 @@ private fun NoteEditorContent(
     val gallerySaver = remember { GallerySaver(context) }
     var pendingImageNote by remember { mutableStateOf<Note?>(null) }
     var pendingPdfNote by remember { mutableStateOf<Note?>(null) }
+    var pendingOptions by remember { mutableStateOf(ShareOptions()) }
+    /** Which share the options sheet is open for, or null when it is closed. */
+    var optionsSheetFor by remember { mutableStateOf<ShareTarget?>(null) }
+
+    /** The note's color as 0xAARRGGBB, or null for a plain note. */
+    fun accentOf(note: Note): Int? = NoteColors.accent(note.color)?.toArgb()
 
     /** Renders the note as one PNG, saves it to the gallery, then opens the share sheet. */
-    fun shareImage(note: Note, saveToGallery: Boolean) {
+    fun shareImage(note: Note, options: ShareOptions, saveToGallery: Boolean) {
         scope.launch {
             snackbar.currentSnackbarData?.dismiss()
             val title = note.title.ifBlank { context.getString(R.string.note_untitled) }
-            val result = runCatching { fileExporter.toPng(note, NoteColors.exportTint(note.color)) }
+            val result = runCatching { fileExporter.toPng(note, options, appIsDark, accentOf(note)) }
             val file = result.getOrNull()
             if (file == null) {
                 showMessage(if (result.exceptionOrNull() is NoteTooTallException) R.string.msg_share_too_tall else R.string.msg_share_render_failed)
@@ -204,7 +215,7 @@ private fun NoteEditorContent(
     }
 
     val storagePermission = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
-        pendingImageNote?.let { shareImage(it, saveToGallery = granted) }
+        pendingImageNote?.let { shareImage(it, pendingOptions, saveToGallery = granted) }
         pendingImageNote = null
     }
 
@@ -215,7 +226,7 @@ private fun NoteEditorContent(
         if (uri == null || note == null) return@rememberLauncherForActivityResult
         scope.launch {
             val title = note.title.ifBlank { context.getString(R.string.note_untitled) }
-            val result = runCatching { fileExporter.toPdf(note, NoteColors.exportTint(note.color)) }
+            val result = runCatching { fileExporter.toPdf(note, pendingOptions, appIsDark, accentOf(note)) }
             val file = result.getOrNull()
             if (file == null) {
                 showMessage(R.string.msg_share_render_failed)
@@ -232,6 +243,31 @@ private fun NoteEditorContent(
             }
             showMessage(R.string.msg_pdf_saved)
             if (!shareFile(context, file, "application/pdf", title)) showMessage(R.string.msg_share_failed)
+        }
+    }
+
+    /** Shares the open note as an image or a PDF with [options]. */
+    fun shareVisual(target: ShareTarget, options: ShareOptions) {
+        val note = viewModel.exportNote()
+        if (note == null) {
+            showMessage(R.string.msg_share_empty)
+            return
+        }
+        pendingOptions = options
+        if (target == ShareTarget.IMAGE) {
+            // Android 9 and older must be allowed to write to the gallery first.
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q &&
+                ContextCompat.checkSelfPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE) !=
+                PackageManager.PERMISSION_GRANTED
+            ) {
+                pendingImageNote = note
+                storagePermission.launch(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+            } else {
+                shareImage(note, options, saveToGallery = true)
+            }
+        } else {
+            pendingPdfNote = note
+            pdfLauncher.launch(fileExporter.baseName(note))
         }
     }
 
@@ -255,30 +291,24 @@ private fun NoteEditorContent(
                     !shareText(context, title, text) -> showMessage(R.string.msg_share_failed)
                 }
             }
-            ShareTarget.IMAGE -> {
-                val note = viewModel.exportNote()
-                when {
-                    note == null -> showMessage(R.string.msg_share_empty)
-                    // Android 9 and older must be allowed to write to the gallery first.
-                    Build.VERSION.SDK_INT < Build.VERSION_CODES.Q &&
-                        ContextCompat.checkSelfPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE) !=
-                        PackageManager.PERMISSION_GRANTED -> {
-                        pendingImageNote = note
-                        storagePermission.launch(Manifest.permission.WRITE_EXTERNAL_STORAGE)
-                    }
-                    else -> shareImage(note, saveToGallery = true)
-                }
-            }
-            ShareTarget.PDF -> {
-                val note = viewModel.exportNote()
-                if (note == null) {
-                    showMessage(R.string.msg_share_empty)
-                } else {
-                    pendingPdfNote = note
-                    pdfLauncher.launch(fileExporter.baseName(note))
-                }
-            }
+            ShareTarget.IMAGE, ShareTarget.PDF ->
+                if (askBeforeSharing) optionsSheetFor = target else shareVisual(target, shareOptions)
+            ShareTarget.OPTIONS -> optionsSheetFor = target
         }
+    }
+
+    optionsSheetFor?.let { target ->
+        ShareOptionsSheet(
+            initial = shareOptions,
+            dontShowAgain = !askBeforeSharing,
+            confirmLabel = if (target == ShareTarget.OPTIONS) R.string.share_save_options else R.string.share_confirm,
+            onDismiss = { optionsSheetFor = null },
+            onConfirm = { options, dontShowAgain ->
+                optionsSheetFor = null
+                viewModel.saveShareOptions(options, askEachTime = !dontShowAgain)
+                if (target != ShareTarget.OPTIONS) shareVisual(target, options)
+            },
+        )
     }
 
     // Save what has been typed (and keep a running recording) when the app goes to the background.

@@ -71,7 +71,7 @@ data class ImageBlock(
     override val id: String,
     /** File name inside the app's media folder. */
     val fileName: String,
-    /** Optional text shown under the image. */
+    /** No longer shown or editable; kept only so older notes and backups still load. */
     val caption: String = "",
     /** The picture as it was before the first edit, kept so the edit can be undone later; null when never edited. */
     val originalFileName: String? = null,

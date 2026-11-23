@@ -11,8 +11,8 @@ sealed interface DocItem {
 
     data class Paragraph(val text: String, val spans: List<TextSpan> = emptyList()) : DocItem
 
-    /** A list row. [marker] is `•`, `1.` or `a.`. */
-    data class Row(val marker: String, val text: String) : DocItem
+    /** A list row. [marker] is `•`, `1.` or `a.`; [markerChars] is the longest marker in its list, which sets the marker column's width. */
+    data class Row(val marker: String, val text: String, val markerChars: Int = marker.length) : DocItem
 
     /** A whole checklist, drawn as one green card with real boxes. */
     data class Checklist(val title: String, val tasks: List<Task>) : DocItem {
@@ -26,11 +26,17 @@ sealed interface DocItem {
 
     data class Link(val title: String, val url: String) : DocItem
 
-    data class Image(val fileName: String, val caption: String) : DocItem
+    data class Image(val fileName: String) : DocItem
 
     data class Table(val rows: List<List<String>>) : DocItem
 
     data class Audio(val label: String) : DocItem
 
     data object Divider : DocItem
+
+    /** An empty text block: one blank line of space, as in the note. */
+    data object Spacer : DocItem
+
+    /** A small muted line (word count and dates, tags, footer). */
+    data class Meta(val text: String, val centered: Boolean = false) : DocItem
 }

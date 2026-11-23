@@ -10,7 +10,7 @@
 
 <p align="center">
   <a href="https://github.com/mastah123/stackpad/actions/workflows/android.yml"><img alt="Build" src="https://github.com/mastah123/stackpad/actions/workflows/android.yml/badge.svg"></a>
-  <img alt="Version" src="https://img.shields.io/badge/version-2.4.0-4F46E5">
+  <img alt="Version" src="https://img.shields.io/badge/version-2.5.0-4F46E5">
   <img alt="Platform" src="https://img.shields.io/badge/platform-Android%208.0%2B-3DDC84">
   <img alt="Kotlin" src="https://img.shields.io/badge/Kotlin-2.0-7F52FF">
   <img alt="License" src="https://img.shields.io/badge/license-MIT-blue">
@@ -24,7 +24,7 @@ Every note is a stack of compact blocks, laid out tightly like chat messages.
 | --- | --- |
 | **Text** | One line per block, so each line can be H1, H2, H3 or normal. **Bold**, *italic*, underline. URLs are highlighted and open when tapped. |
 | **List** (menu) | **Bullets**, **Numbers** and **Letters**: long items wrap under the text, never under the marker. **Checklist**: rounded card with a progress tracker, drag handles to reorder, a sort button (done items last), due dates with reminder notifications, and an "x" to remove it. |
-| **Image** (+ menu) | Full width, from the gallery or camera. Tap for full-screen zoom, edit it (crop, rotate, flip, straighten, restore original), add a caption, or remove it with the "x". |
+| **Image** (+ menu) | Full width, from the gallery or camera. Tap for full-screen zoom, edit it (crop, rotate, flip, straighten, restore original), or remove it with the "x". |
 | **Table** (+ menu) | Small spreadsheet with `+ - * /`, parentheses, cell references such as `=A1+B1*2`, and `SUM`, `AVERAGE`, `MIN`, `MAX`, `COUNT` over ranges such as `=SUM(A1:A5)`. |
 | **Audio** (+ menu) | Voice-message style row: play, animated waveform you can tap or drag to seek, duration, 1x / 1.5x / 2x speed, and "x". Recorded in app. |
 | **Link** (+ menu) | Title and URL with validation; opens in the browser. |
@@ -36,7 +36,7 @@ Also:
 - **Side menu** (top-left) with shortcuts for All notes, Pinned, Folders (small grid), Tags (scrolling row), Trash and Settings.
 - **Import from Google Keep**: Settings > Import > Google Keep, then choose the Takeout `.zip` (export Keep from takeout.google.com). Text and list notes, labels (as tags), colors, pinned state, links, pictures and dates are imported; importing the same zip again adds nothing new. Audio and drawing attachments and notes in Keep's trash are skipped.
 - **More imports** (Settings > Import): Markdown and text files or zips (also Obsidian and Notion exports), Evernote `.enex`, Word `.docx` and PDF. Several files can be picked at once and importing the same file again adds nothing new. PDF text is a best-effort reading (PDFs store no structure); a scanned PDF becomes a note with its pages as pictures.
-- **Share** from the editor's 3-dot menu: copy, plain text, Markdown, a single **image** (PNG, saved to your gallery in Pictures/Stackpad, then shared) or a **PDF** (A4 pages, saved where you choose, then shared). Exports are always on a light page and match the app: block colors, the note color as a page tint, checklist boxes and table grids. The same menu sets the note **color**.
+- **Share** from the editor's 3-dot menu: copy, plain text, Markdown, a single **image** (PNG, saved to your gallery in Pictures/Stackpad, then shared) or a **PDF** (saved where you choose, then shared). Image and PDF copy the note's layout: the app's text sizes, list markers, full-width pictures, block colors, checklist cards with progress, and table grids, without any buttons or handles. **Share options** (a sheet before sharing, with "Don't show this again" and a Share options row in the menu) let you pick a light, dark or match-app page, note color, text size, PDF page size and page numbers, hide completed tasks or pictures, leave out empty lines, list items, checklists, tables and cards, and add the title, word count, dates, tags or a footer. The same menu sets the note **color**.
 - **Tags** are added from the Tag chip in the add bar (tap a tag to add or remove it, "+" creates one); tags show above the title and tap to remove.
 - The add bar groups blocks: **+** (image, camera, audio, link, table, divider), Text, List, Cards, Tag.
 - **Templates**: start from Meeting notes, To-do, Journal or Project plan, or save any note as your own template.

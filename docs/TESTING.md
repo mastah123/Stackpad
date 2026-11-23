@@ -153,13 +153,23 @@ Covers: formula evaluator, span editing, URL detection/validation, list markers,
 - [ ] Trash with several selected: they all go to the trash with one message "N notes moved to trash." and Undo brings all of them back.
 - [ ] A locked note can be selected, pinned, moved and trashed without being opened.
 
+### Share options (image and PDF)
+- [ ] 3-dot menu > Share > Image: a **Share options** sheet opens first with Look (open), Clean up and Details (collapsed) sections. Tap a header to open or close it. **Share** exports with the choices; Cancel exports nothing.
+- [ ] Share > **Share options** (below PDF) opens the same sheet with a **Save** button and shares nothing.
+- [ ] Tick **Don't show this again**, then Share: the next Image or PDF share goes straight through with the saved choices; reopen Share > Share options, untick it, Save: the sheet shows before sharing again. Close and reopen the app: choices and the tick are remembered.
+- [ ] Look: Dark gives a dark page with readable text and cards; Match app follows the app's theme; Light is white. Turn Note color off on a colored note: the page is plain. Small/Medium/Large change the text size. Include pictures off leaves pictures out. Hide completed tasks hides ticked tasks (and a checklist with all tasks done). PDF: Letter page size and page numbers ("2 / 5") appear.
+- [ ] Clean up, with a note that has an empty text line, an empty list item, a blank checklist item, an empty table row and an empty quote/code/link card: with nothing ticked, they all appear as in the note. Each tick removes only its own kind and nothing else.
+- [ ] Details: Word count, Dates and Tags show as small lines under the title; Title off hides the title; Footer adds "Made with Stackpad" centered at the end.
+- [ ] Layout: compare the image with the note on screen. Text sizes, headings, the list markers (numbers right-aligned in a column, a long item wrapping under its text), checklist card with title, done count and progress bar, and pictures at the full page width all look the same. No "x", handles or buttons appear.
+- [ ] A photo taken in portrait with the camera appears upright in the exported image and PDF.
+
 ### Share
 - [ ] In a note with a title, headings, bold/italic, a list, a checklist with a due date, a table with a formula, a link, a quote, code and a divider, open the 3-dot menu, Share, Markdown. The share sheet opens; paste into a notes app: `#` title, `-` bullets, `- [ ]` checklist, a table with the calculated value, fenced code, `>` quote and `---`.
 - [ ] Share, Text: no Markdown symbols except what you typed, lists use their own markers.
-- [ ] An image shows as `[Image: caption]`. An audio note shows its length.
+- [ ] An image shows as `[Image]` (old captions are not exported). An audio note shows its length.
 - [ ] Sharing an empty note shows "This note is empty" and opens nothing.
 - [ ] Share, Copy copies the whole note as plain text. Back returns to the main menu.
-- [ ] Share, Image: a message says it was saved to the gallery, the share sheet opens, and the picture is in the gallery album "Stackpad". Check title, headings, bold/italic, list markers, checklist card (green, boxes drawn, ticks on done items struck through), table (teal header and grid, calculated values), quote (amber bar), prompt (purple outline), code (slate, monospaced), link (blue), audio (rose pill with play button), divider and pictures with captions. A colored note gives a lightly tinted page. On Android 9 or older: the storage permission is asked once; deny it and the image is still shared with a message.
+- [ ] Share, Image: a message says it was saved to the gallery, the share sheet opens, and the picture is in the gallery album "Stackpad". Check title, headings, bold/italic, list markers, checklist card (green, boxes drawn, ticks on done items struck through), table (teal header and grid, calculated values), quote (amber bar), prompt (purple outline), code (slate, monospaced), link (blue), audio (rose pill with play button), divider and full-width pictures. A colored note gives a lightly tinted page. On Android 9 or older: the storage permission is asked once; deny it and the image is still shared with a message.
 - [ ] Share, PDF: the file picker opens with the note title as the name; after choosing a place the PDF is saved there ("PDF saved") and the share sheet opens; cancelling the picker does nothing. Same look as the image. A4 pages; blocks are not cut in half unless taller than a page; pictures fit the page width. Try a note with many blocks (several pages) and one empty note (message, nothing shared).
 - [ ] A very long note shows "too long for one image" for Image and still works as PDF.
 - [ ] The menu also has Move to trash, which still asks for confirmation.
@@ -199,7 +209,7 @@ Covers: formula evaluator, span editing, URL detection/validation, list markers,
 
 ### Lists
 - [ ] Tap **List**. An option row (same look as the text format toolbar) shows Bullets, Numbers, Letters and Checklist, the List chip is highlighted, and each option adds the right block and closes the row. Tapping List again closes the row.
-- [ ] Tap **Image**. An option row shows "Choose from gallery" and "Take a photo"; each works and closes the row. Tapping another chip closes the row.
+- [ ] Tap **Image**. An option row shows "Gallery" and "Photo"; each works and closes the row. Tapping another chip closes the row.
 - [ ] Add bullets, numbers and letters. Press Enter to add items; Backspace on an empty item removes it.
 - [ ] Add more than 10 numbered items and more than 26 lettered items (`10.`, `aa.`). Text stays aligned.
 - [ ] Type a very long item. Wrapped lines stay under the item text, not under the marker.
@@ -219,7 +229,7 @@ Covers: formula evaluator, span editing, URL detection/validation, list markers,
 - [ ] Restart the phone with a pending reminder: it still fires.
 
 ### Picture editor
-- [ ] Image block: tap the pencil. A menu shows Edit picture, Edit caption (and Restore original after an edit). Tap the picture, then the crop icon at the top left of the full-screen view: the editor opens too.
+- [ ] Image block: tap the crop icon at the top left: the editor opens (after an edit it opens a menu with Edit picture and Restore original). Tap the picture, then the crop icon at the top left of the full-screen view: the editor opens too.
 - [ ] Crop, free: drag a corner, an edge and the inside of the frame. It cannot leave the picture or become tiny. The area outside is dimmed and a thirds grid shows.
 - [ ] Crop shapes: choose 1:1, 4:3, 3:4, 16:9, 9:16 and Original. The frame takes that shape; only the corners resize it and the shape holds. Free allows any shape again.
 - [ ] Rotate left and right, flip horizontally and vertically on a photo with text: each does what the icon says, the crop frame follows the picture, and a fixed shape stays selected.
@@ -237,7 +247,7 @@ Covers: formula evaluator, span editing, URL detection/validation, list markers,
 - [ ] Add from the camera. Cancelling the camera adds nothing.
 - [ ] The "x" removes the image.
 - [ ] Tap the image: it opens full screen. Pinch to zoom, drag to pan while zoomed (the image cannot be dragged away from the screen edges), double-tap to zoom in and out. Close button and the back gesture both close it.
-- [ ] Tap the pencil, then Edit caption: a caption field appears and is focused. The caption stays under the image, shows in the full-screen view, and is found by search. Clearing it and leaving the field hides the field again.
+- [ ] Images have no caption option anywhere: no caption field, none shown under old pictures or in the full-screen view, and none in search or exports.
 
 ### Table
 - [ ] Tap a cell and type `2`, in another `3`, in a third `=A1+B1`. The result shows `5` when not editing.

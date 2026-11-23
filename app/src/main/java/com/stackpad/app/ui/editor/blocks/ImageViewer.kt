@@ -44,7 +44,6 @@ import java.io.File
 @Composable
 fun ImageViewer(
     file: File,
-    caption: String,
     onDismiss: () -> Unit,
     onEdit: () -> Unit,
 ) {
@@ -111,18 +110,6 @@ fun ImageViewer(
                     imageVector = Icons.Filled.Close,
                     contentDescription = stringResource(R.string.cd_close_image),
                     tint = Color.White,
-                )
-            }
-            if (caption.isNotBlank()) {
-                Text(
-                    text = caption,
-                    color = Color.White,
-                    textAlign = TextAlign.Center,
-                    modifier = Modifier
-                        .align(Alignment.BottomCenter)
-                        .safeDrawingPadding()
-                        .background(Color.Black.copy(alpha = 0.55f))
-                        .padding(horizontal = 16.dp, vertical = 8.dp),
                 )
             }
         }

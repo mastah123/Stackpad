@@ -113,9 +113,10 @@ class NoteExporterTest {
 
     @Test
     fun imagesAudioAndDivider() {
-        assertEquals("*[Image]*\n\n*[Image: Sunset]*\n\n[Audio note 1:05]\n\n---",
+        assertEquals("*[Image]*\n\n*[Image]*\n\n[Audio note 1:05]\n\n---",
             md("", ImageBlock("1", "a.jpg"), ImageBlock("2", "b.jpg", "Sunset"), AudioBlock("3", "x.m4a", 65_000, emptyList()), DividerBlock("4")))
-        assertEquals("[Image: Sunset]", plain("", ImageBlock("2", "b.jpg", "Sunset")))
+        // Captions are no longer shown anywhere, so old ones do not appear in exports.
+        assertEquals("[Image]", plain("", ImageBlock("2", "b.jpg", "Sunset")))
     }
 
     @Test

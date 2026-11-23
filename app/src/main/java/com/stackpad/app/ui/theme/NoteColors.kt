@@ -35,7 +35,3 @@ fun noteCardColor(index: Int): Color {
     val dark = MaterialTheme.colorScheme.surface.luminance() < 0.5f
     return accent.copy(alpha = if (dark) 0.28f else 0.30f).compositeOver(base)
 }
-
-/** Opaque page color for an exported image or PDF: the note color washed lightly over white, or null for no color. */
-fun NoteColors.exportTint(index: Int): Int? =
-    accent(index)?.copy(alpha = 0.18f)?.compositeOver(Color.White)?.toArgb()

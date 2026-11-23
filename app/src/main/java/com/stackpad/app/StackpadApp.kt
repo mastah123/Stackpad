@@ -20,6 +20,7 @@ import com.stackpad.app.data.media.ImageEditSaver
 import com.stackpad.app.data.media.MediaStorage
 import com.stackpad.app.data.media.ThumbnailStore
 import com.stackpad.app.data.prefs.ListPreferences
+import com.stackpad.app.data.prefs.SharePreferences
 import com.stackpad.app.data.prefs.SecurityPreferences
 import com.stackpad.app.data.prefs.TemplatePreferences
 import com.stackpad.app.data.prefs.ThemePreferences
@@ -55,6 +56,7 @@ class AppContainer(context: Context) {
     )
     val themePreferences = ThemePreferences(appContext)
     val listPreferences = ListPreferences(appContext)
+    val sharePreferences = SharePreferences(appContext)
     val securityPreferences = SecurityPreferences(appContext)
     val templatePreferences = TemplatePreferences(appContext)
     val audioPlayer = AudioPlayer()

@@ -136,7 +136,7 @@ object MarkdownParser {
         if (path.startsWith("http://") || path.startsWith("https://")) {
             assembler.link(alt.ifBlank { path }, path)
         } else {
-            assembler.image(percentDecode(path), alt)
+            assembler.image(percentDecode(path))
         }
     }
 

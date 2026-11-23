@@ -27,7 +27,7 @@ enum class ExportFormat { MARKDOWN, PLAIN }
 
 /**
  * Turns a note into shareable text. Images and audio cannot travel as text, so they appear as
- * short placeholders such as `[Image: caption]`. Table formulas are replaced by their results.
+ * short placeholders such as `[Image]`. Table formulas are replaced by their results.
  */
 object NoteExporter {
 
@@ -58,10 +58,7 @@ object NoteExporter {
         is TextBlock -> renderText(block, markdown)
         is ListBlock -> renderList(block, markdown)
         is ChecklistBlock -> renderChecklist(block, markdown)
-        is ImageBlock -> {
-            val label = if (block.caption.isBlank()) "Image" else "Image: ${block.caption.trim()}"
-            if (markdown) "*[$label]*" else "[$label]"
-        }
+        is ImageBlock -> if (markdown) "*[Image]*" else "[Image]"
         is SheetBlock -> renderSheet(block, markdown)
         is AudioBlock -> "[Audio note ${formatDuration(block.durationMs)}]"
         is LinkBlock -> renderLink(block, markdown)

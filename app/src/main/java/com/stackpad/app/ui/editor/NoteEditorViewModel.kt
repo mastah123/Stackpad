@@ -20,6 +20,7 @@ import com.stackpad.app.data.model.ImageBlock
 import com.stackpad.app.data.model.mediaFileName
 import com.stackpad.app.data.model.mediaFileNames
 import com.stackpad.app.domain.image.ImageEdit
+import com.stackpad.app.domain.share.ShareOptions
 import com.stackpad.app.domain.blocks.BlockOrder
 import com.stackpad.app.domain.export.ExportFormat
 import com.stackpad.app.domain.templates.BuiltInTemplates
@@ -82,6 +83,16 @@ class NoteEditorViewModel(
     val templates: StateFlow<List<NoteTemplate>> = container.templatePreferences.templates
         .map { saved -> BuiltInTemplates.all() + saved }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(STOP_TIMEOUT_MS), BuiltInTemplates.all())
+
+    /** The saved options for sharing as an image or PDF, and whether their sheet opens before every share. */
+    val shareOptions: StateFlow<ShareOptions> = container.sharePreferences.options
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(STOP_TIMEOUT_MS), ShareOptions())
+    val askBeforeSharing: StateFlow<Boolean> = container.sharePreferences.askEachTime
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(STOP_TIMEOUT_MS), true)
+
+    fun saveShareOptions(options: ShareOptions, askEachTime: Boolean) {
+        viewModelScope.launch { container.sharePreferences.save(options, askEachTime) }
+    }
 
     private val history = UndoHistory<EditorSnapshot>()
     private val _canUndo = MutableStateFlow(false)
@@ -382,7 +393,7 @@ class NoteEditorViewModel(
         replaceImageBlock(id) { it.copy(fileName = original, originalFileName = null) }
     }
 
-    /** Changes an image block as its own undo step (not merged with caption typing). */
+    /** Changes an image block as its own undo step (not merged with other edits). */
     private fun replaceImageBlock(id: String, transform: (ImageBlock) -> ImageBlock) = mutate { s ->
         s.copy(blocks = s.blocks.map { if (it.id == id && it is ImageBlock) transform(it) else it })
     }

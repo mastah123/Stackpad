@@ -20,6 +20,7 @@ import androidx.compose.material.icons.filled.Palette
 import androidx.compose.material.icons.filled.PictureAsPdf
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material.icons.filled.TextFields
+import androidx.compose.material.icons.filled.Tune
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
@@ -36,7 +37,8 @@ import androidx.compose.ui.unit.dp
 import com.stackpad.app.R
 
 /** Everything the Share submenu can do with the open note. */
-enum class ShareTarget { COPY, TEXT, MARKDOWN, IMAGE, PDF }
+/** [OPTIONS] opens the share options without sharing anything. */
+enum class ShareTarget { COPY, TEXT, MARKDOWN, IMAGE, PDF, OPTIONS }
 
 private enum class MenuPage { MAIN, SHARE, COLOR }
 
@@ -93,6 +95,7 @@ fun NoteActionsMenu(
                     item(R.string.share_markdown, Icons.Filled.Description) { close(); onShare(ShareTarget.MARKDOWN) }
                     item(R.string.share_image, Icons.Filled.Image) { close(); onShare(ShareTarget.IMAGE) }
                     item(R.string.share_pdf, Icons.Filled.PictureAsPdf) { close(); onShare(ShareTarget.PDF) }
+                    item(R.string.share_options, Icons.Filled.Tune) { close(); onShare(ShareTarget.OPTIONS) }
                 }
                 MenuPage.COLOR -> {
                     item(R.string.action_back, Icons.AutoMirrored.Filled.ArrowBack) { page = MenuPage.MAIN }
