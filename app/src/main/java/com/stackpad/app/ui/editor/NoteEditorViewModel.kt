@@ -13,6 +13,7 @@ import com.stackpad.app.data.model.Block
 import com.stackpad.app.data.model.BlockFactory
 import com.stackpad.app.data.model.Note
 import com.stackpad.app.data.model.SpanType
+import com.stackpad.app.data.model.NoteVersion
 import com.stackpad.app.data.model.TextBlock
 import com.stackpad.app.data.model.TextLevel
 import com.stackpad.app.data.model.TextSpan
@@ -274,6 +275,33 @@ class NoteEditorViewModel(
         }
         if (lastFocusedId == id) lastFocusedId = null
         if (_activeText.value?.blockId == id) _activeText.value = null
+    }
+
+    /** Earlier versions of this note, newest first, without the one that equals what is on screen. */
+    suspend fun loadVersions(): List<NoteVersion> {
+        val s = _state.value
+        return repository.versions(noteId).filterNot { it.title == s.title && it.blocks == s.blocks }
+    }
+
+    /** Puts an earlier version into the editor. The current text is kept as a version first, and Undo brings it back. */
+    fun restoreVersion(version: NoteVersion) {
+        viewModelScope.launch {
+            saveJob?.cancel()
+            snapshot()?.let {
+                repository.save(it)
+                existsInDb = true
+                dirty = false
+            }
+            repository.keepVersionNow(noteId)
+            mutate { s ->
+                s.copy(
+                    title = version.title,
+                    blocks = version.blocks.ifEmpty { listOf(BlockFactory.text()) },
+                    focusBlockId = null,
+                    focusCaret = null,
+                )
+            }
+        }
     }
 
     fun consumeFocus(id: String) {

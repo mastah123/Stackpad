@@ -300,6 +300,14 @@ Covers: formula evaluator, span editing, URL detection/validation, list markers,
 - [ ] Switch Daily/Weekly; the choice stays after reopening. Switch the feature off: no new backups. After a few days the folder holds at most 7 automatic backups and other files in it are untouched.
 - [ ] Delete the folder or revoke access, then Back up now: the status says the backup failed. Restore from an automatic backup using Restore backup.
 
+### Version history and tile
+- [ ] Open an existing note, type a few words, wait a moment, and open the 3-dot menu, Version history: it lists the earlier state (not the one on screen). A brand new note shows "No earlier versions yet".
+- [ ] Open a version: its title and content preview show. "Restore this version" puts it into the note; the 3-dot menu, Version history now also lists the text you replaced; the top Undo brings it back too.
+- [ ] Keep editing for 25+ minutes (or change the phone clock): new versions appear about every 10 minutes, and never more than 20 for one note. Changing only the color, pin or tags adds no version.
+- [ ] A restored version with pictures shows its pictures. Delete the note forever: no errors, and the pictures are cleaned up.
+- [ ] Update the app over a build from before 2.9.0: notes are all still there (no crash on start) and history starts empty.
+- [ ] Pull down the Quick Settings panel, edit tiles, add "New note": tapping it opens Stackpad on a blank note (also with the phone locked behind the lock screen: it asks to unlock first).
+
 ### Appearance
 - [ ] Theme menu: System, Light and Dark each apply immediately and persist after restarting the app.
 - [ ] Spacing is compact; text is small but readable; layouts fit in portrait and landscape.

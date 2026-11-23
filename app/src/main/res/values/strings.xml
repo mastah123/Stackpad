@@ -100,6 +100,12 @@
     <string name="action_move_to_trash">Move to trash</string>
     <string name="action_save">Save</string>
     <string name="action_undo">Undo</string>
+    <string name="action_history">Version history</string>
+    <string name="history_title">Earlier versions</string>
+    <string name="history_empty">No earlier versions yet. Stackpad keeps one about every 10 minutes while you edit, up to 20 per note.</string>
+    <string name="history_restore">Restore this version</string>
+    <string name="history_restore_hint">Your current text is kept as a version first, and Undo brings it back.</string>
+    <string name="tile_new_note">New note</string>
     <string name="action_select_range">Select everything between</string>
     <string name="add_code">Code</string>
     <string name="add_divider">Divider</string>

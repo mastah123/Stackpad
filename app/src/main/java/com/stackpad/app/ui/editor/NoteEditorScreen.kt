@@ -176,6 +176,7 @@ private fun NoteEditorContent(
     var saveTemplateDialog by remember { mutableStateOf(false) }
     var selecting by remember { mutableStateOf(false) }
     var selectedIds by remember { mutableStateOf(emptySet<String>()) }
+    var showHistory by remember { mutableStateOf(false) }
     val templates by viewModel.templates.collectAsStateWithLifecycle()
     val clipboard = LocalClipboardManager.current
 
@@ -515,6 +516,7 @@ private fun NoteEditorContent(
                             selectedIds = emptySet()
                             selecting = true
                         },
+                        onHistory = { focusManager.clearFocus(); showHistory = true },
                         onShare = ::share,
                         onTrash = { confirmDelete = true },
                     )
@@ -633,6 +635,14 @@ private fun NoteEditorContent(
                 viewModel.addTag(it)
             },
             onDismiss = { newTagDialog = false },
+        )
+    }
+
+    if (showHistory) {
+        HistorySheet(
+            loadVersions = viewModel::loadVersions,
+            onRestore = viewModel::restoreVersion,
+            onDismiss = { showHistory = false },
         )
     }
 

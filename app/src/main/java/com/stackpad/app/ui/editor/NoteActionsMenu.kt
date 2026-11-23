@@ -12,6 +12,7 @@ import androidx.compose.material.icons.filled.ContentCopy
 import androidx.compose.material.icons.filled.Dashboard
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Description
+import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.Image
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.LockOpen
@@ -56,6 +57,7 @@ fun NoteActionsMenu(
     onInsertTemplate: () -> Unit,
     onSaveTemplate: () -> Unit,
     onSelectBlocks: () -> Unit,
+    onHistory: () -> Unit,
     onTrash: () -> Unit,
 ) {
     var open by remember { mutableStateOf(false) }
@@ -80,6 +82,7 @@ fun NoteActionsMenu(
                     item(R.string.action_share, Icons.Filled.Share) { page = MenuPage.SHARE }
                     item(R.string.action_color, Icons.Filled.Palette) { page = MenuPage.COLOR }
                     item(R.string.action_select_blocks, Icons.Filled.Checklist) { close(); onSelectBlocks() }
+                    item(R.string.action_history, Icons.Filled.History) { close(); onHistory() }
                     item(R.string.action_templates, Icons.Filled.Dashboard) { close(); onInsertTemplate() }
                     item(R.string.action_save_template, Icons.Filled.BookmarkAdd) { close(); onSaveTemplate() }
                     item(

@@ -3,8 +3,9 @@ package com.stackpad.app.data.db
 import androidx.room.Database
 import androidx.room.RoomDatabase
 
-@Database(entities = [NoteEntity::class, FolderEntity::class], version = 3, exportSchema = true)
+@Database(entities = [NoteEntity::class, FolderEntity::class, NoteVersionEntity::class], version = 4, exportSchema = true)
 abstract class StackpadDatabase : RoomDatabase() {
     abstract fun noteDao(): NoteDao
     abstract fun folderDao(): FolderDao
+    abstract fun versionDao(): NoteVersionDao
 }

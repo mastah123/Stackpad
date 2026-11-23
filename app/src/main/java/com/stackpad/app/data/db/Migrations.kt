@@ -3,6 +3,22 @@ package com.stackpad.app.data.db
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 
+/** 3 -> 4 (app 2.9.0): earlier versions of notes. Existing notes simply start with no history. */
+val MIGRATION_3_4 = object : Migration(3, 4) {
+    override fun migrate(db: SupportSQLiteDatabase) {
+        db.execSQL(
+            "CREATE TABLE IF NOT EXISTS note_versions (" +
+                "id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, " +
+                "noteId TEXT NOT NULL, " +
+                "savedAt INTEGER NOT NULL, " +
+                "capturedAt INTEGER NOT NULL, " +
+                "title TEXT NOT NULL, " +
+                "blocksJson TEXT NOT NULL)",
+        )
+        db.execSQL("CREATE INDEX IF NOT EXISTS index_note_versions_noteId ON note_versions (noteId)")
+    }
+}
+
 /** 2 -> 3 (app 1.6.0): per-note lock. Existing notes are unlocked. */
 val MIGRATION_2_3 = object : Migration(2, 3) {
     override fun migrate(db: SupportSQLiteDatabase) {

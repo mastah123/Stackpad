@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.9.0] - 2026-11-23
+
+### Added
+- **Version history** in the note menu: earlier versions of a note (one about every 10 minutes of editing, newest 20 kept), with a preview and **Restore this version**. Restoring keeps the current text as a version and can be undone. Deleting a note deletes its history; pictures in older versions are kept until those versions are trimmed.
+- **Quick Settings tile "New note"**: opens Stackpad on a blank note in one tap.
+
+### Changed
+- The database moves to version 4 (a new table for versions). Existing notes keep all data and start with no history. History is not included in backups.
+
 ## [2.8.0] - 2026-11-23
 
 ### Changed

@@ -82,6 +82,18 @@
                 android:resource="@xml/stackpad_widget_info" />
         </receiver>
 
+        <!-- Quick Settings tile: a new note in one tap. The user adds it from the tile editor. -->
+        <service
+            android:name=".widget.QuickNoteTileService"
+            android:exported="true"
+            android:icon="@drawable/ic_notification"
+            android:label="@string/tile_new_note"
+            android:permission="android.permission.BIND_QUICK_SETTINGS_TILE">
+            <intent-filter>
+                <action android:name="android.service.quicksettings.action.QS_TILE" />
+            </intent-filter>
+        </service>
+
         <!-- Lets the system camera app write photos into the app's media folder. -->
         <provider
             android:name="androidx.core.content.FileProvider"

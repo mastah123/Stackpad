@@ -8,6 +8,12 @@ import com.stackpad.app.data.db.FolderDao
 import com.stackpad.app.data.db.FolderEntity
 import com.stackpad.app.data.db.NoteDao
 import com.stackpad.app.data.db.NoteEntity
+import com.stackpad.app.data.db.NoteVersionDao
+import com.stackpad.app.data.db.NoteVersionEntity
+import com.stackpad.app.data.model.Block
+import com.stackpad.app.data.model.NoteVersion
+import com.stackpad.app.data.model.isBlank
+import com.stackpad.app.domain.history.HistoryPolicy
 import com.stackpad.app.data.media.MediaStorage
 import com.stackpad.app.data.model.BlockFactory
 import com.stackpad.app.data.model.Folder
@@ -35,6 +41,7 @@ import java.time.ZoneId
 class NoteRepository(
     private val dao: NoteDao,
     private val folderDao: FolderDao,
+    private val versionDao: NoteVersionDao,
     private val media: MediaStorage,
     private val reminders: ReminderScheduler,
     private val scope: CoroutineScope,
@@ -87,13 +94,55 @@ class NoteRepository(
 
     suspend fun save(note: Note) {
         writeLock.withLock {
-            val previous = dao.get(note.id)?.toNote()
+            val previousEntity = dao.get(note.id)
+            val previous = previousEntity?.toNote()
+            if (previousEntity != null) captureVersion(previousEntity, note.title, note.blocks, force = false)
             dao.upsert(note.toEntity(updatedAt = System.currentTimeMillis()))
             val changes = ReminderPlanner.reconcile(previous, note, System.currentTimeMillis(), ZoneId.systemDefault())
             changes.cancel.forEach(reminders::cancel)
             changes.schedule.forEach(reminders::schedule)
         }
     }
+
+    // region History
+
+    /** Keeps [previous] as a version when [HistoryPolicy] says so (or always with [force], unless nothing changed). */
+    private suspend fun captureVersion(previous: NoteEntity, newTitle: String, newBlocks: List<Block>, force: Boolean) {
+        val oldBlocks = BlockJsonCodec.decode(previous.blocksJson)
+        val blank = previous.title.isBlank() && oldBlocks.all { it.isBlank() }
+        val changed = previous.title != newTitle || oldBlocks != newBlocks
+        val now = System.currentTimeMillis()
+        val existing = versionDao.forNote(previous.id)
+        val latest = existing.firstOrNull()
+        val take = if (force) {
+            !blank && (latest == null || latest.title != previous.title || latest.blocksJson != previous.blocksJson)
+        } else {
+            HistoryPolicy.shouldCapture(latest?.capturedAt, now, changed, blank)
+        }
+        if (!take) return
+        versionDao.insert(
+            NoteVersionEntity(
+                noteId = previous.id,
+                savedAt = previous.updatedAt,
+                capturedAt = now,
+                title = previous.title,
+                blocksJson = previous.blocksJson,
+            ),
+        )
+        versionDao.delete(HistoryPolicy.idsToTrim(versionDao.forNote(previous.id).map { it.id }))
+    }
+
+    /** Earlier versions of the note, newest first. */
+    suspend fun versions(noteId: String): List<NoteVersion> = versionDao.forNote(noteId).map {
+        NoteVersion(it.id, it.savedAt, it.title, BlockJsonCodec.decode(it.blocksJson))
+    }
+
+    /** Keeps the saved state of the note as a version right now (before a restore), unless it is already the newest one. */
+    suspend fun keepVersionNow(noteId: String) {
+        writeLock.withLock { dao.get(noteId)?.let { captureVersion(it, "\u0000", emptyList(), force = true) } }
+    }
+
+    // endregion
 
     /** Saves on the app-wide scope so the write survives the caller being destroyed. */
     fun saveAsync(note: Note) {
@@ -191,6 +240,11 @@ class NoteRepository(
             val note = entity.toNote()
             ReminderPlanner.dueKeys(note).forEach(reminders::cancel)
             note.blocks.flatMap { it.mediaFileNames() }.forEach(media::delete)
+            versionDao.forNote(entity.id)
+                .flatMap { BlockJsonCodec.decode(it.blocksJson) }
+                .flatMap { it.mediaFileNames() }
+                .forEach(media::delete)
+            versionDao.deleteForNote(entity.id)
             dao.delete(entity.id)
         }
     }
@@ -198,7 +252,7 @@ class NoteRepository(
     /** Removes media files that no note refers to (left behind by undo history or a crash). */
     suspend fun sweepOrphanMedia() {
         writeLock.withLock {
-            val referenced = dao.allBlocksJson()
+            val referenced = (dao.allBlocksJson() + versionDao.allBlocksJson())
                 .flatMap { BlockJsonCodec.decode(it) }
                 .flatMap { it.mediaFileNames() }
                 .toSet()
