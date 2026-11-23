@@ -16,6 +16,7 @@ import com.stackpad.app.data.model.TextBlock
 import com.stackpad.app.data.model.TextLevel
 import com.stackpad.app.domain.blocks.BlockTone
 import com.stackpad.app.domain.formula.SheetEvaluator
+import com.stackpad.app.domain.text.TextRuns
 import com.stackpad.app.domain.share.ShareCleanUp
 import com.stackpad.app.domain.share.ShareDetails
 import com.stackpad.app.domain.share.ShareOptions
@@ -53,7 +54,7 @@ object DocItems {
         hideCompletedTasks: Boolean = false,
     ): List<DocItem> {
         val items = ArrayList<DocItem>()
-        blocks.forEach { block ->
+        TextRuns.expand(blocks).forEach { block ->
             when (block) {
                 is TextBlock -> when {
                     block.text.isBlank() -> if (!cleanUp.emptyLines) items += DocItem.Spacer

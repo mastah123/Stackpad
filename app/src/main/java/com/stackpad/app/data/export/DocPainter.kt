@@ -101,6 +101,7 @@ class DocPainter(
                 SpanType.BOLD -> StyleSpan(Typeface.BOLD)
                 SpanType.ITALIC -> StyleSpan(Typeface.ITALIC)
                 SpanType.UNDERLINE -> UnderlineSpan()
+                else -> return@forEach // headings are separate lines in exports
             }
             out.setSpan(what, start, end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
         }

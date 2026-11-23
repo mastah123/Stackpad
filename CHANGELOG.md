@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.8.0] - 2026-11-23
+
+### Changed
+- **Plain text is now one block per run of text**, not one block per line. Enter adds a line inside the same block, so many lines can be selected and copied at once. A table, list, checklist, picture or card ends a run (text, table, text is three blocks).
+- **Headings are per line**: H1, H2 and H3 apply to the lines the cursor or selection touches, and tapping the active heading again turns it off. On an empty line the choice applies to what you type next.
+- Existing notes are joined automatically when opened (neighbouring text blocks become one; old heading levels become line headings). Nothing is lost, and the change is saved with the next edit.
+- Adding a block (table, list, picture...) with the cursor inside text splits the text at the cursor. Removing a block between two texts joins them.
+- Share, PDF/image export, Markdown/text export and note previews show each line as before.
+
+### Added
+- **Select everything between** in block selection: selects all blocks from the first to the last one you picked, for copying text and tables together.
+
 ## [2.7.0] - 2026-11-23
 
 ### Added

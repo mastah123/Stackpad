@@ -74,8 +74,10 @@ import com.stackpad.app.audio.AudioPlayer
 import com.stackpad.app.data.media.MediaStorage
 import com.stackpad.app.data.model.SpanType
 import com.stackpad.app.data.model.TextBlock
+import com.stackpad.app.data.model.TextLevel
 import com.stackpad.app.domain.notes.TrashPolicy
 import com.stackpad.app.notifications.ReminderNotifications
+import com.stackpad.app.domain.text.HeadingSpans
 import com.stackpad.app.domain.text.SpanEditing
 import com.stackpad.app.ui.components.ConfirmDialog
 import com.stackpad.app.ui.components.InlineTextField
@@ -422,8 +424,15 @@ private fun NoteEditorContent(
             } else {
                 SpanEditing.isFullyStyled(block.spans, active.start, active.end, type)
             }
+            val pendingHeading = typingStyles?.firstOrNull(HeadingSpans::isHeading)
+            val level = when {
+                !collapsed -> HeadingSpans.commonLevel(block.text, block.spans, active.start, active.end)
+                    ?: TextLevel.PARAGRAPH
+                pendingHeading != null -> HeadingSpans.levelOf(pendingHeading)
+                else -> HeadingSpans.levelAt(block.text, block.spans, active.start)
+            }
             FormatState(
-                level = block.level,
+                level = level,
                 bold = hasStyle(SpanType.BOLD),
                 italic = hasStyle(SpanType.ITALIC),
                 underline = hasStyle(SpanType.UNDERLINE),
@@ -438,6 +447,12 @@ private fun NoteEditorContent(
                     selectedCount = selectedIds.size,
                     onClose = closeSelection,
                     onSelectAll = { selectedIds = state.blocks.map { it.id }.toSet() },
+                    onSelectRange = {
+                        val picked = state.blocks.indices.filter { state.blocks[it].id in selectedIds }
+                        if (picked.size >= 2) {
+                            selectedIds = state.blocks.slice(picked.first()..picked.last()).map { it.id }.toSet()
+                        }
+                    },
                     canMoveUp = viewModel.canMove(selectedIds, up = true),
                     canMoveDown = viewModel.canMove(selectedIds, up = false),
                     onMoveUp = { viewModel.moveBlocks(selectedIds, up = true) },

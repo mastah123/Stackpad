@@ -21,6 +21,8 @@ import com.stackpad.app.domain.text.UrlUtils
 class RichTextTransformation(
     private val spans: List<TextSpan>,
     private val linkColor: Color,
+    /** Looks of the line headings (H1 to H3). */
+    private val headings: Map<SpanType, SpanStyle> = emptyMap(),
 ) : VisualTransformation {
 
     override fun filter(text: AnnotatedString): TransformedText {
@@ -47,5 +49,6 @@ class RichTextTransformation(
         SpanType.BOLD -> SpanStyle(fontWeight = FontWeight.Bold)
         SpanType.ITALIC -> SpanStyle(fontStyle = FontStyle.Italic)
         SpanType.UNDERLINE -> SpanStyle(textDecoration = TextDecoration.Underline)
+        SpanType.H1, SpanType.H2, SpanType.H3 -> headings[this] ?: SpanStyle()
     }
 }

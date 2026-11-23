@@ -32,6 +32,9 @@ import androidx.compose.ui.input.key.onPreviewKeyEvent
 import androidx.compose.ui.input.key.type
 import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.TextRange
+import androidx.compose.ui.unit.TextUnit
+import com.stackpad.app.data.model.SpanType
+import com.stackpad.app.data.model.TextLevel
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.TextFieldValue
 import com.stackpad.app.data.model.TextBlock
@@ -39,8 +42,8 @@ import com.stackpad.app.domain.text.UrlUtils
 import com.stackpad.app.ui.theme.textStyle
 
 /**
- * One line of text with its own heading level and inline bold/italic/underline.
- * URLs are highlighted and open when tapped. Enter starts a new text block, so every line is independent.
+ * A run of text lines in one field: Enter adds a line, any line can be a heading, and text can have
+ * inline bold/italic/underline. URLs are highlighted and open when tapped.
  */
 @Composable
 fun TextBlockView(
@@ -75,22 +78,26 @@ fun TextBlockView(
         }
     }
 
-    val transformation = remember(block.spans, colors.primary) {
-        RichTextTransformation(block.spans, colors.primary)
+    val typography = MaterialTheme.typography
+    val headingStyles = remember(typography) {
+        mapOf(
+            SpanType.H1 to TextLevel.H1.textStyle(typography).toSpanStyle(),
+            SpanType.H2 to TextLevel.H2.textStyle(typography).toSpanStyle(),
+            SpanType.H3 to TextLevel.H3.textStyle(typography).toSpanStyle(),
+        )
     }
-    val textStyle = block.level.textStyle().copy(color = colors.onSurface)
+    val transformation = remember(block.spans, colors.primary, headingStyles) {
+        RichTextTransformation(block.spans, colors.primary, headingStyles)
+    }
+    // No fixed line height: a line with a heading is taller than a body line.
+    val textStyle = TextLevel.PARAGRAPH.textStyle(typography)
+        .copy(color = colors.onSurface, lineHeight = TextUnit.Unspecified)
 
     BasicTextField(
         value = value,
         onValueChange = { updated ->
             val textChanged = updated.text != value.text
-            if ('\n' in updated.text) {
-                // Keep only the first line here; the view model creates the other blocks.
-                val first = updated.text.substringBefore('\n')
-                value = TextFieldValue(first, TextRange(first.length))
-            } else {
-                value = updated
-            }
+            value = updated
             if (textChanged) onTextChange(updated.text, updated.selection.end)
             if (focused) onSelectionChange(updated.selection.min, updated.selection.max)
         },

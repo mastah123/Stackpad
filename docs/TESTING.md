@@ -20,9 +20,15 @@ Covers: formula evaluator, span editing, URL detection/validation, list markers,
 - [ ] Upgrade from 1.1.0 (install over it): every existing note is still there, unchanged, with no folder, tags or color.
 
 ### Text
-- [ ] Type a line, press Enter, type another. Each line is its own block.
-- [ ] Make line 1 H1, line 2 H2, line 3 H3 and line 4 normal. Each keeps its own size; changing one does not change the others.
-- [ ] Tapping the active heading button again returns that line to normal.
+- [ ] Type a line, press Enter, type another. Both lines are in the same block: press and hold, drag the selection handles over several lines, and Copy gets all of them.
+- [ ] Make line 1 H1, line 2 H2, line 3 H3 and line 4 normal. Each keeps its own size; changing one does not change the others. A heading line next to body lines looks right (no clipped or overlapping text).
+- [ ] Tapping the active heading button again returns that line to normal. Select three lines and tap H2: all three become H2; tap H2 again: all go back to normal.
+- [ ] Type at the end of a heading line: the new text is part of the heading. Press Enter at the end of a heading: the next line is normal text. Press Enter in the middle of a heading: both halves are headings.
+- [ ] On an empty line tap H1, then type: the text is H1. Move the cursor away before typing: the choice is dropped.
+- [ ] Backspace at the start of a line joins it with the line above. Paste several lines: they all stay in the block.
+- [ ] Text, then a table, then text: three blocks. With the cursor in the middle of a text, add a table (+ menu): the text splits at the cursor and the table sits between. Delete the table: the two texts join into one with no lost lines. Same with a list, checklist, picture and card.
+- [ ] Open a note made before this version (many one-line blocks): the lines are in one block, headings keep their size, and bold/italic are where they were.
+- [ ] Select blocks (3-dot menu), tick the first and last block, tap "Select everything between": everything in between is selected; Copy pastes text and the table together.
 - [ ] Select a word and tap bold, italic, underline. Buttons light up when the selection has the style; tapping again removes it.
 - [ ] With only the cursor (nothing selected), tap Bold, then type. The new text is bold. Tap Bold again and type. The text is normal.
 - [ ] Type at the end of a bold word. New text stays bold; move the cursor elsewhere and the style choice resets.

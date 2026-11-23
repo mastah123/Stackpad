@@ -57,19 +57,4 @@ class TextSplittingTest {
         assertEquals(1, result.lines.size)
         assertEquals(2, result.caretOffset)
     }
-
-    @Test
-    fun multilineBlocksFromOlderNotesAreSplit() {
-        val blocks: List<Block> = listOf(TextBlock("1", TextLevel.H1, "a\nb"), ImageBlock("2", "x.jpg"))
-        val result = TextSplitting.splitMultilineBlocks(blocks)
-        assertEquals(3, result.size)
-        val first = result[0] as TextBlock
-        val second = result[1] as TextBlock
-        assertEquals("1", first.id)
-        assertEquals(TextLevel.H1, first.level)
-        assertEquals("a", first.text)
-        assertEquals(TextLevel.PARAGRAPH, second.level)
-        assertEquals("b", second.text)
-        assertTrue(result[2] is ImageBlock)
-    }
 }

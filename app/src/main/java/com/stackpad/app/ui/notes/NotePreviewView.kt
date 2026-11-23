@@ -294,6 +294,7 @@ private fun styled(text: String, spans: List<TextSpan>): AnnotatedString = build
                     SpanType.BOLD -> SpanStyle(fontWeight = FontWeight.Bold)
                     SpanType.ITALIC -> SpanStyle(fontStyle = FontStyle.Italic)
                     SpanType.UNDERLINE -> SpanStyle(textDecoration = TextDecoration.Underline)
+                    else -> SpanStyle() // headings are separate lines in previews
                 },
                 start,
                 end,

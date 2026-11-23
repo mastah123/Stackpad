@@ -2,6 +2,7 @@ package com.stackpad.app.ui.theme
 
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Typography
+import androidx.compose.material3.Typography
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -26,9 +27,11 @@ val StackpadTypography = Typography(
 
 /** Text style for a block's heading level. */
 @Composable
-fun TextLevel.textStyle(): TextStyle = when (this) {
-    TextLevel.PARAGRAPH -> MaterialTheme.typography.bodyMedium
-    TextLevel.H1 -> MaterialTheme.typography.headlineSmall
-    TextLevel.H2 -> MaterialTheme.typography.titleLarge
-    TextLevel.H3 -> MaterialTheme.typography.titleMedium
+fun TextLevel.textStyle(): TextStyle = textStyle(MaterialTheme.typography)
+
+fun TextLevel.textStyle(typography: Typography): TextStyle = when (this) {
+    TextLevel.PARAGRAPH -> typography.bodyMedium
+    TextLevel.H1 -> typography.headlineSmall
+    TextLevel.H2 -> typography.titleLarge
+    TextLevel.H3 -> typography.titleMedium
 }

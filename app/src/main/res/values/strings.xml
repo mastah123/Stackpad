@@ -100,6 +100,7 @@
     <string name="action_move_to_trash">Move to trash</string>
     <string name="action_save">Save</string>
     <string name="action_undo">Undo</string>
+    <string name="action_select_range">Select everything between</string>
     <string name="add_code">Code</string>
     <string name="add_divider">Divider</string>
     <string name="add_quote">Quote</string>

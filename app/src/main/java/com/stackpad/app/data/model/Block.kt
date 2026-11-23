@@ -7,9 +7,12 @@ import kotlinx.serialization.Serializable
 @Serializable
 enum class TextLevel { PARAGRAPH, H1, H2, H3 }
 
-/** Inline formatting that can be applied to a selection inside a text block. */
+/**
+ * Inline formatting inside a text block. H1 to H3 are line headings: a heading span always covers
+ * one whole line, and a line has at most one.
+ */
 @Serializable
-enum class SpanType { BOLD, ITALIC, UNDERLINE }
+enum class SpanType { BOLD, ITALIC, UNDERLINE, H1, H2, H3 }
 
 /** A formatted range `[start, end)` inside a text block. */
 @Serializable
@@ -44,6 +47,7 @@ sealed interface Block {
 @SerialName("text")
 data class TextBlock(
     override val id: String,
+    /** Only read from older notes; headings are now line spans (see [SpanType.H1]). Always PARAGRAPH once opened. */
     val level: TextLevel = TextLevel.PARAGRAPH,
     val text: String = "",
     val spans: List<TextSpan> = emptyList(),

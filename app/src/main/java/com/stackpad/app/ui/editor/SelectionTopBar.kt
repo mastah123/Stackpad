@@ -6,6 +6,7 @@ import androidx.compose.material.icons.filled.ArrowUpward
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.ContentCopy
 import androidx.compose.material.icons.filled.SelectAll
+import androidx.compose.material.icons.filled.UnfoldMore
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -23,6 +24,7 @@ fun SelectionTopBar(
     selectedCount: Int,
     onClose: () -> Unit,
     onSelectAll: () -> Unit,
+    onSelectRange: () -> Unit,
     canMoveUp: Boolean,
     canMoveDown: Boolean,
     onMoveUp: () -> Unit,
@@ -41,6 +43,9 @@ fun SelectionTopBar(
         actions = {
             IconButton(onClick = onSelectAll) {
                 Icon(Icons.Filled.SelectAll, contentDescription = stringResource(R.string.action_select_all))
+            }
+            IconButton(onClick = onSelectRange, enabled = selectedCount >= 2) {
+                Icon(Icons.Filled.UnfoldMore, contentDescription = stringResource(R.string.action_select_range))
             }
             IconButton(onClick = onMoveUp, enabled = canMoveUp) {
                 Icon(Icons.Filled.ArrowUpward, contentDescription = stringResource(R.string.action_move_up))

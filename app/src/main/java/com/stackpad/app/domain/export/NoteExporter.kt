@@ -20,6 +20,7 @@ import com.stackpad.app.data.model.TextSpan
 import com.stackpad.app.data.model.isBlank
 import com.stackpad.app.domain.formula.SheetEvaluator
 import com.stackpad.app.domain.text.ListMarkers
+import com.stackpad.app.domain.text.TextRuns
 import com.stackpad.app.util.formatDuration
 
 /** How a note is turned into text for sharing. */
@@ -46,7 +47,7 @@ object NoteExporter {
         if (note.title.isNotBlank()) {
             parts += (if (markdown) "# ${note.title.trim()}" else note.title.trim()) to false
         }
-        note.blocks.filterNot { it.isBlank() }.forEach { block ->
+        TextRuns.expand(note.blocks).filterNot { it.isBlank() }.forEach { block ->
             parts += render(block, markdown, imagePath) to (block is TextBlock && !markdown)
         }
 

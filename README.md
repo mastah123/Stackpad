@@ -10,7 +10,7 @@
 
 <p align="center">
   <a href="https://github.com/mastah123/stackpad/actions/workflows/android.yml"><img alt="Build" src="https://github.com/mastah123/stackpad/actions/workflows/android.yml/badge.svg"></a>
-  <img alt="Version" src="https://img.shields.io/badge/version-2.7.0-4F46E5">
+  <img alt="Version" src="https://img.shields.io/badge/version-2.8.0-4F46E5">
   <img alt="Platform" src="https://img.shields.io/badge/platform-Android%208.0%2B-3DDC84">
   <img alt="Kotlin" src="https://img.shields.io/badge/Kotlin-2.0-7F52FF">
   <img alt="License" src="https://img.shields.io/badge/license-MIT-blue">
@@ -38,6 +38,7 @@ Also:
 - **More imports** (Settings > Import): Markdown and text files or zips (also Obsidian and Notion exports), Evernote `.enex`, Word `.docx` and PDF. Several files can be picked at once and importing the same file again adds nothing new. PDF text is a best-effort reading (PDFs store no structure); a scanned PDF becomes a note with its pages as pictures.
 - **Share** from the editor's 3-dot menu: copy, plain text, Markdown, a single **image** (PNG, saved to your gallery in Pictures/Stackpad, then shared) or a **PDF** (saved where you choose, then shared). Image and PDF copy the note's layout: the app's text sizes, list markers, full-width pictures, block colors, checklist cards with progress, and table grids, without any buttons or handles. **Share options** (a sheet before sharing, with "Don't show this again" and a Share options row in the menu) let you pick a light, dark or match-app page, note color, text size, PDF page size and page numbers, hide completed tasks or pictures, leave out empty lines, list items, checklists, tables and cards, and add the title, word count, dates, tags or a footer. The same menu sets the note **color**.
 - **Tags** are added from the Tag chip in the add bar (tap a tag to add or remove it, "+" creates one); tags show above the title and tap to remove.
+- **Text runs**: plain text lines live in one block, so you can select and copy many lines at once. Any line can be a heading (H1 to H3). A table, list, picture or card ends a run: text, then a table, then text is three blocks. Inserting a block in the middle of text splits it at the cursor, and removing a block between two texts joins them. In block selection, "Select everything between" fills the gap between the first and last selected block.
 - **Share into Stackpad**: choose Stackpad in another app's share menu to save text, links or pictures as a new note (web addresses become link cards; a shared page title becomes the note title).
 - **Export all notes as Markdown** (Settings): one zip with a `.md` file per note, a folder per Stackpad folder and a shared `media/` folder with pictures. Locked and trashed notes are left out; audio is not included.
 - **Automatic backup** (Settings): pick a folder and a daily or weekly schedule; Stackpad writes `stackpad-auto-<date>.zip` there and keeps the last 7. "Back up now" runs it on demand. Android decides the exact time, and backups are not encrypted.
@@ -126,7 +127,7 @@ To enable signed builds, add four repository secrets. Step-by-step instructions 
 
 ## Testing
 
-Unit tests cover the formula evaluator, span editing, URL handling, list markers, table operations, waveform helpers, block serialization, table functions, due dates and reminder planning, image zoom limits, audio speed, note sorting and filtering, tags, trash timing, undo history, word counting, note previews, picture editing maths, Keep import rules, Markdown, Evernote, Word and PDF import parsing, CSV reading and writing, share-in planning, Markdown archive naming, backup retention, checklist sorting and counting, note export (text, image/PDF layout and pagination), backup rules and app-lock timing. A manual checklist for everything else (UI, audio, camera) is in [docs/TESTING.md](docs/TESTING.md).
+Unit tests cover the formula evaluator, span editing, URL handling, list markers, table operations, waveform helpers, block serialization, table functions, due dates and reminder planning, image zoom limits, audio speed, note sorting and filtering, tags, trash timing, undo history, word counting, note previews, picture editing maths, Keep import rules, Markdown, Evernote, Word and PDF import parsing, CSV reading and writing, text runs and line headings, share-in planning, Markdown archive naming, backup retention, checklist sorting and counting, note export (text, image/PDF layout and pagination), backup rules and app-lock timing. A manual checklist for everything else (UI, audio, camera) is in [docs/TESTING.md](docs/TESTING.md).
 
 ## Known limitations
 
@@ -138,7 +139,7 @@ Unit tests cover the formula evaluator, span editing, URL handling, list markers
 - Due dates are whole days. Reminders fire at 9:00 and may arrive a little late when the phone is idle (inexact alarms), and nothing is shown if notifications are off for the app.
 - Notes are local only; uninstalling the app deletes them unless you exported a backup. Backups are not encrypted, so keep the zip somewhere safe. Restoring adds and updates notes but never deletes any, and a note deleted on this phone comes back if it is in the backup.
 - Note lock and app lock use the phone's screen lock to gate the app. They do not encrypt notes on disk, and backups are not encrypted either, so a locked note's content is readable in a backup file.
-- Whole blocks are reordered with move up and move down buttons (no drag and drop between blocks; checklist items can be dragged). Block selection copies whole blocks; selecting a range of characters across blocks is not possible.
+- Whole blocks are reordered with move up and move down buttons (no drag and drop between blocks; checklist items can be dragged). Block selection copies whole blocks; dragging a text selection across a table or list is not possible (select the blocks instead).
 - App lock uses the phone's screen lock. If that lock is removed from the phone, app lock turns itself off. It locks again after 30 seconds in the background. It does not encrypt the notes on disk.
 - The widget shows the most recently edited note and refreshes when you leave the app and about every 30 minutes.
 - Recording stops automatically after 10 minutes.

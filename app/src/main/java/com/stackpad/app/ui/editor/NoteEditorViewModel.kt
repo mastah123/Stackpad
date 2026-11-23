@@ -15,6 +15,7 @@ import com.stackpad.app.data.model.Note
 import com.stackpad.app.data.model.SpanType
 import com.stackpad.app.data.model.TextBlock
 import com.stackpad.app.data.model.TextLevel
+import com.stackpad.app.data.model.TextSpan
 import com.stackpad.app.data.model.isBlank
 import com.stackpad.app.data.model.ImageBlock
 import com.stackpad.app.data.model.mediaFileName
@@ -30,7 +31,8 @@ import com.stackpad.app.domain.export.NoteExporter
 import com.stackpad.app.domain.history.UndoHistory
 import com.stackpad.app.domain.notes.Tags
 import com.stackpad.app.domain.text.SpanEditing
-import com.stackpad.app.domain.text.TextSplitting
+import com.stackpad.app.domain.text.HeadingSpans
+import com.stackpad.app.domain.text.TextRuns
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -132,7 +134,7 @@ class NoteEditorViewModel(
                 _state.value = EditorUiState(
                     loaded = true,
                     title = note.title,
-                    blocks = TextSplitting.splitMultilineBlocks(note.blocks).ifEmpty { listOf(BlockFactory.text()) },
+                    blocks = TextRuns.normalize(note.blocks).blocks.ifEmpty { listOf(BlockFactory.text()) },
                     pinned = note.pinned,
                     folderId = note.folderId,
                     tags = note.tags,
@@ -228,14 +230,23 @@ class NoteEditorViewModel(
      */
     fun addBlock(block: Block) {
         val anchor = lastFocusedId
+        val caret = _activeText.value?.takeIf { it.blockId == anchor }
         mutate { s ->
             val list = s.blocks.toMutableList()
             val anchorIndex = list.indexOfFirst { it.id == anchor }
-            val target = list.getOrNull(if (anchorIndex >= 0) anchorIndex else list.lastIndex)
-            if (target is TextBlock && target.isBlank()) {
-                list[list.indexOf(target)] = block
+            val caretBlock = if (caret != null && anchorIndex >= 0) list[anchorIndex] as? TextBlock else null
+            if (caret != null && caretBlock != null) {
+                // Inserting in the middle of a run of text splits it: text before, the block, text after.
+                val (before, after) = TextRuns.splitAround(caretBlock, caret.start)
+                list.removeAt(anchorIndex)
+                list.addAll(anchorIndex, listOfNotNull(before, block, after))
             } else {
-                list.add(if (anchorIndex >= 0) anchorIndex + 1 else list.size, block)
+                val target = list.getOrNull(if (anchorIndex >= 0) anchorIndex else list.lastIndex)
+                if (target is TextBlock && target.isBlank()) {
+                    list[list.indexOf(target)] = block
+                } else {
+                    list.add(if (anchorIndex >= 0) anchorIndex + 1 else list.size, block)
+                }
             }
             if (list.last() !is TextBlock) list.add(BlockFactory.text())
             s.copy(blocks = list, focusBlockId = block.id, focusCaret = null)
@@ -306,38 +317,29 @@ class NoteEditorViewModel(
     }
 
     /**
-     * Handles typing in a text block. Newly typed text gets the current typing styles, and
-     * pressing Enter (or pasting several lines) splits the text into one block per line so
-     * every line can have its own heading level.
+     * Handles typing in a text block. Newly typed text gets the current typing styles; a heading
+     * on a line grows with what is typed on that line. Enter just adds a line to the same block.
      */
     fun onTextChanged(id: String, newText: String, caret: Int) {
         val typing = _typingStyles.value
         _typingStyles.value = null
-        var focusId: String? = null
-        mutate(coalesceKey = if ('\n' in newText) null else "text:$id") { s ->
+        val old = _state.value.blocks.firstOrNull { it.id == id } as? TextBlock
+        val lineBreakEdit = old != null && old.text.count { it == '\n' } != newText.count { it == '\n' }
+        mutate(coalesceKey = if (lineBreakEdit) null else "text:$id") { s ->
             val index = s.blocks.indexOfFirst { it.id == id }
             val block = s.blocks.getOrNull(index) as? TextBlock ?: return@mutate s
-            val spans = SpanEditing.applyEdit(block.spans, block.text, newText, typing)
-            val list = s.blocks.toMutableList()
-            if ('\n' !in newText) {
-                list[index] = block.copy(text = newText, spans = spans)
-                s.copy(blocks = list)
-            } else {
-                val split = TextSplitting.splitLines(newText, spans, caret)
-                val lines = split.lines.mapIndexed { i, line ->
-                    if (i == 0) {
-                        block.copy(text = line.text, spans = line.spans)
-                    } else {
-                        TextBlock(BlockFactory.newId(), TextLevel.PARAGRAPH, line.text, line.spans)
-                    }
-                }
-                list.removeAt(index)
-                list.addAll(index, lines)
-                focusId = lines[split.caretLine].id
-                s.copy(blocks = list, focusBlockId = focusId, focusCaret = split.caretOffset)
+            val (headings, others) = block.spans.partition { HeadingSpans.isHeading(it.type) }
+            val styled = SpanEditing.applyEdit(others, block.text, newText, typing?.filterNot(HeadingSpans::isHeading)?.toSet())
+            val grown = SpanEditing.adjustForEdit(headings, block.text, newText).toMutableList()
+            typing?.firstOrNull(HeadingSpans::isHeading)?.let { type ->
+                val change = SpanEditing.diff(block.text, newText)
+                if (change.newEnd > change.prefix) grown += TextSpan(change.prefix, change.newEnd, type)
             }
+            val spans = HeadingSpans.normalize(newText, styled + grown)
+            val list = s.blocks.toMutableList()
+            list[index] = block.copy(text = newText, spans = spans)
+            s.copy(blocks = list)
         }
-        focusId?.let { lastFocusedId = it }
     }
 
     /**
@@ -370,12 +372,22 @@ class NoteEditorViewModel(
         lastFocusedId = previous.id
     }
 
-    /** Applies [level] to the active text block; tapping the current level reverts to a paragraph. */
+    /**
+     * Toggles a heading on the lines the selection touches (tapping the level they all have turns it
+     * off). On an empty line the heading is picked for the text typed next.
+     */
     fun toggleLevel(level: TextLevel) {
         val active = _activeText.value ?: return
-        edit<TextBlock>(active.blockId) {
-            it.copy(level = if (it.level == level) TextLevel.PARAGRAPH else level)
+        val block = _state.value.blocks.firstOrNull { it.id == active.blockId } as? TextBlock ?: return
+        val toggled = HeadingSpans.toggleLevel(block.text, block.spans, active.start, active.end, level)
+        if (toggled != block.spans) {
+            edit<TextBlock>(active.blockId) { it.copy(spans = toggled) }
+            return
         }
+        val type = HeadingSpans.typeOf(level) ?: return
+        val current = _typingStyles.value ?: SpanEditing.stylesAt(block.spans, active.start - 1)
+        val withoutHeading = current.filterNot(HeadingSpans::isHeading).toSet()
+        _typingStyles.value = if (type in current) withoutHeading else withoutHeading + type
     }
 
     // endregion
@@ -633,7 +645,8 @@ class NoteEditorViewModel(
     ) {
         val before = _state.value
         if (!before.loaded) return
-        val after = change(before)
+        val changed = change(before)
+        val after = joinTextRuns(changed)
         if (after == before) return
         if (record && (after.title != before.title || after.blocks != before.blocks)) {
             history.record(before.toSnapshot(), coalesceKey, SystemClock.elapsedRealtime())
@@ -641,6 +654,20 @@ class NoteEditorViewModel(
         }
         _state.value = after
         markChanged()
+    }
+
+    /** Keeps each run of text in one block: neighbouring text blocks (e.g. after a table is removed) are joined. */
+    private fun joinTextRuns(state: EditorUiState): EditorUiState {
+        val joined = TextRuns.normalize(state.blocks)
+        if (joined.moved.isEmpty() && joined.blocks == state.blocks) return state
+        val focus = state.focusBlockId?.let { joined.moved[it] }
+        lastFocusedId = lastFocusedId?.let { joined.moved[it]?.into ?: it }
+        if (_activeText.value?.blockId?.let { it in joined.moved } == true) _activeText.value = null
+        return state.copy(
+            blocks = joined.blocks,
+            focusBlockId = focus?.into ?: state.focusBlockId,
+            focusCaret = if (focus != null) focus.offset + (state.focusCaret ?: 0) else state.focusCaret,
+        )
     }
 
     private fun markChanged() {
