@@ -227,7 +227,7 @@
     <string name="settings_auto_backup_folder_none">No folder chosen. Tap to pick one.</string>
     <string name="settings_auto_backup_folder_change">Tap to choose a different folder</string>
     <string name="settings_auto_backup_now_title">Back up now</string>
-    <string name="settings_auto_backup_now_subtitle">Writes today's backup to the folder</string>
+    <string name="settings_auto_backup_now_subtitle">Writes today\'s backup to the folder</string>
     <string name="settings_auto_backup_never">No automatic backup yet</string>
     <string name="settings_auto_backup_last" formatted="true">Last backup: %1$s</string>
     <string name="settings_auto_backup_failed">The last backup failed. Check that the folder still exists, or pick it again.</string>
