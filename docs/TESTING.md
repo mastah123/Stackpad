@@ -361,3 +361,9 @@ Covers: formula evaluator, span editing, URL detection/validation, list markers,
 - [ ] Share/export a note with these lists: Markdown shows "-" for all bullet styles; PDF/text keep the markers. Old notes with bullets, numbers and letters look the same as before.
 - [ ] The Tag button is gone from the add bar. Above the title there is always an "Add tag" chip: it opens a pop-up listing known tags (check mark on this note's tags), tapping toggles one; "New tag" opens the new-tag dialog; tag chips next to it still remove on tap.
 
+### Fonts (2.15.0)
+- [ ] Menus, buttons, chips, previews and editor body text use Inter; note titles in the list, the editor title, H1/H2/H3 headings, screen titles and the menu name use the serif Fraunces.
+- [ ] Bold, semi-bold and medium weights all look different (no flat or missing weights); italic and bold-italic text still render.
+- [ ] Code and prompt blocks are still monospace. Check light and dark themes and the largest Android font size for clipped text.
+- [ ] Hindi/Arabic/CJK or emoji text still shows (the system font fills in what Inter lacks).
+

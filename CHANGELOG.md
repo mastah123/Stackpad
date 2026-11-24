@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.15.0] - 2026-11-24
+
+### Changed
+- New typography: Inter for body text, labels and buttons; Fraunces (serif) for note titles, headings, screen titles and the menu name. The fonts are bundled (about 1.2 MB added to the app) and licensed under the SIL Open Font License (`docs/licenses/`).
+
 ## [2.14.0] - 2026-11-24
 
 ### Added
