@@ -483,6 +483,5 @@
     <string name="list_style_upper_roman">Capital roman numerals I. II. III.</string>
     <string name="list_style_lower_roman">Roman numerals i. ii. iii.</string>
     <string name="list_style_greek">Greek letters α. β. γ.</string>
-    <string name="add_image">Image</string>
     <string name="add_text_options">Text options</string>
 </resources>
