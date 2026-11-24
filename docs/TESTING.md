@@ -362,8 +362,14 @@ Covers: formula evaluator, span editing, URL detection/validation, list markers,
 - [ ] The Tag button is gone from the add bar. Above the title there is always an "Add tag" chip: it opens a pop-up listing known tags (check mark on this note's tags), tapping toggles one; "New tag" opens the new-tag dialog; tag chips next to it still remove on tap.
 
 ### Fonts (2.15.0)
-- [ ] Menus, buttons, chips, previews and editor body text use Inter; note titles in the list, the editor title, H1/H2/H3 headings, screen titles and the menu name use the serif Fraunces.
+- [ ] All text (menus, buttons, chips, previews, note titles, headings, editor text) uses Inter.
 - [ ] Bold, semi-bold and medium weights all look different (no flat or missing weights); italic and bold-italic text still render.
 - [ ] Code and prompt blocks are still monospace. Check light and dark themes and the largest Android font size for clipped text.
 - [ ] Hindi/Arabic/CJK or emoji text still shows (the system font fills in what Inter lacks).
+
+### Editor bars and lists (2.16.0)
+- [ ] First chip in the add bar hides/shows the text options (H1 H2 H3 B I U); it is highlighted while they are shown. Selected chips and text buttons (bold, H1, ...) are clearly highlighted.
+- [ ] List row: Bullets, Numbers, Letters, Checklist. Bullets: round, hollow, square (same size, centered on the line). Numbers: 1. I. i. Letters: a. A. α.
+- [ ] Roman and Greek lists are not indented more than other lists; items line up with the text beside the marker.
+- [ ] Add row: Image, Audio, Link, Table, Divider. Image opens Gallery and Photo above it, both work.
 

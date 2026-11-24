@@ -7,10 +7,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.16.0] - 2026-11-24
+
+### Added
+- Letters is back in the List row (a. A. α.); Numbers now offers 1. I. i.
+- Add > Image opens a third row with Gallery and Photo.
+- A first chip in the add bar shows or hides the text options (H1, H2, H3, bold, italic, underline).
+
+### Changed
+- Inter is used for all text; Fraunces was removed.
+- Selected buttons in the add bar and text toolbar are now filled with the accent color so they stand out.
+
+### Fixed
+- Bullet styles are drawn as shapes of the same size, centered on the first line; the hollow bullet no longer looks like a "C".
+- Roman and Greek lists no longer indent: the marker column fits the widest marker.
+
 ## [2.15.0] - 2026-11-24
 
 ### Changed
-- New typography: Inter for body text, labels and buttons; Fraunces (serif) for note titles, headings, screen titles and the menu name. The fonts are bundled (about 1.2 MB added to the app) and licensed under the SIL Open Font License (`docs/licenses/`).
+- New typography: Inter is used for all text in the app. The font is bundled (about 0.9 MB added to the app) and licensed under the SIL Open Font License (`docs/licenses/`).
 
 ## [2.14.0] - 2026-11-24
 

@@ -22,8 +22,5 @@ private fun variableFamily(resId: Int): FontFamily = FontFamily(
     },
 )
 
-/** Inter: the clean sans-serif used for body text, labels and buttons. */
+/** Inter: the one font used for all text in the app. */
 val InterFamily: FontFamily = variableFamily(R.font.inter_variable)
-
-/** Fraunces: the soft serif used for note titles, headings and screen titles. */
-val FrauncesFamily: FontFamily = variableFamily(R.font.fraunces_variable)

@@ -24,29 +24,25 @@ private val BaseTypography = Typography(
     labelSmall = TextStyle(fontSize = 11.sp, lineHeight = 14.sp, fontWeight = FontWeight.Medium),
 )
 
-/**
- * Inter for body text and labels; Fraunces (serif) for note titles, headings and screen titles
- * (headlineSmall, titleLarge, titleMedium).
- */
+/** Inter for every text style. */
 val StackpadTypography: Typography = BaseTypography.let { t ->
-    fun TextStyle.sans() = copy(fontFamily = InterFamily)
-    fun TextStyle.serif() = copy(fontFamily = FrauncesFamily)
+    fun TextStyle.inter() = copy(fontFamily = InterFamily)
     t.copy(
-        displayLarge = t.displayLarge.sans(),
-        displayMedium = t.displayMedium.sans(),
-        displaySmall = t.displaySmall.sans(),
-        headlineLarge = t.headlineLarge.sans(),
-        headlineMedium = t.headlineMedium.sans(),
-        headlineSmall = t.headlineSmall.serif(),
-        titleLarge = t.titleLarge.serif(),
-        titleMedium = t.titleMedium.serif(),
-        titleSmall = t.titleSmall.sans(),
-        bodyLarge = t.bodyLarge.sans(),
-        bodyMedium = t.bodyMedium.sans(),
-        bodySmall = t.bodySmall.sans(),
-        labelLarge = t.labelLarge.sans(),
-        labelMedium = t.labelMedium.sans(),
-        labelSmall = t.labelSmall.sans(),
+        displayLarge = t.displayLarge.inter(),
+        displayMedium = t.displayMedium.inter(),
+        displaySmall = t.displaySmall.inter(),
+        headlineLarge = t.headlineLarge.inter(),
+        headlineMedium = t.headlineMedium.inter(),
+        headlineSmall = t.headlineSmall.inter(),
+        titleLarge = t.titleLarge.inter(),
+        titleMedium = t.titleMedium.inter(),
+        titleSmall = t.titleSmall.inter(),
+        bodyLarge = t.bodyLarge.inter(),
+        bodyMedium = t.bodyMedium.inter(),
+        bodySmall = t.bodySmall.inter(),
+        labelLarge = t.labelLarge.inter(),
+        labelMedium = t.labelMedium.inter(),
+        labelSmall = t.labelSmall.inter(),
     )
 }
 

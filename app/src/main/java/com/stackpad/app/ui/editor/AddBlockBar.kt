@@ -19,6 +19,7 @@ import androidx.compose.material.icons.filled.CameraAlt
 import androidx.compose.material.icons.filled.CheckBox
 import androidx.compose.material.icons.filled.Code
 import androidx.compose.material.icons.filled.FormatListBulleted
+import androidx.compose.material.icons.filled.FormatSize
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.icons.filled.FormatListNumbered
@@ -35,6 +36,7 @@ import androidx.compose.material.icons.filled.TableChart
 import androidx.compose.material.icons.filled.TextFields
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -51,6 +53,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
 import com.stackpad.app.R
+import com.stackpad.app.ui.editor.blocks.BulletMark
 import com.stackpad.app.data.model.Block
 import com.stackpad.app.data.model.BlockFactory
 import com.stackpad.app.data.model.ListKind
@@ -59,13 +62,14 @@ import com.stackpad.app.domain.text.isBullet
 
 private enum class OptionRow { PLUS, LIST, CARDS }
 
-/** The style row that opens above the List row for Bullets or Numbers. */
-private enum class StyleRow { BULLETS, NUMBERS }
+/** The third row that opens above the List row (Bullets, Numbers, Letters) or the + row (Image). */
+private enum class StyleRow { BULLETS, NUMBERS, LETTERS, IMAGE }
 
 /**
  * Scrollable row of chips; each one inserts a block of that type into the note.
  * "+", List and Cards open an option row above the chips, styled like the text format toolbar;
- * in the List row, Bullets and Numbers open a third row with their styles (• ○ ▪, 1. A. a. I. i. α.).
+ * in the List row, Bullets, Numbers and Letters open a third row with their styles, and Image in the + row opens Gallery and Photo.
+ * The first chip shows or hides the text format toolbar.
  * [onOptionRowChange] reports whether such a row is open, so the editor can hide the text toolbar.
  */
 @Composable
@@ -76,6 +80,9 @@ fun AddBlockBar(
     onTakePhoto: () -> Unit,
     onRecordAudio: () -> Unit,
     onOptionRowChange: (Boolean) -> Unit,
+    /** Whether the text format toolbar is shown, and how to show or hide it. */
+    textOptionsShown: Boolean,
+    onToggleTextOptions: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     var openRow by remember { mutableStateOf<OptionRow?>(null) }
@@ -93,39 +100,58 @@ fun AddBlockBar(
     }
 
     Column(modifier = modifier) {
-        when (openRow) {
-            OptionRow.LIST -> {
-                styleRow?.let { group ->
-                    OptionButtons {
-                        val kinds = if (group == StyleRow.BULLETS) ListMarkers.BULLET_KINDS else ListMarkers.NUMBER_KINDS
+        // The third row (styles, or Gallery and Photo) sits above the option row that opened it.
+        styleRow?.let { group ->
+            OptionButtons {
+                when (group) {
+                    StyleRow.IMAGE -> {
+                        OptionButton(Icons.Filled.PhotoLibrary, stringResource(R.string.image_from_gallery)) {
+                            choose(onPickFromGallery)
+                        }
+                        OptionButton(Icons.Filled.CameraAlt, stringResource(R.string.image_from_camera)) {
+                            choose(onTakePhoto)
+                        }
+                    }
+                    else -> {
+                        val kinds = when (group) {
+                            StyleRow.BULLETS -> ListMarkers.BULLET_KINDS
+                            StyleRow.NUMBERS -> ListMarkers.NUMBER_KINDS
+                            else -> ListMarkers.LETTER_KINDS
+                        }
                         kinds.forEach { kind ->
                             StyleButton(kind) { choose { onAddBlock(BlockFactory.list(kind)) } }
                         }
                     }
                 }
-                OptionButtons {
-                    OptionButton(
-                        Icons.Filled.FormatListBulleted,
-                        stringResource(R.string.add_bullets),
-                        expanded = styleRow == StyleRow.BULLETS,
-                    ) { styleRow = if (styleRow == StyleRow.BULLETS) null else StyleRow.BULLETS }
-                    OptionButton(
-                        Icons.Filled.FormatListNumbered,
-                        stringResource(R.string.add_numbers),
-                        expanded = styleRow == StyleRow.NUMBERS,
-                    ) { styleRow = if (styleRow == StyleRow.NUMBERS) null else StyleRow.NUMBERS }
-                    OptionButton(Icons.Filled.CheckBox, stringResource(R.string.add_checklist)) {
-                        choose { onAddBlock(BlockFactory.checklist()) }
-                    }
+            }
+        }
+        when (openRow) {
+            OptionRow.LIST -> OptionButtons {
+                OptionButton(
+                    Icons.Filled.FormatListBulleted,
+                    stringResource(R.string.add_bullets),
+                    expanded = styleRow == StyleRow.BULLETS,
+                ) { styleRow = if (styleRow == StyleRow.BULLETS) null else StyleRow.BULLETS }
+                OptionButton(
+                    Icons.Filled.FormatListNumbered,
+                    stringResource(R.string.add_numbers),
+                    expanded = styleRow == StyleRow.NUMBERS,
+                ) { styleRow = if (styleRow == StyleRow.NUMBERS) null else StyleRow.NUMBERS }
+                OptionButton(
+                    Icons.Filled.SortByAlpha,
+                    stringResource(R.string.add_letters),
+                    expanded = styleRow == StyleRow.LETTERS,
+                ) { styleRow = if (styleRow == StyleRow.LETTERS) null else StyleRow.LETTERS }
+                OptionButton(Icons.Filled.CheckBox, stringResource(R.string.add_checklist)) {
+                    choose { onAddBlock(BlockFactory.checklist()) }
                 }
             }
             OptionRow.PLUS -> OptionButtons {
-                OptionButton(Icons.Filled.PhotoLibrary, stringResource(R.string.image_from_gallery)) {
-                    choose(onPickFromGallery)
-                }
-                OptionButton(Icons.Filled.CameraAlt, stringResource(R.string.image_from_camera)) {
-                    choose(onTakePhoto)
-                }
+                OptionButton(
+                    Icons.Filled.PhotoLibrary,
+                    stringResource(R.string.add_image),
+                    expanded = styleRow == StyleRow.IMAGE,
+                ) { styleRow = if (styleRow == StyleRow.IMAGE) null else StyleRow.IMAGE }
                 if (!recordingActive) {
                     OptionButton(Icons.Filled.Mic, stringResource(R.string.add_audio)) { choose(onRecordAudio) }
                 }
@@ -159,6 +185,9 @@ fun AddBlockBar(
             horizontalArrangement = Arrangement.spacedBy(6.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
+            AddChip(Icons.Filled.FormatSize, stringResource(R.string.add_text_options), selected = textOptionsShown) {
+                onToggleTextOptions()
+            }
             AddChip(Icons.Filled.Add, stringResource(R.string.add_plus), selected = openRow == OptionRow.PLUS) {
                 toggle(OptionRow.PLUS)
             }
@@ -189,12 +218,12 @@ private fun OptionButtons(content: @Composable () -> Unit) {
 /** One list style in the third row, shown by its marker (`1. 2. 3.`, `A. B. C.`, `•`, ...). */
 @Composable
 private fun StyleButton(kind: ListKind, onClick: () -> Unit) {
-    val sample = if (kind.isBullet) ListMarkers.label(kind, 0) else (0..2).joinToString("  ") { ListMarkers.label(kind, it) }
     FormatButton(isSelected = false, description = stringResource(kind.labelRes()), onClick = onClick) {
-        Text(
-            text = sample,
-            style = if (kind.isBullet) MaterialTheme.typography.titleMedium else MaterialTheme.typography.labelLarge,
-        )
+        if (kind.isBullet) {
+            BulletMark(kind = kind, color = LocalContentColor.current, lineHeight = 20.dp, modifier = Modifier.width(20.dp))
+        } else {
+            Text(text = (0..2).joinToString("  ") { ListMarkers.label(kind, it) }, style = MaterialTheme.typography.labelLarge)
+        }
     }
 }
 
@@ -236,10 +265,14 @@ private fun AddChip(
     onClick: () -> Unit,
 ) {
     val colors = MaterialTheme.colorScheme
-    val contentColor = if (enabled) colors.onSurface else colors.onSurface.copy(alpha = 0.38f)
+    val contentColor = when {
+        !enabled -> colors.onSurface.copy(alpha = 0.38f)
+        selected -> colors.onPrimary
+        else -> colors.onSurface
+    }
     Surface(
         shape = RoundedCornerShape(16.dp),
-        color = if (selected) colors.primaryContainer else colors.surfaceVariant,
+        color = if (selected) colors.primary else colors.surfaceVariant,
         modifier = Modifier
             .height(32.dp)
             .clip(RoundedCornerShape(16.dp))
@@ -253,7 +286,7 @@ private fun AddChip(
                 imageVector = icon,
                 contentDescription = null,
                 modifier = Modifier.size(16.dp),
-                tint = if (enabled) colors.primary else contentColor,
+                tint = if (selected || !enabled) contentColor else colors.primary,
             )
             Spacer(Modifier.width(5.dp))
             Text(text = label, style = MaterialTheme.typography.labelMedium, color = contentColor)

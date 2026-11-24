@@ -9,12 +9,10 @@ val ListKind.isBullet: Boolean
 /** Marker text for list items: bullets, `1.` numbers, `a.`/`A.` letters, `i.`/`I.` roman numerals and `α.` Greek letters. */
 object ListMarkers {
 
-    /** The styles offered under "Bullets" and "Numbers" when adding a list. */
+    /** The styles offered under "Bullets", "Numbers" and "Letters" when adding a list. */
     val BULLET_KINDS = listOf(ListKind.BULLET, ListKind.BULLET_HOLLOW, ListKind.BULLET_SQUARE)
-    val NUMBER_KINDS = listOf(
-        ListKind.NUMBERED, ListKind.UPPER_ALPHA, ListKind.LETTERED,
-        ListKind.UPPER_ROMAN, ListKind.LOWER_ROMAN, ListKind.GREEK,
-    )
+    val NUMBER_KINDS = listOf(ListKind.NUMBERED, ListKind.UPPER_ROMAN, ListKind.LOWER_ROMAN)
+    val LETTER_KINDS = listOf(ListKind.LETTERED, ListKind.UPPER_ALPHA, ListKind.GREEK)
 
     private val GREEK = "αβγδεζηθικλμνξοπρστυφχψω"
     private val ROMAN = listOf(

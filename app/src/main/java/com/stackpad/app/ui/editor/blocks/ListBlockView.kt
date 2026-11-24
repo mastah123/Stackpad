@@ -36,6 +36,16 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.rememberTextMeasurer
+import com.stackpad.app.data.model.ListKind
+import com.stackpad.app.domain.text.isBullet
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -64,13 +74,24 @@ fun ListBlockView(
     val requesters = remember { HashMap<String, FocusRequester>() }
     var pendingFocusId by remember { mutableStateOf<String?>(null) }
 
-    val longestMarker = block.items.indices.maxOfOrNull { ListMarkers.label(block.kind, it).length } ?: 1
-    val markerWidth = with(LocalDensity.current) { (longestMarker * MARKER_CHAR_SP + MARKER_GAP_SP).sp.toDp() }
+    // The marker column is as wide as the widest real marker (III. is wider than 1.), so nothing is indented more than needed.
+    val measurer = rememberTextMeasurer()
+    val markerStyle = MaterialTheme.typography.bodyMedium
+    val density = LocalDensity.current
+    val markerWidth = if (block.kind.isBullet) {
+        BULLET_COLUMN
+    } else {
+        val widest = block.items.indices.maxOfOrNull {
+            measurer.measure(ListMarkers.label(block.kind, it), markerStyle).size.width
+        } ?: 0
+        with(density) { widest.toDp() } + MARKER_GAP
+    }
 
     Row(modifier = modifier.fillMaxWidth(), verticalAlignment = Alignment.Top) {
         Column(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(1.dp)) {
             block.items.forEachIndexed { index, item ->
                 ListItemRow(
+                    kind = block.kind,
                     marker = ListMarkers.label(block.kind, index),
                     markerWidth = markerWidth,
                     item = item,
@@ -134,6 +155,7 @@ fun ListBlockView(
 
 @Composable
 private fun ListItemRow(
+    kind: ListKind,
     marker: String,
     markerWidth: Dp,
     item: ListItem,
@@ -156,13 +178,25 @@ private fun ListItemRow(
     }
 
     Row(verticalAlignment = Alignment.Top) {
-        Text(
-            text = marker,
-            style = textStyle.copy(color = colors.onSurfaceVariant, textAlign = TextAlign.End),
-            maxLines = 1,
-            softWrap = false,
-            modifier = Modifier.width(markerWidth).padding(end = 6.dp),
-        )
+        if (kind.isBullet) {
+            BulletMark(
+                kind = kind,
+                color = colors.onSurfaceVariant,
+                lineHeight = with(LocalDensity.current) { textStyle.lineHeight.toDp() },
+                modifier = Modifier.width(markerWidth).padding(end = 6.dp),
+            )
+        } else {
+            Text(
+                text = marker,
+                style = textStyle.copy(
+                    color = colors.onSurfaceVariant,
+                    textAlign = if (kind == ListKind.NUMBERED) TextAlign.End else TextAlign.Start,
+                ),
+                maxLines = 1,
+                softWrap = false,
+                modifier = Modifier.width(markerWidth).padding(end = 6.dp),
+            )
+        }
         BasicTextField(
             value = value,
             onValueChange = { updated ->
@@ -202,5 +236,5 @@ private fun ListItemRow(
     }
 }
 
-private const val MARKER_CHAR_SP = 8
-private const val MARKER_GAP_SP = 8
+private val MARKER_GAP = 8.dp
+private val BULLET_COLUMN = 16.dp
