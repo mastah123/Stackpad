@@ -10,7 +10,7 @@
 
 <p align="center">
   <a href="https://github.com/mastah123/stackpad/actions/workflows/android.yml"><img alt="Build" src="https://github.com/mastah123/stackpad/actions/workflows/android.yml/badge.svg"></a>
-  <img alt="Version" src="https://img.shields.io/badge/version-2.9.0-4F46E5">
+  <img alt="Version" src="https://img.shields.io/badge/version-2.10.0-4F46E5">
   <img alt="Platform" src="https://img.shields.io/badge/platform-Android%208.0%2B-3DDC84">
   <img alt="Kotlin" src="https://img.shields.io/badge/Kotlin-2.0-7F52FF">
   <img alt="License" src="https://img.shields.io/badge/license-MIT-blue">
@@ -38,6 +38,7 @@ Also:
 - **More imports** (Settings > Import): Markdown and text files or zips (also Obsidian and Notion exports), Evernote `.enex`, Word `.docx` and PDF. Several files can be picked at once and importing the same file again adds nothing new. PDF text is a best-effort reading (PDFs store no structure); a scanned PDF becomes a note with its pages as pictures.
 - **Share** from the editor's 3-dot menu: copy, plain text, Markdown, a single **image** (PNG, saved to your gallery in Pictures/Stackpad, then shared) or a **PDF** (saved where you choose, then shared). Image and PDF copy the note's layout: the app's text sizes, list markers, full-width pictures, block colors, checklist cards with progress, and table grids, without any buttons or handles. **Share options** (a sheet before sharing, with "Don't show this again" and a Share options row in the menu) let you pick a light, dark or match-app page, note color, text size, PDF page size and page numbers, hide completed tasks or pictures, leave out empty lines, list items, checklists, tables and cards, and add the title, word count, dates, tags or a footer. The same menu sets the note **color**.
 - **Tags** are added from the Tag chip in the add bar (tap a tag to add or remove it, "+" creates one); tags show above the title and tap to remove.
+- **Picture extras**: the picture editor has an **Adjust** tab (crop, rotate, flip, straighten, a colour look - Mono, Sepia, Vivid, Cool, Warm - and a saved size of Original, Large, Medium or Small) and a **Mark up** tab (pen, highlighter, blur, pixelate and text). Marks are placed on the cropped picture, so cropping or rotating afterwards removes them. The picture menu's **Copy text from picture** reads text on the phone (Latin alphabet, using Google ML Kit, adds about 5 MB) and adds it below the picture.
 - **Version history**: the note menu's **Version history** lists earlier versions of the note (about one every 10 minutes of editing, up to 20 per note). Open one to see it, then restore it; the current text is kept as a version first and Undo brings it back. History is not part of backups.
 - **Quick Settings tile**: add the "New note" tile from your phone's Quick Settings editor to open a blank note in one tap. The home-screen widget also has a new-note button.
 - **Text runs**: plain text lines live in one block, so you can select and copy many lines at once. Any line can be a heading (H1 to H3). A table, list, picture or card ends a run: text, then a table, then text is three blocks. Inserting a block in the middle of text splits it at the cursor, and removing a block between two texts joins them. In block selection, "Select everything between" fills the gap between the first and last selected block.
@@ -129,7 +130,7 @@ To enable signed builds, add four repository secrets. Step-by-step instructions 
 
 ## Testing
 
-Unit tests cover the formula evaluator, span editing, URL handling, list markers, table operations, waveform helpers, block serialization, table functions, due dates and reminder planning, image zoom limits, audio speed, note sorting and filtering, tags, trash timing, undo history, word counting, note previews, picture editing maths, Keep import rules, Markdown, Evernote, Word and PDF import parsing, CSV reading and writing, version history rules, text runs and line headings, share-in planning, Markdown archive naming, backup retention, checklist sorting and counting, note export (text, image/PDF layout and pagination), backup rules and app-lock timing. A manual checklist for everything else (UI, audio, camera) is in [docs/TESTING.md](docs/TESTING.md).
+Unit tests cover the formula evaluator, span editing, URL handling, list markers, table operations, waveform helpers, block serialization, table functions, due dates and reminder planning, image zoom limits, audio speed, note sorting and filtering, tags, trash timing, undo history, word counting, note previews, picture editing maths, Keep import rules, Markdown, Evernote, Word and PDF import parsing, CSV reading and writing, picture looks and sizes, version history rules, text runs and line headings, share-in planning, Markdown archive naming, backup retention, checklist sorting and counting, note export (text, image/PDF layout and pagination), backup rules and app-lock timing. A manual checklist for everything else (UI, audio, camera) is in [docs/TESTING.md](docs/TESTING.md).
 
 ## Known limitations
 

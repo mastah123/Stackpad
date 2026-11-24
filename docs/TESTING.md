@@ -254,6 +254,16 @@ Covers: formula evaluator, span editing, URL detection/validation, list markers,
 - [ ] A very large photo (12 MP or more) saves without the app closing; if memory runs out a message says the picture could not be saved.
 - [ ] Back up and restore: an edited picture comes back edited, and Restore original still works. Delete the note: no stray picture files are left.
 
+### Picture extras
+- [ ] Edit picture, Adjust tab: tap each Look (Mono, Sepia, Vivid, Cool, Warm): the preview changes at once; Original removes it. Save: the saved picture has the same look.
+- [ ] Size: pick Small, save: the picture is smaller on screen sharpness and in file size than Original. A picture already smaller than the limit is not enlarged.
+- [ ] Mark up tab: Draw and Highlight with different colours and sizes; the highlighter is see-through. Blur and Pixelate: drag a box; the region is hidden in the preview. Text: tap, type, Add; multi-line text works. Save: everything appears at the same place and size in the saved picture.
+- [ ] Undo removes the last mark; the bin button removes all marks; Reset clears everything.
+- [ ] With marks on, go to Adjust and rotate or crop: a message says the marks were removed.
+- [ ] Mark up with a rotated or cropped picture: marks land where you touch.
+- [ ] Picture menu, Copy text from picture, on a photo of printed text: "Reading the text" appears, then the text is added below the picture. On a picture without text: "No text found". Works without internet.
+- [ ] Menu still shows Edit picture, and Restore original only after an edit.
+
 ### Image
 - [ ] Add from the gallery. The image is full width.
 - [ ] Add from the camera. Cancelling the camera adds nothing.

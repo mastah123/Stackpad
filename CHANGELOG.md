@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.10.0] - 2026-11-24
+
+### Added
+- **Mark up** tab in the picture editor: pen, highlighter, blur, pixelate and text, with colours and three sizes. Undo and "remove all marks" are included. Cropping or rotating after marking removes the marks (a message says so), because they are placed on the cropped picture.
+- **Colour looks** in the Adjust tab: Original, Mono, Sepia, Vivid, Cool, Warm.
+- **Saved size**: Original, Large (2048 px), Medium (1280 px) or Small (800 px) with matching JPEG compression. Pictures are never enlarged.
+- **Copy text from picture** (picture menu): reads the text on the phone and adds it below the picture. Uses Google ML Kit text recognition (Latin alphabet, adds about 5 MB to the app).
+
+### Changed
+- The picture menu now always opens, with Edit picture, Copy text from picture and (after an edit) Restore original.
+
 ## [2.9.0] - 2026-11-23
 
 ### Added

@@ -9,15 +9,27 @@ package com.stackpad.app.domain.image
  * @property quarterTurns clockwise quarter turns, 0 to 3
  * @property mirrored mirrored left to right before turning
  * @property straighten clockwise angle in degrees, -45 to 45
+ * @property filter colour look
+ * @property size the biggest size the saved picture may have
+ * @property annotations pen, highlighter, hidden regions and text, placed on the finished (cropped) picture
  */
 data class ImageEdit(
     val quarterTurns: Int = 0,
     val mirrored: Boolean = false,
     val straighten: Float = 0f,
     val crop: CropRect = CropRect.FULL,
+    val filter: ImageFilter = ImageFilter.NONE,
+    val size: ImageSize = ImageSize.ORIGINAL,
+    val annotations: List<Annotation> = emptyList(),
 ) {
     val isUnchanged: Boolean
-        get() = quarterTurns == 0 && !mirrored && straighten == 0f && crop.isFull
+        get() = quarterTurns == 0 && !mirrored && straighten == 0f && crop.isFull &&
+            filter == ImageFilter.NONE && size == ImageSize.ORIGINAL && annotations.isEmpty()
+
+    /** True when [other] shows the same part of the picture the same way (marks placed on it still fit). */
+    fun sameGeometry(other: ImageEdit): Boolean =
+        quarterTurns == other.quarterTurns && mirrored == other.mirrored &&
+            straighten == other.straighten && crop == other.crop
 
     fun rotateRight() = copy(quarterTurns = (quarterTurns + 1) % 4, crop = crop.rotatedRight())
 
@@ -38,6 +50,14 @@ data class ImageEdit(
     fun straightened(degrees: Float) = copy(straighten = degrees.coerceIn(-MAX_STRAIGHTEN, MAX_STRAIGHTEN), crop = CropRect.FULL)
 
     fun cropped(rect: CropRect) = copy(crop = rect)
+
+    fun withFilter(value: ImageFilter) = copy(filter = value)
+
+    fun withSize(value: ImageSize) = copy(size = value)
+
+    fun withMark(mark: Annotation) = copy(annotations = annotations + mark)
+
+    fun withoutMarks() = copy(annotations = emptyList())
 
     companion object {
         const val MAX_STRAIGHTEN = 45f

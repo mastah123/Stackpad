@@ -51,5 +51,9 @@ enum class EditorMessage(@StringRes val resId: Int) {
     TEMPLATE_EMPTY(R.string.msg_template_empty),
     TEMPLATE_LIMIT(R.string.msg_template_limit),
     CSV_FAILED(R.string.msg_csv_failed),
+    PICTURE_TEXT_WORKING(R.string.msg_picture_text_working),
+    PICTURE_TEXT_ADDED(R.string.msg_picture_text_added),
+    PICTURE_TEXT_NONE(R.string.msg_picture_text_none),
+    PICTURE_TEXT_FAILED(R.string.msg_picture_text_failed),
     CSV_EXPORT_FAILED(R.string.msg_csv_export_failed),
 }

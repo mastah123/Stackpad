@@ -11,6 +11,7 @@ import com.stackpad.app.data.backup.AutoBackupWriter
 import com.stackpad.app.data.backup.BackupManager
 import com.stackpad.app.data.export.NotesArchiveExporter
 import com.stackpad.app.data.prefs.AutoBackupPreferences
+import com.stackpad.app.data.media.PictureTextReader
 import com.stackpad.app.data.share.SharedNoteCreator
 import com.stackpad.app.data.db.MIGRATION_1_2
 import com.stackpad.app.data.db.MIGRATION_2_3
@@ -93,6 +94,8 @@ class AppContainer(context: Context) {
     )
 
     val sharedNoteCreator = SharedNoteCreator(repository, mediaStorage)
+
+    val pictureTextReader = PictureTextReader()
 
     /** Redraws the home-screen widget with the latest note (or "Locked"). [onDone] runs afterwards. */
     fun refreshWidget(onDone: () -> Unit = {}) {

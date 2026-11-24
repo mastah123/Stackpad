@@ -14,6 +14,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Crop
 import androidx.compose.material.icons.filled.Restore
+import androidx.compose.material.icons.filled.TextFields
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
@@ -48,6 +49,7 @@ fun ImageBlockView(
     hasOriginal: Boolean,
     onSaveEdit: suspend (ImageEdit) -> Boolean,
     onRestoreOriginal: () -> Unit,
+    onReadText: () -> Unit,
     onRemove: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -91,7 +93,7 @@ fun ImageBlockView(
                 OverlayButton(
                     icon = Icons.Filled.Crop,
                     description = stringResource(R.string.cd_image_options),
-                    onClick = { if (hasOriginal) menuOpen = true else editingPicture = true },
+                    onClick = { menuOpen = true },
                 )
                 DropdownMenu(expanded = menuOpen, onDismissRequest = { menuOpen = false }) {
                     DropdownMenuItem(
@@ -100,10 +102,17 @@ fun ImageBlockView(
                         onClick = { menuOpen = false; editingPicture = true },
                     )
                     DropdownMenuItem(
-                        text = { Text(stringResource(R.string.image_edit_restore_original)) },
-                        leadingIcon = { Icon(Icons.Filled.Restore, contentDescription = null) },
-                        onClick = { menuOpen = false; onRestoreOriginal() },
+                        text = { Text(stringResource(R.string.image_menu_read_text)) },
+                        leadingIcon = { Icon(Icons.Filled.TextFields, contentDescription = null) },
+                        onClick = { menuOpen = false; onReadText() },
                     )
+                    if (hasOriginal) {
+                        DropdownMenuItem(
+                            text = { Text(stringResource(R.string.image_edit_restore_original)) },
+                            leadingIcon = { Icon(Icons.Filled.Restore, contentDescription = null) },
+                            onClick = { menuOpen = false; onRestoreOriginal() },
+                        )
+                    }
                 }
             }
         }

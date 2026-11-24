@@ -438,6 +438,29 @@ class NoteEditorViewModel(
         return true
     }
 
+    /** Reads the text in the picture of image block [id] and adds it as text right below the picture. */
+    fun readPictureText(id: String) {
+        val block = _state.value.blocks.firstOrNull { it.id == id } as? ImageBlock ?: return
+        viewModelScope.launch {
+            emit(EditorMessage.PICTURE_TEXT_WORKING)
+            val text = container.pictureTextReader.read(media.file(block.fileName))
+            when {
+                text == null -> emit(EditorMessage.PICTURE_TEXT_FAILED)
+                text.isBlank() -> emit(EditorMessage.PICTURE_TEXT_NONE)
+                else -> {
+                    mutate { s ->
+                        val index = s.blocks.indexOfFirst { it.id == id }
+                        if (index < 0) return@mutate s
+                        val list = s.blocks.toMutableList()
+                        list.add(index + 1, BlockFactory.text().copy(text = text.trim()))
+                        s.copy(blocks = list)
+                    }
+                    emit(EditorMessage.PICTURE_TEXT_ADDED)
+                }
+            }
+        }
+    }
+
     /** Puts the untouched picture back in the image block [id]. */
     fun restoreOriginalImage(id: String) {
         val block = _state.value.blocks.firstOrNull { it.id == id } as? ImageBlock ?: return

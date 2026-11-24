@@ -93,6 +93,7 @@ fun EditorBlockItem(
             hasOriginal = block.originalFileName != null,
             onSaveEdit = { change -> viewModel.saveImageEdit(id, change) },
             onRestoreOriginal = { viewModel.restoreOriginalImage(id) },
+            onReadText = { viewModel.readPictureText(id) },
             onRemove = onRemove,
             modifier = modifier,
         )

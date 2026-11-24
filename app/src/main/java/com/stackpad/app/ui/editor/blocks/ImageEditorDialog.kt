@@ -1,6 +1,16 @@
 package com.stackpad.app.ui.editor.blocks
 
 import android.graphics.Bitmap
+import android.widget.Toast
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.graphics.ColorMatrix
+import androidx.compose.ui.platform.LocalContext
+import com.stackpad.app.domain.image.Annotation
+import com.stackpad.app.domain.image.ImageFilter
+import com.stackpad.app.domain.image.ImageSize
+import com.stackpad.app.domain.image.MarkStyle
+import com.stackpad.app.domain.image.NormPoint
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.horizontalScroll
@@ -89,6 +99,13 @@ fun ImageEditorDialog(
     var ratio by remember { mutableStateOf(AspectChoice.FREE) }
     var saving by remember { mutableStateOf(false) }
     var confirmDiscard by remember { mutableStateOf(false) }
+    var mode by remember { mutableStateOf(EditMode.ADJUST) }
+    var tool by remember { mutableStateOf(MarkupTool.DRAW) }
+    var markColor by remember { mutableStateOf(MarkStyle.colors.first()) }
+    var markSize by remember { mutableStateOf(MarkStyle.Size.MEDIUM) }
+    var textAt by remember { mutableStateOf<NormPoint?>(null) }
+    var labelText by remember { mutableStateOf("") }
+    val context = LocalContext.current
 
     val edit = live ?: history.current
     val orientationKey = Triple(edit.quarterTurns, edit.mirrored, edit.straighten)
@@ -104,10 +121,21 @@ fun ImageEditorDialog(
         value = Rendered(key, withContext(Dispatchers.Default) { ImageTransformer.apply(source, oriented) })
     }
 
+    // The Mark up tab shows the picture as cropped, with hidden regions already applied.
+    val markKey = edit.copy(size = ImageSize.ORIGINAL, annotations = edit.annotations.filterIsInstance<Annotation.Obscure>())
+    val markBase by produceState<Bitmap?>(null, source, markKey, mode) {
+        value = null
+        if (source == null || mode != EditMode.MARKUP) return@produceState
+        value = withContext(Dispatchers.Default) { ImageTransformer.apply(source, markKey, withMarks = false) }
+    }
+
     val base = source?.let { EditGeometry.baseSize(it.width, it.height, edit) }
 
     fun commit(next: ImageEdit) {
-        history = history.commit(next)
+        // Marks are placed on the finished picture; moving or cropping it would put them in the wrong place.
+        val moved = !next.sameGeometry(history.current) && next.annotations.isNotEmpty()
+        if (moved) Toast.makeText(context, R.string.image_mark_removed, Toast.LENGTH_SHORT).show()
+        history = history.commit(if (moved) next.withoutMarks() else next)
         live = null
     }
 
@@ -151,13 +179,33 @@ fun ImageEditorDialog(
             )
 
             Box(modifier = Modifier.weight(1f).fillMaxWidth(), contentAlignment = Alignment.Center) {
-                val shownBitmap = rendered?.bitmap
-                if (shownBitmap != null) {
+                val shownBitmap = if (mode == EditMode.MARKUP) markBase else rendered?.bitmap
+                if (shownBitmap != null && mode == EditMode.MARKUP) {
                     val image = remember(shownBitmap) { shownBitmap.asImageBitmap() }
                     Image(
                         bitmap = image,
                         contentDescription = stringResource(R.string.cd_image),
                         contentScale = ContentScale.Fit,
+                        modifier = Modifier.fillMaxSize(),
+                    )
+                    MarkupOverlay(
+                        pictureWidth = shownBitmap.width,
+                        pictureHeight = shownBitmap.height,
+                        marks = edit.annotations.filterNot { it is Annotation.Obscure },
+                        tool = tool,
+                        color = markColor,
+                        size = markSize,
+                        onAdd = { commit(history.current.withMark(it)) },
+                        onTextAt = { labelText = ""; textAt = it },
+                        modifier = Modifier.fillMaxSize(),
+                    )
+                } else if (shownBitmap != null) {
+                    val image = remember(shownBitmap) { shownBitmap.asImageBitmap() }
+                    Image(
+                        bitmap = image,
+                        contentDescription = stringResource(R.string.cd_image),
+                        contentScale = ContentScale.Fit,
+                        colorFilter = if (edit.filter == ImageFilter.NONE) null else ColorFilter.colorMatrix(ColorMatrix(edit.filter.matrix)),
                         modifier = Modifier.fillMaxSize(),
                     )
                     if (rendered?.key == orientationKey && base != null) {
@@ -178,6 +226,14 @@ fun ImageEditorDialog(
                 }
             }
 
+            EditorModeTabs(mode = mode, enabled = source != null && !saving, onMode = { mode = it })
+            if (mode == EditMode.ADJUST) {
+                ImageAdjustControls(
+                    edit = edit,
+                    enabled = source != null && !saving,
+                    onFilter = { commit(history.current.withFilter(it)) },
+                    onSize = { commit(history.current.withSize(it)) },
+                )
             EditorControls(
                 history = history,
                 edit = edit,
@@ -193,7 +249,47 @@ fun ImageEditorDialog(
                 onUndo = { history = history.undo(); live = null },
                 onReset = { history = history.reset(); live = null; ratio = AspectChoice.FREE },
             )
+            } else {
+                MarkupControls(
+                    tool = tool,
+                    onTool = { tool = it },
+                    color = markColor,
+                    onColor = { markColor = it },
+                    size = markSize,
+                    onSize = { markSize = it },
+                    canUndo = history.canUndo,
+                    onUndo = { history = history.undo(); live = null },
+                    hasMarks = edit.annotations.isNotEmpty(),
+                    onClear = { commit(history.current.withoutMarks()) },
+                    enabled = source != null && !saving,
+                )
+            }
         }
+    }
+
+    textAt?.let { point ->
+        AlertDialog(
+            onDismissRequest = { textAt = null },
+            title = { Text(stringResource(R.string.image_mark_text_title)) },
+            text = {
+                OutlinedTextField(
+                    value = labelText,
+                    onValueChange = { labelText = it },
+                    placeholder = { Text(stringResource(R.string.image_mark_text_hint)) },
+                    modifier = Modifier.fillMaxWidth(),
+                )
+            },
+            confirmButton = {
+                TextButton(
+                    enabled = labelText.isNotBlank(),
+                    onClick = {
+                        commit(history.current.withMark(Annotation.Label(labelText.trim(), point.x, point.y, markSize.text, markColor)))
+                        textAt = null
+                    },
+                ) { Text(stringResource(R.string.image_mark_text_add)) }
+            },
+            dismissButton = { TextButton(onClick = { textAt = null }) { Text(stringResource(R.string.action_cancel)) } },
+        )
     }
 
     if (confirmDiscard) {
@@ -213,6 +309,29 @@ fun ImageEditorDialog(
 
 /** Angles near zero snap to exactly zero, so the picture is easy to set back level. */
 private fun snap(degrees: Float): Float = if (abs(degrees) < SNAP_DEGREES) 0f else (degrees * 2f).roundToInt() / 2f
+
+private enum class EditMode { ADJUST, MARKUP }
+
+/** Switches between the Adjust tools (crop, rotate, filter, size) and Mark up (draw, blur, text). */
+@Composable
+private fun EditorModeTabs(mode: EditMode, enabled: Boolean, onMode: (EditMode) -> Unit) {
+    Surface(color = MaterialTheme.colorScheme.surface, modifier = Modifier.fillMaxWidth()) {
+        Row(modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            FilterChip(
+                selected = mode == EditMode.ADJUST,
+                onClick = { onMode(EditMode.ADJUST) },
+                enabled = enabled,
+                label = { Text(stringResource(R.string.image_tab_adjust)) },
+            )
+            FilterChip(
+                selected = mode == EditMode.MARKUP,
+                onClick = { onMode(EditMode.MARKUP) },
+                enabled = enabled,
+                label = { Text(stringResource(R.string.image_tab_markup)) },
+            )
+        }
+    }
+}
 
 @Composable
 private fun EditorTopBar(canSave: Boolean, saving: Boolean, onClose: () -> Unit, onSave: () -> Unit) {

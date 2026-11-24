@@ -21,7 +21,7 @@ class ImageEditSaver(private val media: MediaStorage) {
             val name = media.newImageName()
             val target = media.file(name)
             temp = File(target.parentFile, "$name.tmp")
-            temp.outputStream().use { check(result.compress(Bitmap.CompressFormat.JPEG, QUALITY, it)) }
+            temp.outputStream().use { check(result.compress(Bitmap.CompressFormat.JPEG, edit.size.jpegQuality, it)) }
             if (!temp.renameTo(target)) return@withContext null
             name
         } catch (e: IOException) {
@@ -40,6 +40,5 @@ class ImageEditSaver(private val media: MediaStorage) {
     private companion object {
         /** Pictures bigger than this are halved while editing, which keeps memory use safe. */
         const val MAX_SIDE = 4096
-        const val QUALITY = 92
     }
 }
