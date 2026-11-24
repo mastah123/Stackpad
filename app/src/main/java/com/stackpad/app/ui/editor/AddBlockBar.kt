@@ -211,34 +211,6 @@ private fun ListKind.labelRes(): Int = when (this) {
 }
 
 @Composable
-private fun OptionButtons(content: @Composable () -> Unit) {
-    Row(
-        modifier = Modifier
-            .horizontalScroll(rememberScrollState())
-            .padding(horizontal = 8.dp, vertical = 2.dp),
-        verticalAlignment = Alignment.CenterVertically,
-    ) { content() }
-}
-
-@Composable
-private fun TagToggle(tag: String, selected: Boolean, onClick: () -> Unit) {
-    val colors = MaterialTheme.colorScheme
-    Surface(
-        shape = RoundedCornerShape(14.dp),
-        color = if (selected) colors.primaryContainer else colors.surface,
-        modifier = Modifier
-            .padding(horizontal = 3.dp)
-            .height(30.dp)
-            .clip(RoundedCornerShape(14.dp))
-            .clickable(role = Role.Checkbox, onClick = onClick),
-    ) {
-        Row(modifier = Modifier.padding(horizontal = 10.dp), verticalAlignment = Alignment.CenterVertically) {
-            Text(text = "#$tag", style = MaterialTheme.typography.labelLarge, color = colors.onSurface)
-        }
-    }
-}
-
-@Composable
 private fun OptionButton(icon: ImageVector, label: String, expanded: Boolean? = null, onClick: () -> Unit) {
     FormatButton(isSelected = expanded == true, description = label, onClick = onClick) {
         Icon(imageVector = icon, contentDescription = null, modifier = Modifier.size(16.dp))
