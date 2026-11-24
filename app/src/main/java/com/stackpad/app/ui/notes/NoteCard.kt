@@ -2,6 +2,9 @@ package com.stackpad.app.ui.notes
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -12,16 +15,21 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CheckBox
 import androidx.compose.material.icons.filled.CheckBoxOutlineBlank
 import androidx.compose.material.icons.filled.Lock
-import androidx.compose.material.icons.filled.PushPin
-import androidx.compose.material.icons.outlined.PushPin
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.style.TextOverflow
@@ -29,22 +37,26 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.stackpad.app.R
 import com.stackpad.app.data.model.NoteSummary
-import com.stackpad.app.ui.components.SmallIconButton
 import com.stackpad.app.ui.components.highlightMatches
+import com.stackpad.app.ui.theme.NoteColors
 import com.stackpad.app.ui.theme.noteCardColor
-import com.stackpad.app.util.formatDate
+import com.stackpad.app.util.formatListStamp
 
 @OptIn(ExperimentalFoundationApi::class)
-/** Compact row for one note: title, preview, tags, date and a pin button (notes are trashed from selection mode). */
+/**
+ * One note. In the list it is a flat row (time, bold title, preview, tag chips, three-dot menu) with a
+ * left accent bar for pinned or colored notes; in the grid the same content sits in a rounded card.
+ */
 @Composable
 fun NoteCard(
     note: NoteSummary,
     onClick: () -> Unit,
-    onTogglePin: () -> Unit,
+    actions: NoteCardActions,
     modifier: Modifier = Modifier,
+    grid: Boolean = false,
     /** Search words to mark in the title, preview and tags. */
     highlight: List<String> = emptyList(),
-    /** True while several notes are being selected: the card shows a checkbox instead of the pin button. */
+    /** True while several notes are being selected: the card shows a checkbox instead of the menu. */
     selecting: Boolean = false,
     selected: Boolean = false,
     onLongClick: () -> Unit = {},
@@ -57,20 +69,40 @@ fun NoteCard(
 ) {
     val colors = MaterialTheme.colorScheme
     val mark = colors.tertiary.copy(alpha = 0.3f)
-    Surface(
+    val cardColor = when {
+        note.color != 0 -> noteCardColor(note.color)
+        grid -> colors.surfaceContainerLow
+        note.pinned -> colors.surfaceContainer
+        else -> Color.Transparent
+    }
+    val background by animateColorAsState(
+        targetValue = if (selected) colors.primaryContainer else cardColor,
+        animationSpec = tween(180),
+        label = "noteBackground",
+    )
+    val accent = NoteColors.accent(note.color) ?: if (note.pinned) colors.primary else null
+    val shape = RoundedCornerShape(if (grid) 12.dp else 0.dp)
+    val barWidth = with(LocalDensity.current) { ACCENT_BAR_WIDTH.toPx() }
+    Box(
         modifier = modifier
             .fillMaxWidth()
-            .clip(RoundedCornerShape(12.dp))
-            .combinedClickable(role = Role.Button, onClick = onClick, onLongClick = onLongClick),
-        shape = RoundedCornerShape(12.dp),
-        color = if (selected) colors.primaryContainer else noteCardColor(note.color),
+            .clip(shape)
+            .background(background)
+            .then(if (grid) Modifier.border(1.dp, colors.outlineVariant.copy(alpha = 0.6f), shape) else Modifier)
+            .combinedClickable(role = Role.Button, onClick = onClick, onLongClick = onLongClick)
+            .drawBehind { if (accent != null) drawRect(accent, size = Size(barWidth, size.height)) },
     ) {
         Row(
-            modifier = Modifier.padding(start = 12.dp, top = 8.dp, bottom = 8.dp, end = 4.dp),
-            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.padding(start = 16.dp, top = 8.dp, bottom = 8.dp, end = 4.dp),
+            verticalAlignment = Alignment.Top,
         ) {
-            Column(modifier = Modifier.weight(1f)) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
+            Column(modifier = Modifier.weight(1f).padding(top = 4.dp)) {
+                Text(
+                    text = formatListStamp(note.updatedAt),
+                    style = MaterialTheme.typography.labelMedium,
+                    color = colors.onSurfaceVariant,
+                )
+                Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(top = 2.dp)) {
                     if (note.locked) {
                         Icon(
                             Icons.Filled.Lock,
@@ -85,9 +117,9 @@ fun NoteCard(
                             highlight,
                             mark,
                         ),
-                        style = MaterialTheme.typography.titleMedium,
+                        style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
                         color = colors.onSurface,
-                        maxLines = 1,
+                        maxLines = if (grid) 2 else 1,
                         overflow = TextOverflow.Ellipsis,
                     )
                 }
@@ -101,51 +133,42 @@ fun NoteCard(
                         NotePreviewView(
                             items = formatted,
                             maxHeight = previewMaxHeight,
-                            fadeInto = if (selected) colors.primaryContainer else noteCardColor(note.color),
-                            modifier = Modifier.padding(top = 2.dp),
+                            fadeInto = if (selected) colors.primaryContainer else background,
+                            modifier = Modifier.padding(top = 4.dp),
                         )
                     }
                 } else if (note.preview.isNotBlank()) {
                     Text(
                         text = highlightMatches(note.preview, highlight, mark),
-                        style = MaterialTheme.typography.bodySmall,
-                        color = colors.onSurfaceVariant,
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = colors.onSurface,
                         maxLines = previewLines,
                         overflow = TextOverflow.Ellipsis,
+                        modifier = Modifier.padding(top = 4.dp),
                     )
                 }
-                if (note.tags.isNotEmpty()) {
-                    Text(
-                        text = highlightMatches(note.tags.joinToString("  ") { "#$it" }, highlight, mark),
-                        style = MaterialTheme.typography.labelSmall,
-                        color = colors.primary,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis,
-                        modifier = Modifier.padding(top = 2.dp),
+                if (note.pinned || note.tags.isNotEmpty()) {
+                    TagChipsRow(
+                        tags = note.tags,
+                        pinned = note.pinned,
+                        highlight = highlight,
+                        mark = mark,
+                        modifier = Modifier.padding(top = 8.dp),
                     )
                 }
-                Text(
-                    text = formatDate(note.updatedAt),
-                    style = MaterialTheme.typography.labelSmall,
-                    color = colors.onSurfaceVariant.copy(alpha = 0.8f),
-                    modifier = Modifier.padding(top = 2.dp),
-                )
             }
             if (selecting) {
                 Icon(
                     imageVector = if (selected) Icons.Filled.CheckBox else Icons.Filled.CheckBoxOutlineBlank,
                     contentDescription = stringResource(if (selected) R.string.cd_block_selected else R.string.cd_block_not_selected),
                     tint = if (selected) colors.primary else colors.onSurfaceVariant,
-                    modifier = Modifier.padding(horizontal = 12.dp),
+                    modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp),
                 )
             } else {
-            SmallIconButton(
-                icon = if (note.pinned) Icons.Filled.PushPin else Icons.Outlined.PushPin,
-                contentDescription = stringResource(if (note.pinned) R.string.cd_unpin else R.string.cd_pin),
-                onClick = onTogglePin,
-                tint = if (note.pinned) colors.primary else colors.onSurfaceVariant,
-            )
+                NoteCardMenu(pinned = note.pinned, actions = actions)
             }
         }
     }
 }
+
+private val ACCENT_BAR_WIDTH = 4.dp

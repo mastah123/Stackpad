@@ -457,4 +457,15 @@
     <string name="cd_clear_filter">Clear filter</string>
     <string name="tag_sort_name">Name</string>
     <string name="tag_sort_count">Most notes</string>
+    <string name="search_in_notes">Search in Notes</string>
+    <string name="section_recent">Recent</string>
+    <string name="cd_search">Search</string>
+    <string name="tip_label">Tip</string>
+    <string name="empty_create_note">Create a new note</string>
+    <string name="tip_pin">Keep important notes at the top by pinning them from a note\'s three-dot menu.</string>
+    <string name="tip_tags">Add tags to your notes, then find them again from the Tags tab in the menu.</string>
+    <string name="tip_folders">Sort your notes into folders from the Folders tab in the menu.</string>
+    <string name="tip_checklist">Add a checklist block to track tasks with due dates and reminders.</string>
+    <string name="tip_table">Tables can calculate: type something like =SUM(A1:A5) in a cell.</string>
+    <string name="tip_search">Search finds words in titles, text and tags. Tap the menu icon for your folders and tags.</string>
 </resources>

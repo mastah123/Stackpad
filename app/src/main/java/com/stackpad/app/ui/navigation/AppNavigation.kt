@@ -48,7 +48,14 @@ fun AppNavigation(
     }
 
     CompositionLocalProvider(LocalThumbnails provides container.thumbnailStore) {
-    NavHost(navController = navController, startDestination = ROUTE_NOTES) {
+    NavHost(
+        navController = navController,
+        startDestination = ROUTE_NOTES,
+        enterTransition = screenEnter,
+        exitTransition = screenExit,
+        popEnterTransition = screenPopEnter,
+        popExitTransition = screenPopExit,
+    ) {
         composable(ROUTE_NOTES) {
             val viewModel: NoteListViewModel = viewModel(factory = NoteListViewModel.factory(container))
             NoteListScreen(

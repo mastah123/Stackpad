@@ -2,7 +2,8 @@ package com.stackpad.app.ui.notes
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.core.Animatable
-import androidx.compose.animation.core.tween
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.spring
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.gestures.draggable
@@ -17,6 +18,8 @@ import androidx.compose.runtime.Stable
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalDensity
@@ -24,8 +27,8 @@ import kotlinx.coroutines.launch
 
 /** Share of the screen width the side menu takes. */
 private const val MENU_WIDTH_FRACTION = 0.8f
-private const val SLIDE_MILLIS = 260
 private const val FLING_SPEED = 700f
+private const val SCRIM_ALPHA = 0.16f
 
 /** Open/closed state of [PushMenuLayout]. [fraction] is 0 when closed and 1 when fully open. */
 @Stable
@@ -35,19 +38,23 @@ class PushMenuState {
     /** True while the menu is open or opening. */
     val isOpen: Boolean get() = fraction.targetValue > 0f
 
-    suspend fun open() {
-        fraction.animateTo(1f, tween(SLIDE_MILLIS))
+    // A critically damped spring: smooth, no bounce, and a drag release carries its speed into the slide.
+    private val slide = spring<Float>(dampingRatio = Spring.DampingRatioNoBouncy, stiffness = 380f)
+
+    suspend fun open(velocity: Float = 0f) {
+        fraction.animateTo(1f, slide, velocity)
     }
 
-    suspend fun close() {
-        fraction.animateTo(0f, tween(SLIDE_MILLIS))
+    suspend fun close(velocity: Float = 0f) {
+        fraction.animateTo(0f, slide, velocity)
     }
 
     /** Finishes a drag: a quick fling decides the direction, otherwise whichever side is nearer. */
-    internal suspend fun settle(velocity: Float) {
+    internal suspend fun settle(velocityPx: Float, menuPx: Float) {
+        val velocity = velocityPx / menuPx
         when {
-            velocity > FLING_SPEED -> open()
-            velocity < -FLING_SPEED -> close()
+            velocityPx > FLING_SPEED -> open(velocity)
+            velocityPx < -FLING_SPEED -> close(velocity)
             fraction.value > 0.5f -> open()
             else -> close()
         }
@@ -83,7 +90,7 @@ fun PushMenuLayout(
                 state = dragState,
                 orientation = Orientation.Horizontal,
                 enabled = gesturesEnabled || state.isOpen,
-                onDragStopped = { velocity -> state.settle(velocity) },
+                onDragStopped = { velocity -> state.settle(velocity, menuPx) },
             ),
         ) {
             Box(
@@ -101,7 +108,9 @@ fun PushMenuLayout(
                 if (state.fraction.value > 0f) {
                     // Catches taps on the notes that stay visible, so they close the menu instead of opening a note.
                     Box(
-                        Modifier.fillMaxSize().pointerInput(Unit) {
+                        Modifier.fillMaxSize().drawBehind {
+                            drawRect(Color.Black, alpha = SCRIM_ALPHA * state.fraction.value)
+                        }.pointerInput(Unit) {
                             detectTapGestures { scope.launch { state.close() } }
                         },
                     )

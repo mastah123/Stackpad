@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.12.0] - 2026-11-24
+
+### Added
+- Home: rounded search bar with the menu button inside, PINNED and RECENT sections, and the layout and sort icons on the first section header.
+- Empty Home shows a rotating tip and a "Create a new note" button.
+- Three-dot menu on every note: Pin, Move to folder, Add tag, Move to trash.
+- Smooth motion: spring menu slide that follows the finger (with a light dim on the visible notes), animated note add/remove/move, cross-fade between list and grid and between empty and filled lists, animated selection color, scaling new-note button, slide and fade between screens, animated Trash list.
+
+### Changed
+- Note list rows are flat with the time, a bold title, a preview, outlined tag chips and a left accent bar for pinned or colored notes; the grid uses the same content in rounded cards.
+- Folder and tag views use a top bar with Search, layout and sort icons; folders add a three-dot menu with Rename and Delete.
+- The pin button on a note moved into its three-dot menu (a pin icon still marks pinned notes).
+
 ## [2.11.0] - 2026-11-24
 
 ### Changed

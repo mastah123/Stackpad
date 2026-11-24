@@ -17,7 +17,10 @@ import androidx.compose.material.icons.filled.SwapVert
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
+import androidx.compose.material.icons.filled.GridView
+import androidx.compose.material.icons.filled.ViewAgenda
 import androidx.compose.material3.IconButton
+import com.stackpad.app.data.prefs.ListLayout
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -151,4 +154,16 @@ private fun NoteSort.labelRes(): Int = when (this) {
     NoteSort.LAST_EDITED -> R.string.sort_last_edited
     NoteSort.CREATED -> R.string.sort_created
     NoteSort.TITLE -> R.string.sort_title
+}
+
+/** Switches between the list and the grid; shows the icon of the layout it would switch to. */
+@Composable
+fun LayoutToggleButton(layout: ListLayout, onChange: (ListLayout) -> Unit) {
+    val grid = layout == ListLayout.GRID
+    IconButton(onClick = { onChange(if (grid) ListLayout.LIST else ListLayout.GRID) }) {
+        Icon(
+            imageVector = if (grid) Icons.Filled.ViewAgenda else Icons.Filled.GridView,
+            contentDescription = stringResource(if (grid) R.string.cd_layout_list else R.string.cd_layout_grid),
+        )
+    }
 }

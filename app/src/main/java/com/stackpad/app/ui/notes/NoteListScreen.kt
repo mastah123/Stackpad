@@ -1,6 +1,13 @@
 package com.stackpad.app.ui.notes
 
 import androidx.activity.compose.BackHandler
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.Crossfade
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -91,6 +98,10 @@ fun NoteListScreen(
     }
     var folderChoiceDialog by remember { mutableStateOf(false) }
     var addTagDialog by remember { mutableStateOf(false) }
+    // Notes the folder/tag dialogs act on: the selection, or the one note whose three-dot menu was used.
+    var actionIds by remember { mutableStateOf(emptySet<String>()) }
+    var searchOpen by rememberSaveable { mutableStateOf(false) }
+    val home = mode == ListMode.ALL || mode == ListMode.PINNED
     val searchWords = remember(query) { SearchQuery.words(query) }
     val menu = rememberPushMenuState()
     val scope = rememberCoroutineScope()
@@ -170,54 +181,54 @@ fun NoteListScreen(
     ) {
         Scaffold(
             topBar = {
-                if (selecting) {
-                    val chosen = ui.notes.orEmpty().filter { it.id in selectedIds }
-                    NoteSelectionBar(
-                        count = selectedIds.size,
-                        allPinned = chosen.isNotEmpty() && chosen.all { it.pinned },
-                        onClose = { selectedIds = emptySet() },
-                        onSelectAll = { selectedIds = ui.notes.orEmpty().map { it.id }.toSet() },
-                        onTogglePin = {
-                            viewModel.togglePinned(selectedIds)
-                            selectedIds = emptySet()
-                        },
-                        onTrash = {
-                            viewModel.moveToTrash(selectedIds)
-                            selectedIds = emptySet()
-                        },
-                        onMoveToFolder = { folderChoiceDialog = true },
-                        onAddTag = { addTagDialog = true },
-                    )
-                } else TopAppBar(
-                    navigationIcon = {
-                        IconButton(onClick = { scope.launch { menu.open() } }) {
-                            Icon(Icons.Filled.Menu, contentDescription = stringResource(R.string.cd_open_menu))
-                        }
-                    },
-                    title = { Text(sectionTitle(ui, mode), style = MaterialTheme.typography.titleMedium, maxLines = 1) },
-                    actions = {
-                        currentFolder?.let { folder ->
-                            IconButton(onClick = { renameTarget = folder }) {
-                                Icon(Icons.Filled.Edit, contentDescription = stringResource(R.string.folder_rename))
-                            }
-                            IconButton(onClick = { deleteTarget = folder }) {
-                                Icon(Icons.Filled.Delete, contentDescription = stringResource(R.string.folder_delete))
-                            }
-                        }
-                        val grid = ui.layout == ListLayout.GRID
-                        IconButton(onClick = { viewModel.setLayout(if (grid) ListLayout.LIST else ListLayout.GRID) }) {
-                            Icon(
-                                imageVector = if (grid) Icons.Filled.ViewAgenda else Icons.Filled.GridView,
-                                contentDescription = stringResource(if (grid) R.string.cd_layout_list else R.string.cd_layout_grid),
+                val barKind = when {
+                    selecting -> 1
+                    !home -> 2
+                    else -> 0
+                }
+                Crossfade(targetState = barKind, animationSpec = tween(180), label = "listTopBar") { kind ->
+                    when (kind) {
+                        1 -> {
+                            val chosen = ui.notes.orEmpty().filter { it.id in selectedIds }
+                            NoteSelectionBar(
+                                count = selectedIds.size,
+                                allPinned = chosen.isNotEmpty() && chosen.all { it.pinned },
+                                onClose = { selectedIds = emptySet() },
+                                onSelectAll = { selectedIds = ui.notes.orEmpty().map { it.id }.toSet() },
+                                onTogglePin = {
+                                    viewModel.togglePinned(selectedIds)
+                                    selectedIds = emptySet()
+                                },
+                                onTrash = {
+                                    viewModel.moveToTrash(selectedIds)
+                                    selectedIds = emptySet()
+                                },
+                                onMoveToFolder = { actionIds = selectedIds; folderChoiceDialog = true },
+                                onAddTag = { actionIds = selectedIds; addTagDialog = true },
                             )
                         }
-                        SortMenu(current = ui.sort, onSelect = viewModel::setSort)
-                    },
-                )
+                        2 -> NoteListTopBar(
+                            title = sectionTitle(ui, mode),
+                            layout = ui.layout,
+                            sort = ui.sort,
+                            onOpenMenu = { scope.launch { menu.open() } },
+                            onSearch = { searchOpen = !searchOpen },
+                            onLayout = viewModel::setLayout,
+                            onSort = viewModel::setSort,
+                            onRename = currentFolder?.let { folder -> { renameTarget = folder } },
+                            onDelete = currentFolder?.let { folder -> { deleteTarget = folder } },
+                        )
+                        else -> Unit
+                    }
+                }
             },
             snackbarHost = { SnackbarHost(snackbar) },
             floatingActionButton = {
-                if (!selecting) {
+                AnimatedVisibility(
+                    visible = !selecting,
+                    enter = scaleIn(tween(180)) + fadeIn(tween(180)),
+                    exit = scaleOut(tween(150)) + fadeOut(tween(150)),
+                ) {
                     FloatingActionButton(onClick = { onNewNote(currentFolder?.id) }) {
                         Icon(Icons.Filled.Add, contentDescription = stringResource(R.string.cd_new_note))
                     }
@@ -225,12 +236,23 @@ fun NoteListScreen(
             },
         ) { padding ->
             Column(modifier = Modifier.fillMaxSize().padding(padding)) {
-                SearchField(
-                    query = query,
-                    onQueryChange = viewModel::setQuery,
-                    modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
-                )
-                if ((query.isNotBlank() || ui.filter.color != null) && (mode == ListMode.ALL || mode == ListMode.PINNED)) {
+                if (home) {
+                    HomeSearchBar(
+                        query = query,
+                        onQueryChange = viewModel::setQuery,
+                        onOpenMenu = { scope.launch { menu.open() } },
+                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+                    )
+                } else {
+                    AnimatedVisibility(visible = searchOpen || query.isNotBlank()) {
+                        SearchField(
+                            query = query,
+                            onQueryChange = viewModel::setQuery,
+                            modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
+                        )
+                    }
+                }
+                if ((query.isNotBlank() || ui.filter.color != null) && home) {
                     SearchFilterRow(
                         folders = ui.folders,
                         tags = ui.tags,
@@ -242,21 +264,49 @@ fun NoteListScreen(
                     )
                 }
                 val current = ui.notes
-                when {
-                    current == null -> Box(Modifier.fillMaxSize())
-                    current.isEmpty() -> EmptyState(query = query, filtered = !ui.filter.isEmpty)
-                    else -> NoteList(
-                        notes = current,
-                        layout = ui.layout,
-                        highlight = searchWords,
-                        selecting = selecting,
-                        selectedIds = selectedIds,
-                        onOpen = { id ->
-                            if (selecting) selectedIds = toggled(selectedIds, id) else onOpenNote(id)
-                        },
-                        onLongPress = { id -> selectedIds = selectedIds + id },
-                        onTogglePin = viewModel::togglePin,
+                val actionsFor: (NoteSummary) -> NoteCardActions = { note ->
+                    NoteCardActions(
+                        onTogglePin = { viewModel.togglePin(note) },
+                        onMoveToFolder = { actionIds = setOf(note.id); folderChoiceDialog = true },
+                        onAddTag = { actionIds = setOf(note.id); addTagDialog = true },
+                        onTrash = { viewModel.moveToTrash(note.id) },
                     )
+                }
+                val listIcons: @Composable () -> Unit = {
+                    LayoutToggleButton(layout = ui.layout, onChange = viewModel::setLayout)
+                    SortMenu(current = ui.sort, onSelect = viewModel::setSort)
+                }
+                Crossfade(
+                    targetState = when {
+                        current == null -> 0
+                        current.isEmpty() -> 1
+                        else -> 2
+                    },
+                    animationSpec = tween(200),
+                    label = "listState",
+                ) { state ->
+                    when {
+                        state == 0 || current == null -> Box(Modifier.fillMaxSize())
+                        state == 1 -> NoteListEmpty(
+                            query = query,
+                            filtered = !ui.filter.isEmpty,
+                            onCreate = { onNewNote(currentFolder?.id) },
+                        )
+                        else -> NoteList(
+                            notes = current,
+                            layout = ui.layout,
+                            highlight = searchWords,
+                            selecting = selecting,
+                            selectedIds = selectedIds,
+                            alwaysShowHeaders = home,
+                            onOpen = { id ->
+                                if (selecting) selectedIds = toggled(selectedIds, id) else onOpenNote(id)
+                            },
+                            onLongPress = { id -> selectedIds = selectedIds + id },
+                            actionsFor = actionsFor,
+                            headerActions = if (home) listIcons else null,
+                        )
+                    }
                 }
             }
         }
@@ -267,7 +317,7 @@ fun NoteListScreen(
         FolderChoiceDialog(
             folders = ui.folders,
             onChoose = { folderId ->
-                viewModel.setFolder(selectedIds, folderId)
+                viewModel.setFolder(actionIds, folderId)
                 folderChoiceDialog = false
                 selectedIds = emptySet()
             },
@@ -282,7 +332,7 @@ fun NoteListScreen(
             confirmLabel = stringResource(R.string.action_create),
             maxLength = Tags.MAX_LENGTH,
             onConfirm = {
-                viewModel.addTag(selectedIds, it)
+                viewModel.addTag(actionIds, it)
                 addTagDialog = false
                 selectedIds = emptySet()
             },
@@ -353,107 +403,3 @@ private fun sectionTitle(ui: NoteListUiState, mode: ListMode): String {
 
 private fun toggled(selected: Set<String>, id: String): Set<String> =
     if (id in selected) selected - id else selected + id
-
-@OptIn(ExperimentalFoundationApi::class)
-@Composable
-private fun NoteList(
-    notes: List<NoteSummary>,
-    layout: ListLayout,
-    highlight: List<String>,
-    selecting: Boolean,
-    selectedIds: Set<String>,
-    onOpen: (String) -> Unit,
-    onLongPress: (String) -> Unit,
-    onTogglePin: (NoteSummary) -> Unit,
-) {
-    val pinned = notes.filter { it.pinned }
-    val others = notes.filterNot { it.pinned }
-    val grid = layout == ListLayout.GRID
-
-    @Composable
-    fun card(note: NoteSummary) = NoteCard(
-        note = note,
-        onClick = { onOpen(note.id) },
-        onTogglePin = { onTogglePin(note) },
-        highlight = highlight,
-        selecting = selecting,
-        selected = note.id in selectedIds,
-        onLongClick = { onLongPress(note.id) },
-        previewLines = if (grid) GRID_PREVIEW_LINES else LIST_PREVIEW_LINES,
-        previewMaxHeight = if (grid) GRID_PREVIEW_HEIGHT else LIST_PREVIEW_HEIGHT,
-        previewItems = if (grid) GRID_PREVIEW_ITEMS else LIST_PREVIEW_ITEMS,
-    )
-
-    if (grid) {
-        // Two columns of cards at their natural height; section labels span both.
-        LazyVerticalStaggeredGrid(
-            columns = StaggeredGridCells.Fixed(2),
-            modifier = Modifier.fillMaxSize(),
-            contentPadding = PaddingValues(start = 12.dp, end = 12.dp, top = 4.dp, bottom = 88.dp),
-            verticalItemSpacing = 6.dp,
-            horizontalArrangement = Arrangement.spacedBy(6.dp),
-        ) {
-            if (pinned.isNotEmpty()) {
-                item(key = "header_pinned", span = StaggeredGridItemSpan.FullLine) {
-                    SectionLabel(stringResource(R.string.section_pinned))
-                }
-                items(pinned, key = { it.id }) { note -> card(note) }
-                if (others.isNotEmpty()) {
-                    item(key = "header_notes", span = StaggeredGridItemSpan.FullLine) {
-                        SectionLabel(stringResource(R.string.section_notes))
-                    }
-                }
-            }
-            items(others, key = { it.id }) { note -> card(note) }
-        }
-    } else {
-        LazyColumn(
-            modifier = Modifier.fillMaxSize(),
-            contentPadding = PaddingValues(start = 12.dp, end = 12.dp, top = 4.dp, bottom = 88.dp),
-            verticalArrangement = Arrangement.spacedBy(6.dp),
-        ) {
-            if (pinned.isNotEmpty()) {
-                item(key = "header_pinned") { SectionLabel(stringResource(R.string.section_pinned)) }
-                items(pinned, key = { it.id }) { note -> card(note) }
-                if (others.isNotEmpty()) {
-                    item(key = "header_notes") { SectionLabel(stringResource(R.string.section_notes)) }
-                }
-            }
-            items(others, key = { it.id }) { note -> card(note) }
-        }
-    }
-}
-
-private const val LIST_PREVIEW_LINES = 2
-private const val GRID_PREVIEW_LINES = 6
-private val LIST_PREVIEW_HEIGHT = 96.dp
-private val GRID_PREVIEW_HEIGHT = 200.dp
-private const val LIST_PREVIEW_ITEMS = 5
-private const val GRID_PREVIEW_ITEMS = 9
-
-@Composable
-private fun SectionLabel(text: String) {
-    Text(
-        text = text,
-        style = MaterialTheme.typography.labelMedium,
-        color = MaterialTheme.colorScheme.primary,
-        modifier = Modifier.padding(start = 4.dp, top = 6.dp),
-    )
-}
-
-@Composable
-private fun EmptyState(query: String, filtered: Boolean) {
-    Box(modifier = Modifier.fillMaxSize().padding(32.dp), contentAlignment = Alignment.Center) {
-        Text(
-            text = when {
-                query.isNotBlank() && filtered -> stringResource(R.string.empty_search_filtered, query)
-                query.isNotBlank() -> stringResource(R.string.empty_search, query)
-                filtered -> stringResource(R.string.empty_filtered)
-                else -> stringResource(R.string.empty_notes)
-            },
-            style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-            textAlign = TextAlign.Center,
-        )
-    }
-}

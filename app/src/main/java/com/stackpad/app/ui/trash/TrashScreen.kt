@@ -98,6 +98,7 @@ fun TrashScreen(
                     ) {
                         items(current, key = { it.id }) { note ->
                             TrashCard(
+                                modifier = Modifier.animateItem(),
                                 note = note,
                                 onRestore = { viewModel.restore(note.id) },
                                 onEraseForever = { pendingErase = note },
@@ -139,13 +140,14 @@ fun TrashScreen(
 @Composable
 private fun TrashCard(
     note: NoteSummary,
+    modifier: Modifier = Modifier,
     onRestore: () -> Unit,
     onEraseForever: () -> Unit,
 ) {
     val colors = MaterialTheme.colorScheme
     val daysLeft = note.trashedAt?.let { TrashPolicy.daysLeft(it, System.currentTimeMillis()) } ?: 0
     Surface(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = modifier.fillMaxWidth(),
         shape = RoundedCornerShape(12.dp),
         color = noteCardColor(note.color),
     ) {

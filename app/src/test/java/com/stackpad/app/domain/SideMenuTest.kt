@@ -28,4 +28,15 @@ class SideMenuTest {
         assertEquals(listOf("Home", "homework"), TagList.visible(tags, "  OM", TagSort.NAME).map { it.tag })
         assertTrue(TagList.visible(tags, "zzz", TagSort.NAME).isEmpty())
     }
+
+    private fun note(id: String, pinned: Boolean) =
+        com.stackpad.app.data.model.NoteSummary(id = id, title = id, preview = "", pinned = pinned, createdAt = 0, updatedAt = 0)
+
+    @Test fun sectionsSplitPinnedFromRecentKeepingOrder() {
+        val s = com.stackpad.app.domain.notes.NoteSections.of(listOf(note("a", false), note("b", true), note("c", false), note("d", true)))
+        assertEquals(listOf("b", "d"), s.pinned.map { it.id })
+        assertEquals(listOf("a", "c"), s.recent.map { it.id })
+        assertTrue(com.stackpad.app.domain.notes.NoteSections.of(emptyList()).isEmpty)
+    }
 }
+

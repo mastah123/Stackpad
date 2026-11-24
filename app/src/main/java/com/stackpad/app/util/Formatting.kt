@@ -22,3 +22,14 @@ private val dateTimeFormatter: DateTimeFormatter =
 
 /** Locale-aware date and time, e.g. "Nov 6, 2026, 9:31 PM". */
 fun formatDateTime(epochMillis: Long): String = dateTimeFormatter.format(Instant.ofEpochMilli(epochMillis))
+
+private val timeFormatter: DateTimeFormatter =
+    DateTimeFormatter.ofLocalizedTime(FormatStyle.SHORT).withZone(ZoneId.systemDefault())
+
+/** Time of day for something edited today (e.g. "6:41 PM"), otherwise the date. Used on note rows. */
+fun formatListStamp(epochMillis: Long, nowMillis: Long = System.currentTimeMillis()): String {
+    val zone = ZoneId.systemDefault()
+    val day = Instant.ofEpochMilli(epochMillis).atZone(zone).toLocalDate()
+    val today = Instant.ofEpochMilli(nowMillis).atZone(zone).toLocalDate()
+    return if (day == today) timeFormatter.format(Instant.ofEpochMilli(epochMillis)) else formatDate(epochMillis)
+}

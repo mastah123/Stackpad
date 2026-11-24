@@ -334,3 +334,16 @@ Covers: formula evaluator, span editing, URL detection/validation, list markers,
 - [ ] Tags tab: tapping a tag shows its notes and closes the menu; "Filter tags" narrows the list (clear button works); the sort button switches Name / Most notes; empty states read correctly.
 - [ ] Settings gear in the header opens Settings. Rotate the phone: layout stays correct.
 
+### Home look and motion (2.12.0)
+- [ ] Home has no top bar: a rounded search bar with the menu icon inside; typing filters notes; the x clears it.
+- [ ] PINNED and RECENT headers show; the layout and sort icons are on the first header and both work.
+- [ ] List rows: time (today shows time of day), bold title, preview, tag chips, pin icon for pinned notes, accent bar for pinned/colored notes.
+- [ ] Grid shows the same content as cards; switching list/grid fades smoothly.
+- [ ] Three-dot menu on a note: Pin/Unpin, Move to folder, Add tag and Move to trash all work (trash offers Undo).
+- [ ] Long-press selects notes; checkboxes replace the three-dot menus; selection actions still work.
+- [ ] With no notes: tip chip, a tip, and "Create a new note" opens a new note. Close and reopen: the tip can change.
+- [ ] Search with no result and a folder with no notes show a short message, not the tip.
+- [ ] Folder view: top bar with Search, layout, sort and a three-dot menu (Rename, Delete); the Search icon shows/hides the search box. Tag view has no three-dot menu.
+- [ ] Motion: menu slides smoothly and follows a drag; notes move/fade when pinned, trashed or re-sorted; screens slide and fade; the + button scales away in selection mode; Trash list animates.
+- [ ] With Android "Remove animations" on, animations are skipped or very short.
+
