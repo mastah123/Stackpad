@@ -322,3 +322,15 @@ Covers: formula evaluator, span editing, URL detection/validation, list markers,
 - [ ] Theme menu: System, Light and Dark each apply immediately and persist after restarting the app.
 - [ ] Spacing is compact; text is small but readable; layouts fit in portrait and landscape.
 - [ ] TalkBack announces buttons with meaningful labels.
+
+### Side menu (2.11.0)
+- [ ] Tap the menu button: the menu slides in covering 80% of the width and the notes slide right (not covered); a strip of notes stays visible.
+- [ ] Tap the visible notes: the menu closes and no note opens. Back and a left swipe also close it. A right swipe on the list opens it.
+- [ ] Long-press a note (selection mode): swiping right does not open the menu.
+- [ ] Home tab: All notes, Pinned and Trash show correct counts; the counts change when you pin, trash or restore a note.
+- [ ] Home tab: All notes / Pinned show the right list and the top-bar title; Trash opens the trash.
+- [ ] Moon button (bottom right of Home) opens System / Light / Dark and switches the theme; it is no longer in the top bar.
+- [ ] Folders tab: No folder and each folder filter the list and close the menu; + creates a folder; rename and delete icons still show in the top bar for a selected folder.
+- [ ] Tags tab: tapping a tag shows its notes and closes the menu; "Filter tags" narrows the list (clear button works); the sort button switches Name / Most notes; empty states read correctly.
+- [ ] Settings gear in the header opens Settings. Rotate the phone: layout stays correct.
+

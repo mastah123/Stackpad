@@ -1,4 +1,4 @@
 package com.stackpad.app.ui.notes
 
-/** Which side-menu view the note list is in. It decides which filter bar (if any) is shown. */
+/** What the note list is showing, chosen from the side menu. It sets the top-bar title and highlights the menu entry. */
 enum class ListMode { ALL, PINNED, FOLDERS, TAGS }

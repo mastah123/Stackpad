@@ -449,4 +449,12 @@
     <string name="msg_import_nothing">No notes were found in the chosen files.</string>
     <string name="msg_import_too_large">That file is too large to import.</string>
     <string name="msg_import_io">Could not read the file. Nothing was imported.</string>
+    <string name="menu_home">Home</string>
+    <string name="menu_no_folders">No folders yet. Tap + to add one.</string>
+    <string name="menu_filter_tags">Filter tags…</string>
+    <string name="menu_no_matching_tags">No tags match.</string>
+    <string name="cd_sort_tags">Sort tags</string>
+    <string name="cd_clear_filter">Clear filter</string>
+    <string name="tag_sort_name">Name</string>
+    <string name="tag_sort_count">Most notes</string>
 </resources>

@@ -29,6 +29,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
@@ -83,16 +84,17 @@ fun SearchField(
     }
 }
 
-/** Top-bar menu to choose system, light or dark theme. */
+/** Menu to choose system, light or dark theme. */
 @Composable
 fun ThemeMenu(
     current: ThemeMode,
     onSelect: (ThemeMode) -> Unit,
+    icon: ImageVector = Icons.Filled.BrightnessMedium,
 ) {
     var open by remember { mutableStateOf(false) }
     Box {
         IconButton(onClick = { open = true }) {
-            Icon(Icons.Filled.BrightnessMedium, contentDescription = stringResource(R.string.cd_theme))
+            Icon(icon, contentDescription = stringResource(R.string.cd_theme))
         }
         DropdownMenu(expanded = open, onDismissRequest = { open = false }) {
             ThemeMode.values().forEach { mode ->

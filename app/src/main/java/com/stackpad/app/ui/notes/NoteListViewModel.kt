@@ -13,6 +13,7 @@ import com.stackpad.app.data.prefs.ListPreferences
 import com.stackpad.app.data.prefs.ThemeMode
 import com.stackpad.app.data.prefs.ThemePreferences
 import com.stackpad.app.domain.notes.FolderFilter
+import com.stackpad.app.domain.notes.MenuCounts
 import com.stackpad.app.domain.notes.NoteFilter
 import com.stackpad.app.domain.notes.NoteOrganizer
 import com.stackpad.app.domain.notes.NoteSort
@@ -89,6 +90,13 @@ class NoteListViewModel(
             filter = effective,
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(STOP_TIMEOUT_MS), NoteListUiState())
+
+    /** Counts for the side menu's Home tab. All and pinned ignore the search and filters. */
+    val menuCounts: StateFlow<MenuCounts> = combine(
+        repository.observeSummaries(""),
+        repository.observeTrashed(),
+    ) { active, trashed -> MenuCounts.of(active.map { it.pinned }, trashed.size) }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(STOP_TIMEOUT_MS), MenuCounts())
 
     val themeMode: StateFlow<ThemeMode> = themePreferences.themeMode
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(STOP_TIMEOUT_MS), ThemeMode.SYSTEM)

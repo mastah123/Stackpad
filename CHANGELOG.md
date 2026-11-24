@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.11.0] - 2026-11-24
+
+### Changed
+- New side menu: it slides in at 80% of the screen width and pushes the notes to the right instead of covering them. Tap the visible notes, press back or swipe left to close; swipe right to open.
+- The menu has Home, Folders and Tags tabs (icons along the bottom). Home lists All notes, Pinned and Trash with counts; Folders lists No folder and your folders with a + button; Tags lists tags with note counts, a "Filter tags" box and a sort button (name or most notes).
+- Choosing a folder or tag shows its notes and closes the menu. Settings moved to a gear in the menu header.
+- The theme button moved from the top bar to the Home tab's bottom bar.
+
+### Removed
+- The full-width Folders grid and Tags row above the note list (replaced by the menu tabs).
+
 ## [2.10.0] - 2026-11-24
 
 ### Added

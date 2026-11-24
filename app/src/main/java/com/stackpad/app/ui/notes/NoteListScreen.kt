@@ -21,20 +21,17 @@ import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.GridView
 import androidx.compose.material.icons.filled.ViewAgenda
 import androidx.compose.material.icons.filled.Menu
-import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -76,6 +73,7 @@ fun NoteListScreen(
     val ui by viewModel.state.collectAsStateWithLifecycle()
     val query by viewModel.query.collectAsStateWithLifecycle()
     val themeMode by viewModel.themeMode.collectAsStateWithLifecycle()
+    val counts by viewModel.menuCounts.collectAsStateWithLifecycle()
     val context = LocalContext.current
     val snackbar = remember { SnackbarHostState() }
 
@@ -83,6 +81,7 @@ fun NoteListScreen(
     var renameTarget by remember { mutableStateOf<Folder?>(null) }
     var deleteTarget by remember { mutableStateOf<Folder?>(null) }
     var mode by rememberSaveable { mutableStateOf(ListMode.ALL) }
+    var menuTab by rememberSaveable { mutableStateOf(MenuTab.HOME) }
     // Notes picked by long-press. The list is in selection mode while this is not empty.
     var selectedIds by remember { mutableStateOf(emptySet<String>()) }
     val selecting = selectedIds.isNotEmpty()
@@ -93,10 +92,10 @@ fun NoteListScreen(
     var folderChoiceDialog by remember { mutableStateOf(false) }
     var addTagDialog by remember { mutableStateOf(false) }
     val searchWords = remember(query) { SearchQuery.words(query) }
-    val drawerState = rememberDrawerState(DrawerValue.Closed)
+    val menu = rememberPushMenuState()
     val scope = rememberCoroutineScope()
     fun closeMenu(then: () -> Unit) {
-        scope.launch { drawerState.close() }
+        scope.launch { menu.close() }
         then()
     }
 
@@ -129,12 +128,17 @@ fun NoteListScreen(
     }
     BackHandler(enabled = selecting) { selectedIds = emptySet() }
 
-    ModalNavigationDrawer(
-        drawerState = drawerState,
+    PushMenuLayout(
+        state = menu,
         gesturesEnabled = !selecting,
-        drawerContent = {
-            NoteMenu(
+        menu = {
+            NoteSideMenu(
+                ui = ui,
+                counts = counts,
                 mode = mode,
+                themeMode = themeMode,
+                tab = menuTab,
+                onTab = { menuTab = it },
                 onAll = { closeMenu { mode = ListMode.ALL; viewModel.showAll() } },
                 onPinned = {
                     closeMenu {
@@ -143,10 +147,24 @@ fun NoteListScreen(
                         viewModel.togglePinnedOnly()
                     }
                 },
-                onFolders = { closeMenu { mode = ListMode.FOLDERS; viewModel.showAll() } },
-                onTags = { closeMenu { mode = ListMode.TAGS; viewModel.showAll() } },
                 onTrash = { closeMenu(onOpenTrash) },
                 onSettings = { closeMenu(onOpenSettings) },
+                onFolder = { folder ->
+                    closeMenu {
+                        mode = ListMode.FOLDERS
+                        viewModel.showAll()
+                        viewModel.selectFolder(folder)
+                    }
+                },
+                onNewFolder = { newFolderDialog = true },
+                onTag = { tag ->
+                    closeMenu {
+                        mode = ListMode.TAGS
+                        viewModel.showAll()
+                        viewModel.setTagFilter(tag)
+                    }
+                },
+                onTheme = viewModel::setThemeMode,
             )
         },
     ) {
@@ -172,7 +190,7 @@ fun NoteListScreen(
                     )
                 } else TopAppBar(
                     navigationIcon = {
-                        IconButton(onClick = { scope.launch { drawerState.open() } }) {
+                        IconButton(onClick = { scope.launch { menu.open() } }) {
                             Icon(Icons.Filled.Menu, contentDescription = stringResource(R.string.cd_open_menu))
                         }
                     },
@@ -194,7 +212,6 @@ fun NoteListScreen(
                             )
                         }
                         SortMenu(current = ui.sort, onSelect = viewModel::setSort)
-                        ThemeMenu(current = themeMode, onSelect = viewModel::setThemeMode)
                     },
                 )
             },
@@ -223,31 +240,6 @@ fun NoteListScreen(
                         onColor = viewModel::setColorFilter,
                         modifier = Modifier.padding(bottom = 4.dp),
                     )
-                }
-                when (mode) {
-                    ListMode.FOLDERS -> FolderGrid(
-                        folders = ui.folders,
-                        selected = ui.filter.folder,
-                        onSelect = viewModel::selectFolder,
-                        onNewFolder = { newFolderDialog = true },
-                        modifier = Modifier.padding(bottom = 4.dp),
-                    )
-                    ListMode.TAGS -> if (ui.tags.isEmpty()) {
-                        Text(
-                            text = stringResource(R.string.menu_no_tags),
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp),
-                        )
-                    } else {
-                        TagFilterBar(
-                            tags = ui.tags,
-                            selected = ui.filter.tag,
-                            onToggle = viewModel::toggleTag,
-                            modifier = Modifier.padding(bottom = 4.dp),
-                        )
-                    }
-                    ListMode.ALL, ListMode.PINNED -> Unit
                 }
                 val current = ui.notes
                 when {
@@ -348,12 +340,12 @@ private fun sectionTitle(ui: NoteListUiState, mode: ListMode): String {
     return when {
         mode == ListMode.PINNED -> stringResource(R.string.menu_pinned)
         mode == ListMode.TAGS ->
-            filter.tag?.let { "#$it" } ?: stringResource(R.string.menu_tags)
+            filter.tag?.let { "#$it" } ?: stringResource(R.string.section_all_notes)
         mode == ListMode.FOLDERS -> when {
             filter.folder == FolderFilter.Unfiled -> stringResource(R.string.folder_none)
             filter.folder is FolderFilter.InFolder ->
-                ui.folders.firstOrNull { it.id == filter.folder.id }?.name ?: stringResource(R.string.menu_folders)
-            else -> stringResource(R.string.menu_folders)
+                ui.folders.firstOrNull { it.id == filter.folder.id }?.name ?: stringResource(R.string.section_all_notes)
+            else -> stringResource(R.string.section_all_notes)
         }
         else -> stringResource(R.string.section_all_notes)
     }

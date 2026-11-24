@@ -10,7 +10,7 @@
 
 <p align="center">
   <a href="https://github.com/mastah123/stackpad/actions/workflows/android.yml"><img alt="Build" src="https://github.com/mastah123/stackpad/actions/workflows/android.yml/badge.svg"></a>
-  <img alt="Version" src="https://img.shields.io/badge/version-2.10.0-4F46E5">
+  <img alt="Version" src="https://img.shields.io/badge/version-2.11.0-4F46E5">
   <img alt="Platform" src="https://img.shields.io/badge/platform-Android%208.0%2B-3DDC84">
   <img alt="Kotlin" src="https://img.shields.io/badge/Kotlin-2.0-7F52FF">
   <img alt="License" src="https://img.shields.io/badge/license-MIT-blue">
@@ -33,7 +33,7 @@ Every note is a stack of compact blocks, laid out tightly like chat messages.
 
 Also:
 
-- **Side menu** (top-left) with shortcuts for All notes, Pinned, Folders (small grid), Tags (scrolling row), Trash and Settings.
+- **Side menu** (top-left button, or swipe right): slides in at 80% of the screen width and pushes the notes to the right. Tap the visible notes, press back or swipe left to close. Icons along its bottom switch between **Home** (All notes, Pinned and Trash with counts, plus the theme button), **Folders** (your folders and No folder, with + to add one) and **Tags** (a "Filter tags" box, a sort button, and note counts). Picking a folder or tag shows its notes and closes the menu. Settings is the gear at the top.
 - **Import from Google Keep**: Settings > Import > Google Keep, then choose the Takeout `.zip` (export Keep from takeout.google.com). Text and list notes, labels (as tags), colors, pinned state, links, pictures and dates are imported; importing the same zip again adds nothing new. Audio and drawing attachments and notes in Keep's trash are skipped.
 - **More imports** (Settings > Import): Markdown and text files or zips (also Obsidian and Notion exports), Evernote `.enex`, Word `.docx` and PDF. Several files can be picked at once and importing the same file again adds nothing new. PDF text is a best-effort reading (PDFs store no structure); a scanned PDF becomes a note with its pages as pictures.
 - **Share** from the editor's 3-dot menu: copy, plain text, Markdown, a single **image** (PNG, saved to your gallery in Pictures/Stackpad, then shared) or a **PDF** (saved where you choose, then shared). Image and PDF copy the note's layout: the app's text sizes, list markers, full-width pictures, block colors, checklist cards with progress, and table grids, without any buttons or handles. **Share options** (a sheet before sharing, with "Don't show this again" and a Share options row in the menu) let you pick a light, dark or match-app page, note color, text size, PDF page size and page numbers, hide completed tasks or pictures, leave out empty lines, list items, checklists, tables and cards, and add the title, word count, dates, tags or a footer. The same menu sets the note **color**.

@@ -1,28 +1,27 @@
 package com.stackpad.app.ui.notes
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Folder
-import androidx.compose.material.icons.filled.Notes
-import androidx.compose.material.icons.filled.PushPin
-import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Sell
+import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
-import androidx.compose.material3.NavigationRail
-import androidx.compose.material3.NavigationRailItem
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -35,62 +34,63 @@ import androidx.compose.ui.unit.dp
 import com.stackpad.app.R
 
 /**
- * Thin side menu opened from the top-left button: the logo, then icon shortcuts for All notes,
- * Pinned, Folders, Tags and Trash. Folders and Tags open a picker.
+ * Frame of the side menu: logo, app name and Settings at the top, the tab's [content] in the middle,
+ * and the Home / Folders / Tags icons along the bottom with a tab-specific [trailing] action on the right.
  */
 @Composable
 fun NoteMenu(
-    mode: ListMode,
-    onAll: () -> Unit,
-    onPinned: () -> Unit,
-    onFolders: () -> Unit,
-    onTags: () -> Unit,
-    onTrash: () -> Unit,
+    tab: MenuTab,
+    onTab: (MenuTab) -> Unit,
     onSettings: () -> Unit,
+    trailing: @Composable () -> Unit,
+    content: @Composable () -> Unit,
 ) {
-    // A plain Surface instead of ModalDrawerSheet, which cannot be narrower than 240dp.
-    Surface(
-        modifier = Modifier.width(MENU_WIDTH).fillMaxHeight(),
-        shape = RoundedCornerShape(topEnd = 20.dp, bottomEnd = 20.dp),
-        color = MaterialTheme.colorScheme.surfaceContainerLow,
-        tonalElevation = 1.dp,
-    ) {
-        NavigationRail(
-            modifier = Modifier.fillMaxHeight().navigationBarsPadding(),
-            containerColor = Color.Transparent,
-            header = {
+    Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.surfaceContainerLow) {
+        Column(modifier = Modifier.fillMaxSize().statusBarsPadding()) {
+            Row(
+                modifier = Modifier.fillMaxWidth().padding(start = 16.dp, end = 4.dp, top = 8.dp, bottom = 4.dp),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
                 Image(
                     painter = painterResource(R.drawable.stackpad_logo),
                     contentDescription = null,
-                    modifier = Modifier.padding(top = 12.dp, bottom = 4.dp).size(34.dp),
+                    modifier = Modifier.size(32.dp),
                 )
-            },
-        ) {
-            Column(
-                modifier = Modifier.verticalScroll(rememberScrollState()),
-                verticalArrangement = Arrangement.spacedBy(4.dp),
-                horizontalAlignment = Alignment.CenterHorizontally,
+                Text(
+                    text = stringResource(R.string.app_name),
+                    style = MaterialTheme.typography.titleLarge,
+                    modifier = Modifier.weight(1f).padding(start = 12.dp),
+                )
+                IconButton(onClick = onSettings) {
+                    Icon(Icons.Filled.Settings, contentDescription = stringResource(R.string.menu_settings))
+                }
+            }
+            Box(modifier = Modifier.weight(1f).fillMaxWidth()) { content() }
+            HorizontalDivider()
+            Row(
+                modifier = Modifier.fillMaxWidth().navigationBarsPadding().padding(horizontal = 8.dp, vertical = 4.dp),
+                verticalAlignment = Alignment.CenterVertically,
             ) {
-                MenuItem(Icons.Filled.Notes, R.string.menu_all, mode == ListMode.ALL, onAll)
-                MenuItem(Icons.Filled.PushPin, R.string.menu_pinned, mode == ListMode.PINNED, onPinned)
-                MenuItem(Icons.Filled.Folder, R.string.menu_folders, mode == ListMode.FOLDERS, onFolders)
-                MenuItem(Icons.Filled.Sell, R.string.menu_tags, mode == ListMode.TAGS, onTags)
-                MenuItem(Icons.Filled.Delete, R.string.menu_trash, false, onTrash)
-                MenuItem(Icons.Filled.Settings, R.string.menu_settings, false, onSettings)
+                TabButton(Icons.Filled.Home, R.string.menu_home, tab == MenuTab.HOME) { onTab(MenuTab.HOME) }
+                TabButton(Icons.Filled.Folder, R.string.menu_folders, tab == MenuTab.FOLDERS) { onTab(MenuTab.FOLDERS) }
+                TabButton(Icons.Filled.Sell, R.string.menu_tags, tab == MenuTab.TAGS) { onTab(MenuTab.TAGS) }
+                Spacer(Modifier.weight(1f))
+                trailing()
             }
         }
     }
 }
 
 @Composable
-private fun MenuItem(icon: ImageVector, label: Int, selected: Boolean, onClick: () -> Unit) {
-    NavigationRailItem(
-        selected = selected,
+private fun TabButton(icon: ImageVector, label: Int, selected: Boolean, onClick: () -> Unit) {
+    val colors = MaterialTheme.colorScheme
+    IconButton(
         onClick = onClick,
-        icon = { Icon(icon, contentDescription = null) },
-        label = { Text(stringResource(label), style = MaterialTheme.typography.labelSmall, maxLines = 1) },
-        alwaysShowLabel = true,
-    )
+        colors = IconButtonDefaults.iconButtonColors(
+            containerColor = if (selected) colors.secondaryContainer else Color.Transparent,
+            contentColor = if (selected) colors.onSecondaryContainer else colors.onSurfaceVariant,
+        ),
+    ) {
+        Icon(icon, contentDescription = stringResource(label))
+    }
 }
-
-private val MENU_WIDTH = 72.dp
