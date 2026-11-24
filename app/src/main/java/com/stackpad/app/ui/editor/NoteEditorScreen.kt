@@ -200,7 +200,7 @@ private fun NoteEditorContent(
     fun shareImage(note: Note, options: ShareOptions, saveToGallery: Boolean) {
         scope.launch {
             snackbar.currentSnackbarData?.dismiss()
-            val title = note.title.ifBlank { context.getString(R.string.note_untitled) }
+            val title = com.stackpad.app.domain.notes.AutoTitle.orDefault(note.title, note.createdAt)
             val result = runCatching { fileExporter.toPng(note, options, appIsDark, accentOf(note)) }
             val file = result.getOrNull()
             if (file == null) {
@@ -228,7 +228,7 @@ private fun NoteEditorContent(
         pendingPdfNote = null
         if (uri == null || note == null) return@rememberLauncherForActivityResult
         scope.launch {
-            val title = note.title.ifBlank { context.getString(R.string.note_untitled) }
+            val title = com.stackpad.app.domain.notes.AutoTitle.orDefault(note.title, note.createdAt)
             val result = runCatching { fileExporter.toPdf(note, pendingOptions, appIsDark, accentOf(note)) }
             val file = result.getOrNull()
             if (file == null) {
@@ -275,7 +275,7 @@ private fun NoteEditorContent(
     }
 
     fun share(target: ShareTarget) {
-        val title = state.title.ifBlank { context.getString(R.string.note_untitled) }
+        val title = com.stackpad.app.domain.notes.AutoTitle.orDefault(state.title, state.createdAt)
         when (target) {
             ShareTarget.COPY -> {
                 val text = viewModel.exportText(ExportFormat.PLAIN)
@@ -577,7 +577,7 @@ private fun NoteEditorContent(
                     InlineTextField(
                         text = state.title,
                         onTextChange = viewModel::setTitle,
-                        placeholder = stringResource(R.string.editor_title_hint),
+                        placeholder = remember(state.createdAt) { com.stackpad.app.domain.notes.AutoTitle.of(state.createdAt) },
                         textStyle = MaterialTheme.typography.headlineSmall,
                         singleLine = true,
                         keyboardOptions = KeyboardOptions(

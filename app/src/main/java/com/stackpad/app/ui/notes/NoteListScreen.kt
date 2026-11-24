@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -75,6 +76,7 @@ fun NoteListScreen(
     /** Called with the folder selected in the list (or null), so a new note starts in it. */
     onNewNote: (folderId: String?) -> Unit,
     onOpenTrash: () -> Unit,
+    onOpenReminders: () -> Unit,
     onOpenSettings: () -> Unit,
 ) {
     val ui by viewModel.state.collectAsStateWithLifecycle()
@@ -158,6 +160,7 @@ fun NoteListScreen(
                         viewModel.togglePinnedOnly()
                     }
                 },
+                onReminders = { closeMenu(onOpenReminders) },
                 onTrash = { closeMenu(onOpenTrash) },
                 onSettings = { closeMenu(onOpenSettings) },
                 onFolder = { folder ->
@@ -241,7 +244,9 @@ fun NoteListScreen(
                         query = query,
                         onQueryChange = viewModel::setQuery,
                         onOpenMenu = { scope.launch { menu.open() } },
-                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+                        modifier = Modifier
+                            .then(if (selecting) Modifier else Modifier.statusBarsPadding())
+                            .padding(horizontal = 16.dp, vertical = 8.dp),
                     )
                 } else {
                     AnimatedVisibility(visible = searchOpen || query.isNotBlank()) {

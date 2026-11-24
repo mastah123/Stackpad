@@ -95,7 +95,8 @@ class NoteListViewModel(
     val menuCounts: StateFlow<MenuCounts> = combine(
         repository.observeSummaries(""),
         repository.observeTrashed(),
-    ) { active, trashed -> MenuCounts.of(active.map { it.pinned }, trashed.size) }
+        repository.observeReminders(),
+    ) { active, trashed, reminders -> MenuCounts.of(active.map { it.pinned }, trashed.size, reminders.size) }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(STOP_TIMEOUT_MS), MenuCounts())
 
     val themeMode: StateFlow<ThemeMode> = themePreferences.themeMode

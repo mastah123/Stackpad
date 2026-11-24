@@ -347,3 +347,10 @@ Covers: formula evaluator, span editing, URL detection/validation, list markers,
 - [ ] Motion: menu slides smoothly and follows a drag; notes move/fade when pinned, trashed or re-sorted; screens slide and fade; the + button scales away in selection mode; Trash list animates.
 - [ ] With Android "Remove animations" on, animations are skipped or very short.
 
+### Titles, list cards, reminders (2.13.0)
+- [ ] Create a note, leave the title empty, type some text, go back: the list shows "Note dd-mm-yyyy hh:mm AM/PM" for its creation time. Reopen it: that is the title and you can edit it. An empty new note is still discarded.
+- [ ] Clear a note's title: it returns to the automatic title. Old untitled notes show it too.
+- [ ] List layout: rounded cards with space between them, two preview lines at most, no pictures; more space under the title. Grid still shows formatted previews.
+- [ ] Home search bar and menu button sit below the status bar; in selection mode the selection bar does too.
+- [ ] Menu > Home > Reminders shows a count equal to the unchecked checklist items with a due date; the screen lists them earliest first, overdue in red; tapping opens the note; checking an item or removing its date removes it. Locked notes are left out.
+

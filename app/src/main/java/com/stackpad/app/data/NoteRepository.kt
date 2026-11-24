@@ -27,10 +27,15 @@ import com.stackpad.app.domain.search.SearchQuery
 import com.stackpad.app.domain.notes.TagCount
 import com.stackpad.app.domain.notes.Tags
 import com.stackpad.app.domain.notes.TrashPolicy
+import com.stackpad.app.domain.notes.AutoTitle
+import com.stackpad.app.domain.reminders.ReminderEntry
+import com.stackpad.app.domain.reminders.ReminderList
 import com.stackpad.app.domain.reminders.ReminderPlanner
 import com.stackpad.app.domain.reminders.ReminderScheduler
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
@@ -85,6 +90,16 @@ class NoteRepository(
 
     suspend fun load(id: String): Note? = dao.get(id)?.toNote()
 
+    /** Pending checklist reminders across all notes outside the trash (locked notes are left out). */
+    fun observeReminders(): Flow<List<ReminderEntry>> =
+        observeSummaries("").map { notes ->
+            ReminderList.sorted(
+                notes.filter { !it.locked && it.blocksJson.isNotBlank() }.flatMap {
+                    ReminderList.entriesOf(it.id, AutoTitle.orDefault(it.title, it.createdAt), BlockJsonCodec.decode(it.blocksJson))
+                },
+            )
+        }.flowOn(Dispatchers.Default)
+
     /** The most recently edited note outside the trash. Waits for pending saves so it is current. */
     suspend fun latestSummary(): NoteSummary? = writeLock.withLock { dao.latestActive()?.toSummary() }
 
@@ -92,7 +107,9 @@ class NoteRepository(
 
     // region Writing notes
 
-    suspend fun save(note: Note) {
+    suspend fun save(draft: Note) {
+        // A note without a title is named after the moment it was created.
+        val note = draft.copy(title = AutoTitle.orDefault(draft.title, draft.createdAt))
         writeLock.withLock {
             val previousEntity = dao.get(note.id)
             val previous = previousEntity?.toNote()

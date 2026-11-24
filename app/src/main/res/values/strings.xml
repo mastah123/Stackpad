@@ -468,4 +468,8 @@
     <string name="tip_checklist">Add a checklist block to track tasks with due dates and reminders.</string>
     <string name="tip_table">Tables can calculate: type something like =SUM(A1:A5) in a cell.</string>
     <string name="tip_search">Search finds words in titles, text and tags. Tap the menu icon for your folders and tags.</string>
+    <string name="menu_reminders">Reminders</string>
+    <string name="reminders_title">Reminders</string>
+    <string name="reminders_empty">No reminders yet. Set a due date on a checklist item and it will show up here.</string>
+    <string name="reminder_overdue">Overdue · %1$s</string>
 </resources>

@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.13.0] - 2026-11-24
+
+### Added
+- Notes without a title get one from the date and time they were created, e.g. "Note 24-11-2026 04:09 PM" (saved with the note; older untitled notes show the same name).
+- Reminders in the side menu's Home tab, with a count: a screen listing every unchecked checklist item that has a due date, overdue first. Tap one to open its note.
+
+### Changed
+- List layout: rounded cards like the grid, two lines of text preview only (no pictures), more space under the title.
+
+### Fixed
+- The search bar and menu button on Home were drawn behind the status bar.
+
 ## [2.12.0] - 2026-11-24
 
 ### Added

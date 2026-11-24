@@ -38,6 +38,7 @@ import androidx.compose.ui.unit.dp
 import com.stackpad.app.R
 import com.stackpad.app.data.model.NoteSummary
 import com.stackpad.app.ui.components.highlightMatches
+import com.stackpad.app.domain.notes.AutoTitle
 import com.stackpad.app.ui.theme.NoteColors
 import com.stackpad.app.ui.theme.noteCardColor
 import com.stackpad.app.util.formatListStamp
@@ -71,9 +72,8 @@ fun NoteCard(
     val mark = colors.tertiary.copy(alpha = 0.3f)
     val cardColor = when {
         note.color != 0 -> noteCardColor(note.color)
-        grid -> colors.surfaceContainerLow
         note.pinned -> colors.surfaceContainer
-        else -> Color.Transparent
+        else -> colors.surfaceContainerLow
     }
     val background by animateColorAsState(
         targetValue = if (selected) colors.primaryContainer else cardColor,
@@ -81,14 +81,14 @@ fun NoteCard(
         label = "noteBackground",
     )
     val accent = NoteColors.accent(note.color) ?: if (note.pinned) colors.primary else null
-    val shape = RoundedCornerShape(if (grid) 12.dp else 0.dp)
+    val shape = RoundedCornerShape(12.dp)
     val barWidth = with(LocalDensity.current) { ACCENT_BAR_WIDTH.toPx() }
     Box(
         modifier = modifier
             .fillMaxWidth()
             .clip(shape)
             .background(background)
-            .then(if (grid) Modifier.border(1.dp, colors.outlineVariant.copy(alpha = 0.6f), shape) else Modifier)
+            .border(1.dp, colors.outlineVariant.copy(alpha = 0.6f), shape)
             .combinedClickable(role = Role.Button, onClick = onClick, onLongClick = onLongClick)
             .drawBehind { if (accent != null) drawRect(accent, size = Size(barWidth, size.height)) },
     ) {
@@ -102,7 +102,7 @@ fun NoteCard(
                     style = MaterialTheme.typography.labelMedium,
                     color = colors.onSurfaceVariant,
                 )
-                Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(top = 2.dp)) {
+                Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(top = 4.dp)) {
                     if (note.locked) {
                         Icon(
                             Icons.Filled.Lock,
@@ -113,7 +113,7 @@ fun NoteCard(
                     }
                     Text(
                         text = highlightMatches(
-                            note.title.ifBlank { stringResource(R.string.note_untitled) },
+                            AutoTitle.orDefault(note.title, note.createdAt),
                             highlight,
                             mark,
                         ),
@@ -123,7 +123,7 @@ fun NoteCard(
                         overflow = TextOverflow.Ellipsis,
                     )
                 }
-                val formatted = if (highlight.isEmpty() && !note.locked && note.blocksJson.isNotBlank()) {
+                val formatted = if (grid && highlight.isEmpty() && !note.locked && note.blocksJson.isNotBlank()) {
                     rememberPreviewItems(note, previewItems)
                 } else {
                     null
@@ -134,7 +134,7 @@ fun NoteCard(
                             items = formatted,
                             maxHeight = previewMaxHeight,
                             fadeInto = if (selected) colors.primaryContainer else background,
-                            modifier = Modifier.padding(top = 4.dp),
+                            modifier = Modifier.padding(top = 8.dp),
                         )
                     }
                 } else if (note.preview.isNotBlank()) {
@@ -144,7 +144,7 @@ fun NoteCard(
                         color = colors.onSurface,
                         maxLines = previewLines,
                         overflow = TextOverflow.Ellipsis,
-                        modifier = Modifier.padding(top = 4.dp),
+                        modifier = Modifier.padding(top = 8.dp),
                     )
                 }
                 if (note.pinned || note.tags.isNotEmpty()) {
@@ -153,7 +153,7 @@ fun NoteCard(
                         pinned = note.pinned,
                         highlight = highlight,
                         mark = mark,
-                        modifier = Modifier.padding(top = 8.dp),
+                        modifier = Modifier.padding(top = 10.dp),
                     )
                 }
             }

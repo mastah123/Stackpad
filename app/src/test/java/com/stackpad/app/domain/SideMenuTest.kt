@@ -40,3 +40,27 @@ class SideMenuTest {
     }
 }
 
+
+class AutoTitleAndRemindersTest {
+    @Test fun autoTitleUsesCreationTime() {
+        // 2026-11-24 08:09 UTC
+        val t = java.time.ZonedDateTime.of(2026, 11, 24, 16, 9, 0, 0, java.time.ZoneOffset.UTC).toInstant().toEpochMilli()
+        assertEquals("Note 24-11-2026 04:09 PM", com.stackpad.app.domain.notes.AutoTitle.of(t, java.time.ZoneOffset.UTC, java.util.Locale.US))
+        assertEquals("Mine", com.stackpad.app.domain.notes.AutoTitle.orDefault("Mine", t, java.time.ZoneOffset.UTC, java.util.Locale.US))
+        assertEquals("Note 24-11-2026 04:09 PM", com.stackpad.app.domain.notes.AutoTitle.orDefault("  ", t, java.time.ZoneOffset.UTC, java.util.Locale.US))
+    }
+
+    @Test fun remindersListUncheckedDatedItemsEarliestFirst() {
+        val items = listOf(
+            com.stackpad.app.data.model.ChecklistItem("1", "late", false, "2026-12-01"),
+            com.stackpad.app.data.model.ChecklistItem("2", "done", true, "2026-11-01"),
+            com.stackpad.app.data.model.ChecklistItem("3", "none", false, null),
+            com.stackpad.app.data.model.ChecklistItem("4", "soon", false, "2026-11-10"),
+        )
+        val block = com.stackpad.app.data.model.ChecklistBlock(id = "b", items = items)
+        val entries = com.stackpad.app.domain.reminders.ReminderList.sorted(
+            com.stackpad.app.domain.reminders.ReminderList.entriesOf("n", "Note", listOf(block)),
+        )
+        assertEquals(listOf("soon", "late"), entries.map { it.itemText })
+    }
+}

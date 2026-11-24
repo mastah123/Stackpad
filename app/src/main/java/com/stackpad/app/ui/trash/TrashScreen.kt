@@ -42,6 +42,7 @@ import com.stackpad.app.data.model.NoteSummary
 import com.stackpad.app.domain.notes.TrashPolicy
 import com.stackpad.app.ui.components.ConfirmDialog
 import com.stackpad.app.ui.components.SmallIconButton
+import com.stackpad.app.domain.notes.AutoTitle
 import com.stackpad.app.ui.theme.noteCardColor
 
 /** Deleted notes. Each can be restored or erased for good; old ones are erased automatically. */
@@ -157,7 +158,7 @@ private fun TrashCard(
         ) {
             Column(modifier = Modifier.weight(1f)) {
                 Text(
-                    text = note.title.ifBlank { stringResource(R.string.note_untitled) },
+                    text = AutoTitle.orDefault(note.title, note.createdAt),
                     style = MaterialTheme.typography.titleMedium,
                     color = colors.onSurface,
                     maxLines = 1,

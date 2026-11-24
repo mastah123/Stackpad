@@ -43,7 +43,7 @@ object WidgetRenderer {
                     if (content.note.locked) {
                         context.getString(R.string.widget_locked_note)
                     } else {
-                        content.note.title.ifBlank { content.note.preview.ifBlank { context.getString(R.string.note_untitled) } }
+                        content.note.title.ifBlank { content.note.preview.ifBlank { com.stackpad.app.domain.notes.AutoTitle.of(content.note.createdAt) } }
                     },
                 )
                 openIntent.putExtra(MainActivity.EXTRA_NOTE_ID, content.note.id)

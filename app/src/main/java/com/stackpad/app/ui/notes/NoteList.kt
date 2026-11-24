@@ -103,11 +103,12 @@ fun NoteList(
         } else {
             LazyColumn(
                 modifier = Modifier.fillMaxSize(),
-                contentPadding = PaddingValues(bottom = 88.dp),
+                contentPadding = PaddingValues(start = 12.dp, end = 12.dp, bottom = 88.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp),
             ) {
                 if (showPinnedHeader) {
                     item(key = "header_pinned") {
-                        SectionHeader(pinnedTitle, Modifier.animateItem(), trailing = headerActions)
+                        SectionHeader(pinnedTitle, Modifier.animateItem(), horizontalInset = 4.dp, trailing = headerActions)
                     }
                     items(sections.pinned, key = { it.id }) { note -> card(note, Modifier.animateItem()) }
                 }
@@ -116,6 +117,7 @@ fun NoteList(
                         SectionHeader(
                             recentTitle,
                             Modifier.animateItem(),
+                            horizontalInset = 4.dp,
                             trailing = if (actionsOnPinned) null else headerActions,
                         )
                     }
