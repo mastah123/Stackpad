@@ -548,10 +548,6 @@ private fun NoteEditorContent(
                         onPickFromGallery = pickFromGallery,
                         onTakePhoto = takePhoto,
                         onRecordAudio = recordAudio,
-                        noteTags = state.tags,
-                        knownTags = knownTags,
-                        onToggleTag = { tag -> if (tag in state.tags) viewModel.removeTag(tag) else viewModel.addTag(tag) },
-                        onNewTag = { newTagDialog = true },
                         onOptionRowChange = { optionRowOpen = it },
                     )
                 }
@@ -568,10 +564,14 @@ private fun NoteEditorContent(
                 contentPadding = PaddingValues(horizontal = 12.dp, vertical = 8.dp),
                 verticalArrangement = Arrangement.spacedBy(0.dp),
             ) {
-                if (state.tags.isNotEmpty()) {
-                    item(key = "tags") {
-                        NoteTagsRow(tags = state.tags, onRemove = viewModel::removeTag)
-                    }
+                item(key = "tags") {
+                    NoteTagsRow(
+                        tags = state.tags,
+                        knownTags = knownTags,
+                        onToggle = { tag -> if (tag in state.tags) viewModel.removeTag(tag) else viewModel.addTag(tag) },
+                        onRemove = viewModel::removeTag,
+                        onNewTag = { newTagDialog = true },
+                    )
                 }
                 item(key = "title") {
                     InlineTextField(

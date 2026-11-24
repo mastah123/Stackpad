@@ -19,6 +19,8 @@ import androidx.compose.material.icons.filled.CameraAlt
 import androidx.compose.material.icons.filled.CheckBox
 import androidx.compose.material.icons.filled.Code
 import androidx.compose.material.icons.filled.FormatListBulleted
+import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.icons.filled.FormatListNumbered
 import androidx.compose.material.icons.filled.FormatQuote
 import androidx.compose.material.icons.filled.HorizontalRule
@@ -52,12 +54,18 @@ import com.stackpad.app.R
 import com.stackpad.app.data.model.Block
 import com.stackpad.app.data.model.BlockFactory
 import com.stackpad.app.data.model.ListKind
+import com.stackpad.app.domain.text.ListMarkers
+import com.stackpad.app.domain.text.isBullet
 
-private enum class OptionRow { PLUS, LIST, CARDS, TAGS }
+private enum class OptionRow { PLUS, LIST, CARDS }
+
+/** The style row that opens above the List row for Bullets or Numbers. */
+private enum class StyleRow { BULLETS, NUMBERS }
 
 /**
  * Scrollable row of chips; each one inserts a block of that type into the note.
- * "+", List, Cards and Tag open an option row above the chips, styled like the text format toolbar.
+ * "+", List and Cards open an option row above the chips, styled like the text format toolbar;
+ * in the List row, Bullets and Numbers open a third row with their styles (• ○ ▪, 1. A. a. I. i. α.).
  * [onOptionRowChange] reports whether such a row is open, so the editor can hide the text toolbar.
  */
 @Composable
@@ -67,39 +75,48 @@ fun AddBlockBar(
     onPickFromGallery: () -> Unit,
     onTakePhoto: () -> Unit,
     onRecordAudio: () -> Unit,
-    /** Tags on this note, every tag in use, and what tapping them or "+" does. */
-    noteTags: List<String>,
-    knownTags: List<String>,
-    onToggleTag: (String) -> Unit,
-    onNewTag: () -> Unit,
     onOptionRowChange: (Boolean) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     var openRow by remember { mutableStateOf<OptionRow?>(null) }
+    var styleRow by remember { mutableStateOf<StyleRow?>(null) }
     fun toggle(row: OptionRow) {
+        styleRow = null
         openRow = if (openRow == row) null else row
     }
     LaunchedEffect(openRow) { onOptionRowChange(openRow != null) }
     // Picks an option and closes the row.
     fun choose(action: () -> Unit) {
         openRow = null
+        styleRow = null
         action()
     }
 
     Column(modifier = modifier) {
         when (openRow) {
-            OptionRow.LIST -> OptionButtons {
-                OptionButton(Icons.Filled.FormatListBulleted, stringResource(R.string.add_bullets)) {
-                    choose { onAddBlock(BlockFactory.list(ListKind.BULLET)) }
+            OptionRow.LIST -> {
+                styleRow?.let { group ->
+                    OptionButtons {
+                        val kinds = if (group == StyleRow.BULLETS) ListMarkers.BULLET_KINDS else ListMarkers.NUMBER_KINDS
+                        kinds.forEach { kind ->
+                            StyleButton(kind) { choose { onAddBlock(BlockFactory.list(kind)) } }
+                        }
+                    }
                 }
-                OptionButton(Icons.Filled.FormatListNumbered, stringResource(R.string.add_numbers)) {
-                    choose { onAddBlock(BlockFactory.list(ListKind.NUMBERED)) }
-                }
-                OptionButton(Icons.Filled.SortByAlpha, stringResource(R.string.add_letters)) {
-                    choose { onAddBlock(BlockFactory.list(ListKind.LETTERED)) }
-                }
-                OptionButton(Icons.Filled.CheckBox, stringResource(R.string.add_checklist)) {
-                    choose { onAddBlock(BlockFactory.checklist()) }
+                OptionButtons {
+                    OptionButton(
+                        Icons.Filled.FormatListBulleted,
+                        stringResource(R.string.add_bullets),
+                        expanded = styleRow == StyleRow.BULLETS,
+                    ) { styleRow = if (styleRow == StyleRow.BULLETS) null else StyleRow.BULLETS }
+                    OptionButton(
+                        Icons.Filled.FormatListNumbered,
+                        stringResource(R.string.add_numbers),
+                        expanded = styleRow == StyleRow.NUMBERS,
+                    ) { styleRow = if (styleRow == StyleRow.NUMBERS) null else StyleRow.NUMBERS }
+                    OptionButton(Icons.Filled.CheckBox, stringResource(R.string.add_checklist)) {
+                        choose { onAddBlock(BlockFactory.checklist()) }
+                    }
                 }
             }
             OptionRow.PLUS -> OptionButtons {
@@ -133,15 +150,6 @@ fun AddBlockBar(
                     choose { onAddBlock(BlockFactory.code()) }
                 }
             }
-            OptionRow.TAGS -> OptionButtons {
-                OptionButton(Icons.Filled.Add, stringResource(R.string.tag_new), onClick = onNewTag)
-                (noteTags + knownTags.filterNot { it in noteTags }.sortedBy { it }).let { all ->
-                    // The note's own tags come first so they are always in view.
-                    all.forEach { tag ->
-                        TagToggle(tag = tag, selected = tag in noteTags, onClick = { onToggleTag(tag) })
-                    }
-                }
-            }
             null -> Unit
         }
         Row(
@@ -164,11 +172,42 @@ fun AddBlockBar(
             AddChip(Icons.Filled.Style, stringResource(R.string.add_cards), selected = openRow == OptionRow.CARDS) {
                 toggle(OptionRow.CARDS)
             }
-            AddChip(Icons.Filled.Sell, stringResource(R.string.add_tag), selected = openRow == OptionRow.TAGS) {
-                toggle(OptionRow.TAGS)
-            }
         }
     }
+}
+
+@Composable
+private fun OptionButtons(content: @Composable () -> Unit) {
+    Row(
+        modifier = Modifier
+            .horizontalScroll(rememberScrollState())
+            .padding(horizontal = 8.dp, vertical = 2.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) { content() }
+}
+
+/** One list style in the third row, shown by its marker (`1. 2. 3.`, `A. B. C.`, `•`, ...). */
+@Composable
+private fun StyleButton(kind: ListKind, onClick: () -> Unit) {
+    val sample = if (kind.isBullet) ListMarkers.label(kind, 0) else (0..2).joinToString("  ") { ListMarkers.label(kind, it) }
+    FormatButton(isSelected = false, description = stringResource(kind.labelRes()), onClick = onClick) {
+        Text(
+            text = sample,
+            style = if (kind.isBullet) MaterialTheme.typography.titleMedium else MaterialTheme.typography.labelLarge,
+        )
+    }
+}
+
+private fun ListKind.labelRes(): Int = when (this) {
+    ListKind.BULLET -> R.string.list_style_bullet
+    ListKind.BULLET_HOLLOW -> R.string.list_style_hollow
+    ListKind.BULLET_SQUARE -> R.string.list_style_square
+    ListKind.NUMBERED -> R.string.list_style_numbers
+    ListKind.UPPER_ALPHA -> R.string.list_style_upper_letters
+    ListKind.LETTERED -> R.string.list_style_lower_letters
+    ListKind.UPPER_ROMAN -> R.string.list_style_upper_roman
+    ListKind.LOWER_ROMAN -> R.string.list_style_lower_roman
+    ListKind.GREEK -> R.string.list_style_greek
 }
 
 @Composable
@@ -200,11 +239,19 @@ private fun TagToggle(tag: String, selected: Boolean, onClick: () -> Unit) {
 }
 
 @Composable
-private fun OptionButton(icon: ImageVector, label: String, onClick: () -> Unit) {
-    FormatButton(isSelected = false, description = label, onClick = onClick) {
+private fun OptionButton(icon: ImageVector, label: String, expanded: Boolean? = null, onClick: () -> Unit) {
+    FormatButton(isSelected = expanded == true, description = label, onClick = onClick) {
         Icon(imageVector = icon, contentDescription = null, modifier = Modifier.size(16.dp))
         Spacer(Modifier.width(5.dp))
         Text(text = label, style = MaterialTheme.typography.labelLarge)
+        // A small arrow shows that Bullets and Numbers open their own style row.
+        if (expanded != null) {
+            Icon(
+                imageVector = if (expanded) Icons.Filled.KeyboardArrowDown else Icons.Filled.KeyboardArrowUp,
+                contentDescription = null,
+                modifier = Modifier.size(16.dp),
+            )
+        }
     }
 }
 

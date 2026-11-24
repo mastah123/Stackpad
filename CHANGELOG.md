@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.14.0] - 2026-11-24
+
+### Added
+- List styles: choosing Bullets or Numbers in the List row opens a third row of styles above it (round, hollow and square bullets; 1. A. a. I. i. and Greek α. numbering).
+- Add tag chip above the note title that opens a pop-up to add or remove tags, or create a new one.
+
+### Changed
+- The tags row above the title is always shown (it was hidden when the note had no tags); the Tag button moved out of the add-block bar.
+- The separate "Letters" list button is replaced by the Numbers styles.
+- Markdown export writes every bullet style as "-".
+
 ## [2.13.0] - 2026-11-24
 
 ### Added

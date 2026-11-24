@@ -10,7 +10,7 @@
 
 <p align="center">
   <a href="https://github.com/mastah123/stackpad/actions/workflows/android.yml"><img alt="Build" src="https://github.com/mastah123/stackpad/actions/workflows/android.yml/badge.svg"></a>
-  <img alt="Version" src="https://img.shields.io/badge/version-2.13.0-4F46E5">
+  <img alt="Version" src="https://img.shields.io/badge/version-2.14.0-4F46E5">
   <img alt="Platform" src="https://img.shields.io/badge/platform-Android%208.0%2B-3DDC84">
   <img alt="Kotlin" src="https://img.shields.io/badge/Kotlin-2.0-7F52FF">
   <img alt="License" src="https://img.shields.io/badge/license-MIT-blue">
@@ -35,6 +35,7 @@ Also:
 
 - **Side menu** (top-left button, or swipe right): slides in at 80% of the screen width and pushes the notes to the right. Tap the visible notes, press back or swipe left to close. Icons along its bottom switch between **Home** (All notes, Pinned, Reminders and Trash with counts, plus the theme button), **Folders** (your folders and No folder, with + to add one) and **Tags** (a "Filter tags" box, a sort button, and note counts). Picking a folder or tag shows its notes and closes the menu. Settings is the gear at the top.
 - **Home**: a rounded search bar with the menu button inside it, then **PINNED** and **RECENT** sections with the layout and sort icons on the first header. Notes are rounded cards (time, bold title, a two-line text preview with no pictures in the list, tag chips, pin icon, accent bar for pinned or colored notes, and a three-dot menu with Pin, Move to folder, Add tag and Move to trash); the grid shows the same cards with a formatted preview. A note with no title is named after the date and time it was created (e.g. "Note 24-11-2026 04:09 PM"). **Reminders** (menu) lists every unchecked checklist item with a due date, overdue first; tap one to open its note. An empty Home shows a rotating tip and a **Create a new note** button. Folder and tag views keep a top bar with Search, layout, sort and, for folders, a three-dot menu with Rename and Delete.
+- **Lists and tags**: in the editor, List > Bullets or Numbers opens a third row of styles (• ○ ▪ and 1. A. a. I. i. α.), all in the same horizontal style as the other options. The tags row sits above the title with an **Add tag** chip that opens a pop-up to pick tags or create one.
 - **Motion**: the menu slides with a spring (and follows your finger), notes animate when they are added, removed, pinned or re-sorted, the list/grid switch and screen changes fade and slide, and the new-note button scales in and out.
 - **Import from Google Keep**: Settings > Import > Google Keep, then choose the Takeout `.zip` (export Keep from takeout.google.com). Text and list notes, labels (as tags), colors, pinned state, links, pictures and dates are imported; importing the same zip again adds nothing new. Audio and drawing attachments and notes in Keep's trash are skipped.
 - **More imports** (Settings > Import): Markdown and text files or zips (also Obsidian and Notion exports), Evernote `.enex`, Word `.docx` and PDF. Several files can be picked at once and importing the same file again adds nothing new. PDF text is a best-effort reading (PDFs store no structure); a scanned PDF becomes a note with its pages as pictures.

@@ -354,3 +354,10 @@ Covers: formula evaluator, span editing, URL detection/validation, list markers,
 - [ ] Home search bar and menu button sit below the status bar; in selection mode the selection bar does too.
 - [ ] Menu > Home > Reminders shows a count equal to the unchecked checklist items with a due date; the screen lists them earliest first, overdue in red; tapping opens the note; checking an item or removing its date removes it. Locked notes are left out.
 
+### List styles and tags (2.14.0)
+- [ ] Add bar > List: Bullets, Numbers and Checklist show; Bullets and Numbers have an arrow and open a style row above, in one horizontal scrolling row.
+- [ ] Bullets styles: round, hollow, square. Numbers styles: 1. A. a. I. i. α. Picking one inserts a list with that marker; Enter adds items with the same style; long lists keep correct numbering (e.g. roman iv, ix).
+- [ ] Tapping Bullets again (or switching rows) closes the style row; the text toolbar hides while option rows are open.
+- [ ] Share/export a note with these lists: Markdown shows "-" for all bullet styles; PDF/text keep the markers. Old notes with bullets, numbers and letters look the same as before.
+- [ ] The Tag button is gone from the add bar. Above the title there is always an "Add tag" chip: it opens a pop-up listing known tags (check mark on this note's tags), tapping toggles one; "New tag" opens the new-tag dialog; tag chips next to it still remove on tap.
+

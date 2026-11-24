@@ -20,6 +20,7 @@ import com.stackpad.app.data.model.TextSpan
 import com.stackpad.app.data.model.isBlank
 import com.stackpad.app.domain.formula.SheetEvaluator
 import com.stackpad.app.domain.text.ListMarkers
+import com.stackpad.app.domain.text.isBullet
 import com.stackpad.app.domain.text.TextRuns
 import com.stackpad.app.util.formatDuration
 
@@ -92,7 +93,7 @@ object NoteExporter {
         block.items.filter { it.text.isNotBlank() }.mapIndexed { index, item ->
             val marker = when {
                 !markdown -> ListMarkers.label(block.kind, index)
-                block.kind == ListKind.BULLET -> "-"
+                block.kind.isBullet -> "-"
                 else -> ListMarkers.label(block.kind, index)
             }
             "$marker ${item.text.trim()}"

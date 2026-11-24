@@ -472,4 +472,15 @@
     <string name="reminders_title">Reminders</string>
     <string name="reminders_empty">No reminders yet. Set a due date on a checklist item and it will show up here.</string>
     <string name="reminder_overdue">Overdue · %1$s</string>
+    <string name="tag_add_chip">Add tag</string>
+    <string name="cd_tag_on_note">On this note</string>
+    <string name="list_style_bullet">Round bullets</string>
+    <string name="list_style_hollow">Hollow bullets</string>
+    <string name="list_style_square">Square bullets</string>
+    <string name="list_style_numbers">Numbers 1. 2. 3.</string>
+    <string name="list_style_upper_letters">Capital letters A. B. C.</string>
+    <string name="list_style_lower_letters">Lowercase letters a. b. c.</string>
+    <string name="list_style_upper_roman">Capital roman numerals I. II. III.</string>
+    <string name="list_style_lower_roman">Roman numerals i. ii. iii.</string>
+    <string name="list_style_greek">Greek letters α. β. γ.</string>
 </resources>

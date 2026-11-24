@@ -20,7 +20,10 @@ data class TextSpan(val start: Int, val end: Int, val type: SpanType)
 
 /** Marker style of a list block. */
 @Serializable
-enum class ListKind { BULLET, NUMBERED, LETTERED }
+enum class ListKind {
+    BULLET, NUMBERED, LETTERED,
+    BULLET_HOLLOW, BULLET_SQUARE, UPPER_ALPHA, UPPER_ROMAN, LOWER_ROMAN, GREEK,
+}
 
 @Serializable
 data class ListItem(val id: String, val text: String = "")
