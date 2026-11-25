@@ -34,7 +34,7 @@
     <string name="cd_pin">Pin note</string>
     <string name="cd_play_audio">Play audio</string>
     <string name="cd_remove_audio">Remove audio</string>
-    <string name="cd_remove_checklist">Remove checklist</string>
+    <string name="cd_remove_checklist">Remove task list</string>
     <string name="cd_remove_image">Remove image</string>
     <string name="cd_remove_link">Remove link</string>
     <string name="cd_remove_list">Remove list</string>
@@ -52,7 +52,7 @@
     <string name="checklist_uncheck_all">Uncheck all</string>
     <string name="checklist_delete_completed">Delete completed</string>
     <string name="checklist_done_hidden" formatted="true">%1$d done · Show</string>
-    <string name="cd_checklist_menu">Checklist options</string>
+    <string name="cd_checklist_menu">Task list options</string>
     <string name="msg_checklist_unchecked">All items unchecked</string>
     <string name="msg_completed_deleted">Completed items deleted</string>
     <string name="table_menu">Table options</string>
@@ -62,7 +62,7 @@
     <string name="msg_csv_truncated">Table imported; extra rows or columns were left out</string>
     <string name="msg_csv_failed">Could not read that file as a table</string>
     <string name="msg_csv_export_failed">Could not share the table</string>
-    <string name="checklist_title_hint">Checklist</string>
+    <string name="checklist_title_hint">Task list</string>
     <string name="editor_start_writing">Start writing…</string>
     <string name="editor_title">Note</string>
     <string name="editor_title_hint">Title</string>
@@ -231,8 +231,8 @@
     <string name="image_edit_keep_editing">Keep editing</string>
     <string name="msg_image_edit_failed">Could not save the picture.</string>
     <string name="reminder_channel_name">Due date reminders</string>
-    <string name="reminder_channel_description">Reminders for checklist items on the day they are due.</string>
-    <string name="reminder_untitled_item">Checklist item</string>
+    <string name="reminder_channel_description">Reminders for task list items on the day they are due.</string>
+    <string name="reminder_untitled_item">Task</string>
     <string name="reminder_due_today">Due today</string>
     <string name="reminder_due_today_in" formatted="true">Due today · %1$s</string>
     <string name="due_today">Today</string>
@@ -393,7 +393,7 @@
     <string name="share_page_numbers">PDF page numbers</string>
     <string name="share_clean_lines">Empty lines</string>
     <string name="share_clean_items">Empty list items</string>
-    <string name="share_clean_checklists">Empty checklist items and checklists</string>
+    <string name="share_clean_checklists">Empty task list items and task lists</string>
     <string name="share_clean_tables">Empty table rows and tables</string>
     <string name="share_clean_cards">Empty quote, prompt, code and link cards</string>
     <string name="share_show_title">Title</string>
@@ -465,12 +465,12 @@
     <string name="tip_pin">Keep important notes at the top by pinning them from a note\'s three-dot menu.</string>
     <string name="tip_tags">Add tags to your notes, then find them again from the Tags tab in the menu.</string>
     <string name="tip_folders">Sort your notes into folders from the Folders tab in the menu.</string>
-    <string name="tip_checklist">Add a checklist block to track tasks with due dates and reminders.</string>
+    <string name="tip_checklist">Add a task list to track tasks with due dates and reminders.</string>
     <string name="tip_table">Tables can calculate: type something like =SUM(A1:A5) in a cell.</string>
     <string name="tip_search">Search finds words in titles, text and tags. Tap the menu icon for your folders and tags.</string>
     <string name="menu_reminders">Reminders</string>
     <string name="reminders_title">Reminders</string>
-    <string name="reminders_empty">No reminders yet. Set a due date on a checklist item and it will show up here.</string>
+    <string name="reminders_empty">No reminders yet. Set a due date on a task list item and it will show up here.</string>
     <string name="reminder_overdue">Overdue · %1$s</string>
     <string name="tag_add_chip">Add tag</string>
     <string name="cd_tag_on_note">On this note</string>
@@ -497,4 +497,8 @@
     <string name="group_month">Month</string>
     <string name="section_this_week">This week</string>
     <string name="section_last_week">Last week</string>
+    <string name="add_checkbox_list">Checkbox list</string>
+    <string name="add_task_list">Task list</string>
+    <string name="cd_item_checked">Checked</string>
+    <string name="cd_item_unchecked">Not checked</string>
 </resources>

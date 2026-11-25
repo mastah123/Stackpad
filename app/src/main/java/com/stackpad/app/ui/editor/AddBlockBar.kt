@@ -18,6 +18,8 @@ import androidx.compose.material.icons.filled.AutoAwesome
 import androidx.compose.material.icons.filled.CameraAlt
 import androidx.compose.material.icons.filled.CheckBox
 import androidx.compose.material.icons.filled.Code
+import androidx.compose.material.icons.filled.CheckBoxOutlineBlank
+import androidx.compose.material.icons.filled.Checklist
 import androidx.compose.material.icons.filled.FormatListBulleted
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
@@ -62,12 +64,12 @@ import com.stackpad.app.domain.text.isBullet
 private enum class OptionRow { PLUS, LIST, CARDS }
 
 /** The third row that opens above the List row (Bullets, Numbers, Letters) or the + row (Image). */
-private enum class StyleRow { BULLETS, NUMBERS, LETTERS, IMAGE }
+private enum class StyleRow { BULLETS, NUMBERS, LETTERS, CHECKLIST, IMAGE }
 
 /**
  * Scrollable row of chips; each one inserts a block of that type into the note.
  * "+", List and Cards open an option row above the chips, styled like the text format toolbar;
- * in the List row, Bullets, Numbers and Letters open a third row with their styles, and Image in the + row opens Gallery and Photo.
+ * in the List row, Bullets, Numbers, Letters and Checklist open a third row (styles, or Checkbox list and Task list), and Image in the + row opens Gallery and Photo.
  * [onOptionRowChange] reports whether such a row is open, so the editor can hide the text toolbar.
  */
 @Composable
@@ -107,6 +109,14 @@ fun AddBlockBar(
                             choose(onTakePhoto)
                         }
                     }
+                    StyleRow.CHECKLIST -> {
+                        OptionButton(Icons.Filled.CheckBoxOutlineBlank, stringResource(R.string.add_checkbox_list)) {
+                            choose { onAddBlock(BlockFactory.list(ListKind.CHECKBOX)) }
+                        }
+                        OptionButton(Icons.Filled.Checklist, stringResource(R.string.add_task_list)) {
+                            choose { onAddBlock(BlockFactory.checklist()) }
+                        }
+                    }
                     else -> {
                         val kinds = when (group) {
                             StyleRow.BULLETS -> ListMarkers.BULLET_KINDS
@@ -137,9 +147,11 @@ fun AddBlockBar(
                     stringResource(R.string.add_letters),
                     expanded = styleRow == StyleRow.LETTERS,
                 ) { styleRow = if (styleRow == StyleRow.LETTERS) null else StyleRow.LETTERS }
-                OptionButton(Icons.Filled.CheckBox, stringResource(R.string.add_checklist)) {
-                    choose { onAddBlock(BlockFactory.checklist()) }
-                }
+                OptionButton(
+                    Icons.Filled.CheckBox,
+                    stringResource(R.string.add_checklist),
+                    expanded = styleRow == StyleRow.CHECKLIST,
+                ) { styleRow = if (styleRow == StyleRow.CHECKLIST) null else StyleRow.CHECKLIST }
             }
             OptionRow.PLUS -> OptionButtons {
                 OptionButton(
@@ -229,6 +241,7 @@ private fun ListKind.labelRes(): Int = when (this) {
     ListKind.UPPER_ROMAN -> R.string.list_style_upper_roman
     ListKind.LOWER_ROMAN -> R.string.list_style_lower_roman
     ListKind.GREEK -> R.string.list_style_greek
+    ListKind.CHECKBOX -> R.string.add_checkbox_list
 }
 
 @Composable

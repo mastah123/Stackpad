@@ -23,10 +23,12 @@ data class TextSpan(val start: Int, val end: Int, val type: SpanType)
 enum class ListKind {
     BULLET, NUMBERED, LETTERED,
     BULLET_HOLLOW, BULLET_SQUARE, UPPER_ALPHA, UPPER_ROMAN, LOWER_ROMAN, GREEK,
+    /** Items with a tick box that is checked by tapping it; Enter adds another item. */
+    CHECKBOX,
 }
 
 @Serializable
-data class ListItem(val id: String, val text: String = "")
+data class ListItem(val id: String, val text: String = "", val checked: Boolean = false)
 
 @Serializable
 data class ChecklistItem(

@@ -55,4 +55,10 @@ class ListMarkersTest {
         assertEquals("10.", ListMarkers.label(ListKind.NUMBERED, 9))
         assertEquals("c.", ListMarkers.label(ListKind.LETTERED, 2))
     }
+
+    @Test fun checkboxMarkerShowsTheTickState() {
+        assertEquals("[ ]", ListMarkers.label(ListKind.CHECKBOX, 0))
+        assertEquals("[x]", ListMarkers.label(ListKind.CHECKBOX, 3, checked = true))
+        assertFalse(ListKind.CHECKBOX.isBullet)
+    }
 }

@@ -46,6 +46,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.rememberTextMeasurer
 import com.stackpad.app.data.model.ListKind
 import com.stackpad.app.domain.text.isBullet
+import androidx.compose.foundation.selection.toggleable
+import androidx.compose.material.icons.filled.CheckBox
+import androidx.compose.material.icons.filled.CheckBoxOutlineBlank
+import androidx.compose.material3.Icon
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -80,6 +86,8 @@ fun ListBlockView(
     val density = LocalDensity.current
     val markerWidth = if (block.kind.isBullet) {
         BULLET_COLUMN
+    } else if (block.kind == ListKind.CHECKBOX) {
+        CHECKBOX_COLUMN
     } else {
         val widest = block.items.indices.maxOfOrNull {
             measurer.measure(ListMarkers.label(block.kind, it), markerStyle).size.width
@@ -95,6 +103,9 @@ fun ListBlockView(
                     marker = ListMarkers.label(block.kind, index),
                     markerWidth = markerWidth,
                     item = item,
+                    onToggleChecked = {
+                        onEdit { b -> b.copy(items = b.items.map { if (it.id == item.id) it.copy(checked = !it.checked) else it }) }
+                    },
                     focusRequester = requesters.getOrPut(item.id) { FocusRequester() },
                     onFocused = onBlockFocused,
                     onTextChange = { text ->
@@ -159,6 +170,7 @@ private fun ListItemRow(
     marker: String,
     markerWidth: Dp,
     item: ListItem,
+    onToggleChecked: () -> Unit,
     focusRequester: FocusRequester,
     onFocused: () -> Unit,
     onTextChange: (String) -> Unit,
@@ -166,7 +178,11 @@ private fun ListItemRow(
     onBackspaceWhenEmpty: () -> Unit,
 ) {
     val colors = MaterialTheme.colorScheme
-    val textStyle = MaterialTheme.typography.bodyMedium.copy(color = colors.onSurface)
+    val tickable = kind == ListKind.CHECKBOX
+    val textStyle = MaterialTheme.typography.bodyMedium.copy(
+        color = if (tickable && item.checked) colors.onSurfaceVariant else colors.onSurface,
+        textDecoration = if (tickable && item.checked) TextDecoration.LineThrough else TextDecoration.None,
+    )
     var focused by remember { mutableStateOf(false) }
     var layout by remember { mutableStateOf<androidx.compose.ui.text.TextLayoutResult?>(null) }
     var value by remember(item.id) {
@@ -178,7 +194,22 @@ private fun ListItemRow(
     }
 
     Row(verticalAlignment = Alignment.Top) {
-        if (kind.isBullet) {
+        if (tickable) {
+            Box(
+                modifier = Modifier
+                    .width(markerWidth)
+                    .height(with(LocalDensity.current) { textStyle.lineHeight.toDp() })
+                    .toggleable(value = item.checked, role = Role.Checkbox, onValueChange = { onToggleChecked() }),
+                contentAlignment = Alignment.CenterStart,
+            ) {
+                Icon(
+                    imageVector = if (item.checked) Icons.Filled.CheckBox else Icons.Filled.CheckBoxOutlineBlank,
+                    contentDescription = stringResource(if (item.checked) R.string.cd_item_checked else R.string.cd_item_unchecked),
+                    tint = if (item.checked) colors.primary else colors.onSurfaceVariant,
+                    modifier = Modifier.size(20.dp),
+                )
+            }
+        } else if (kind.isBullet) {
             BulletMark(
                 kind = kind,
                 color = colors.onSurfaceVariant,
@@ -238,3 +269,4 @@ private fun ListItemRow(
 
 private val MARKER_GAP = 8.dp
 private val BULLET_COLUMN = 16.dp
+private val CHECKBOX_COLUMN = 28.dp

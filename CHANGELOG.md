@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.18.0] - 2026-11-25
+
+### Added
+- Checkbox list: a simple list with a tick box on each item. Tap the box to check it (the text is struck through); Enter adds a new item and Backspace on an empty item removes it. Exports as `- [ ]` / `- [x]` in Markdown and `[ ]` / `[x]` in text, PDF and Word.
+
+### Changed
+- The earlier checklist (due dates, reminders, progress, sorting) is now called **Task list**. In the List row, Checklist opens a third row with Checkbox list and Task list.
+- Reminders and related texts say "task list" instead of "checklist".
+
 ## [2.17.0] - 2026-11-25
 
 ### Added

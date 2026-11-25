@@ -20,7 +20,8 @@ object ListMarkers {
         50 to "l", 40 to "xl", 10 to "x", 9 to "ix", 5 to "v", 4 to "iv", 1 to "i",
     )
 
-    fun label(kind: ListKind, index: Int): String = when (kind) {
+    /** Marker for item number [index]; [checked] only matters for [ListKind.CHECKBOX] (`[x]` or `[ ]`). */
+    fun label(kind: ListKind, index: Int, checked: Boolean = false): String = when (kind) {
         ListKind.BULLET -> "•"
         ListKind.BULLET_HOLLOW -> "○"
         ListKind.BULLET_SQUARE -> "▪"
@@ -30,6 +31,7 @@ object ListMarkers {
         ListKind.LOWER_ROMAN -> "${roman(index + 1)}."
         ListKind.UPPER_ROMAN -> "${roman(index + 1).uppercase()}."
         ListKind.GREEK -> "${sequence(index, GREEK)}."
+        ListKind.CHECKBOX -> if (checked) "[x]" else "[ ]"
     }
 
     fun letters(index: Int): String = sequence(index, "abcdefghijklmnopqrstuvwxyz")

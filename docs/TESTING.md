@@ -380,3 +380,9 @@ Covers: formula evaluator, span editing, URL detection/validation, list markers,
 - [ ] Crop a picture, then open the editor again: the full original picture is shown (not the cropped one); saving applies the new edit to the original. "Restore original" still works.
 - [ ] More space between the "words · created" line and the first text of a note. The add bar shows Add, Text, List, Cards only.
 
+### Checkbox list and Task list (2.18.0)
+- [ ] List row: Bullets, Numbers, Letters, Checklist. Checklist (with an arrow) opens a row above with Checkbox list and Task list.
+- [ ] Checkbox list: Enter adds a new unchecked item; tapping a box checks it and strikes the text; tapping again unchecks it; Backspace on an empty item removes it (the last one removes the list); the list survives closing and reopening the note.
+- [ ] Task list: works as before (due dates, reminders, progress, menu) and is named "Task list" in the hint, menus and Reminders screen. Old notes' checklists load unchanged.
+- [ ] Export or share a note with a checkbox list: Markdown shows `- [ ] item` / `- [x] item`; PDF/Word/text show `[ ]` / `[x]`.
+

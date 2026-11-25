@@ -65,7 +65,7 @@ object DocItems {
                     val shown = if (cleanUp.emptyListItems) block.items.filter { it.text.isNotBlank() } else block.items
                     val longest = shown.indices.maxOfOrNull { ListMarkers.label(block.kind, it).length } ?: 1
                     shown.forEachIndexed { index, item ->
-                        items += DocItem.Row(ListMarkers.label(block.kind, index), item.text.trim(), longest)
+                        items += DocItem.Row(ListMarkers.label(block.kind, index, item.checked), item.text.trim(), longest)
                     }
                 }
                 is ChecklistBlock -> checklist(block, cleanUp, hideCompletedTasks)?.let { items += it }

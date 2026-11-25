@@ -92,8 +92,9 @@ object NoteExporter {
     private fun renderList(block: ListBlock, markdown: Boolean): String =
         block.items.filter { it.text.isNotBlank() }.mapIndexed { index, item ->
             val marker = when {
-                !markdown -> ListMarkers.label(block.kind, index)
+                !markdown -> ListMarkers.label(block.kind, index, item.checked)
                 block.kind.isBullet -> "-"
+                block.kind == ListKind.CHECKBOX -> "- " + ListMarkers.label(block.kind, index, item.checked)
                 else -> ListMarkers.label(block.kind, index)
             }
             "$marker ${item.text.trim()}"
