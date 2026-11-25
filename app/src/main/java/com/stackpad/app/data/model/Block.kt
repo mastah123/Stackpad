@@ -96,6 +96,10 @@ data class SheetBlock(
     override val id: String,
     /** Row-major raw cell contents. Raw text starting with `=` is a formula. */
     val cells: List<List<String>>,
+    /** Column widths in dp, one per column; 0 or a missing entry means the default width. */
+    val columnWidths: List<Int> = emptyList(),
+    /** Row heights in dp, one per row; 0 or a missing entry means the default height. */
+    val rowHeights: List<Int> = emptyList(),
 ) : Block
 
 @Serializable
