@@ -1,5 +1,6 @@
 package com.stackpad.app.ui.editor.blocks
 
+import com.stackpad.app.ui.icons.AppIcons
 import com.stackpad.app.ui.theme.tint
 import com.stackpad.app.ui.theme.container
 import com.stackpad.app.ui.theme.BlockAccent
@@ -13,8 +14,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -80,7 +79,7 @@ fun QuoteBlockView(
             modifier = Modifier.weight(1f).padding(horizontal = 10.dp, vertical = 2.dp),
         )
         SmallIconButton(
-            icon = Icons.Filled.Close,
+            icon = AppIcons.Close,
             contentDescription = stringResource(R.string.cd_remove_quote),
             onClick = onRemove,
             size = 28.dp,

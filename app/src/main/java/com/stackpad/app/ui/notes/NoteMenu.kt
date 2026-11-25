@@ -1,5 +1,6 @@
 package com.stackpad.app.ui.notes
 
+import com.stackpad.app.ui.icons.AppIcons
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -11,11 +12,6 @@ import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Folder
-import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.Sell
-import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -62,7 +58,7 @@ fun NoteMenu(
                     modifier = Modifier.weight(1f).padding(start = 12.dp),
                 )
                 IconButton(onClick = onSettings) {
-                    Icon(Icons.Filled.Settings, contentDescription = stringResource(R.string.menu_settings))
+                    Icon(AppIcons.Settings, contentDescription = stringResource(R.string.menu_settings))
                 }
             }
             Box(modifier = Modifier.weight(1f).fillMaxWidth()) { content() }
@@ -71,9 +67,9 @@ fun NoteMenu(
                 modifier = Modifier.fillMaxWidth().navigationBarsPadding().padding(horizontal = 8.dp, vertical = 4.dp),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
-                TabButton(Icons.Filled.Home, R.string.menu_home, tab == MenuTab.HOME) { onTab(MenuTab.HOME) }
-                TabButton(Icons.Filled.Folder, R.string.menu_folders, tab == MenuTab.FOLDERS) { onTab(MenuTab.FOLDERS) }
-                TabButton(Icons.Filled.Sell, R.string.menu_tags, tab == MenuTab.TAGS) { onTab(MenuTab.TAGS) }
+                TabButton(AppIcons.Home, R.string.menu_home, tab == MenuTab.HOME) { onTab(MenuTab.HOME) }
+                TabButton(AppIcons.Folder, R.string.menu_folders, tab == MenuTab.FOLDERS) { onTab(MenuTab.FOLDERS) }
+                TabButton(AppIcons.Sell, R.string.menu_tags, tab == MenuTab.TAGS) { onTab(MenuTab.TAGS) }
                 Spacer(Modifier.weight(1f))
                 trailing()
             }

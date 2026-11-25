@@ -1,5 +1,6 @@
 package com.stackpad.app.ui.editor
 
+import com.stackpad.app.ui.icons.AppIcons
 import android.text.format.DateUtils
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -10,8 +11,6 @@ import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -78,7 +77,7 @@ fun HistorySheet(
             } else {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     IconButton(onClick = { viewing = null }) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.cd_back))
+                        Icon(AppIcons.ArrowBack, contentDescription = stringResource(R.string.cd_back))
                     }
                     Text(
                         text = whenSaved(selected),

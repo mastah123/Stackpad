@@ -1,5 +1,6 @@
 package com.stackpad.app.ui.notes
 
+import com.stackpad.app.ui.icons.AppIcons
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.background
@@ -11,10 +12,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.CheckBox
-import androidx.compose.material.icons.filled.CheckBoxOutlineBlank
-import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -105,7 +102,7 @@ fun NoteCard(
                 Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(top = 4.dp)) {
                     if (note.locked) {
                         Icon(
-                            Icons.Filled.Lock,
+                            AppIcons.Lock,
                             contentDescription = stringResource(R.string.cd_locked_note),
                             modifier = Modifier.padding(end = 4.dp).size(14.dp),
                             tint = colors.onSurfaceVariant,
@@ -159,7 +156,7 @@ fun NoteCard(
             }
             if (selecting) {
                 Icon(
-                    imageVector = if (selected) Icons.Filled.CheckBox else Icons.Filled.CheckBoxOutlineBlank,
+                    imageVector = if (selected) AppIcons.CheckBox else AppIcons.CheckBoxOutlineBlank,
                     contentDescription = stringResource(if (selected) R.string.cd_block_selected else R.string.cd_block_not_selected),
                     tint = if (selected) colors.primary else colors.onSurfaceVariant,
                     modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp),

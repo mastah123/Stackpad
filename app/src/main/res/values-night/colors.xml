@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="stackpad_window_background">#FF121218</color>
-    <color name="widget_background">#FF1F1F2B</color>
-    <color name="widget_text">#FFECECF4</color>
-    <color name="widget_text_secondary">#FFA6A6B8</color>
-    <color name="widget_accent">#FF6C63F0</color>
+    <color name="stackpad_window_background">#FF11152A</color>
+    <color name="widget_background">#FF1D2340</color>
+    <color name="widget_text">#FFEDEFF8</color>
+    <color name="widget_text_secondary">#FFA9B1CC</color>
+    <color name="widget_accent">#FFFF8D82</color>
 </resources>

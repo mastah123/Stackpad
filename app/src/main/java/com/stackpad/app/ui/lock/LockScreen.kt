@@ -1,13 +1,12 @@
 package com.stackpad.app.ui.lock
 
+import com.stackpad.app.ui.icons.AppIcons
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.LockOpen
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -44,7 +43,7 @@ fun LockScreen(onUnlock: () -> Unit) {
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
             Button(onClick = onUnlock) {
-                Icon(Icons.Filled.LockOpen, contentDescription = null, modifier = Modifier.padding(end = 8.dp))
+                Icon(AppIcons.LockOpen, contentDescription = null, modifier = Modifier.padding(end = 8.dp))
                 Text(stringResource(R.string.lock_unlock))
             }
         }

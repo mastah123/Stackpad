@@ -1,5 +1,6 @@
 package com.stackpad.app.ui.notes
 
+import com.stackpad.app.ui.icons.AppIcons
 import android.util.LruCache
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -15,10 +16,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.CheckBox
-import androidx.compose.material.icons.filled.CheckBoxOutlineBlank
-import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -145,7 +142,7 @@ private fun PreviewItem(item: DocItem) {
             item.tasks.forEach { task ->
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Icon(
-                        imageVector = if (task.done) Icons.Filled.CheckBox else Icons.Filled.CheckBoxOutlineBlank,
+                        imageVector = if (task.done) AppIcons.CheckBox else AppIcons.CheckBoxOutlineBlank,
                         contentDescription = null,
                         tint = Color(BlockTone.CHECKLIST.argb),
                         modifier = Modifier.size(14.dp),
@@ -209,7 +206,7 @@ private fun PreviewItem(item: DocItem) {
                 modifier = Modifier.size(16.dp).clip(RoundedCornerShape(50)).background(Color(BlockTone.AUDIO.argb)),
                 contentAlignment = Alignment.Center,
             ) {
-                Icon(Icons.Filled.PlayArrow, contentDescription = null, tint = Color.White, modifier = Modifier.size(12.dp))
+                Icon(AppIcons.PlayArrow, contentDescription = null, tint = Color.White, modifier = Modifier.size(12.dp))
             }
             Text(item.label, style = body, color = colors.onSurface, modifier = Modifier.padding(horizontal = 6.dp), maxLines = 1)
         }

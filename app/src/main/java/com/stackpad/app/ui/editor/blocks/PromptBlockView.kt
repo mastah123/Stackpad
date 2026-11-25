@@ -1,5 +1,6 @@
 package com.stackpad.app.ui.editor.blocks
 
+import com.stackpad.app.ui.icons.AppIcons
 import com.stackpad.app.ui.theme.tint
 import com.stackpad.app.ui.theme.BlockAccent
 import androidx.compose.foundation.BorderStroke
@@ -8,10 +9,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AutoAwesome
-import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.ContentCopy
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -63,7 +60,7 @@ fun PromptBlockView(
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             Icon(
-                imageVector = Icons.Filled.AutoAwesome,
+                imageVector = AppIcons.AutoAwesome,
                 contentDescription = null,
                 modifier = Modifier.size(14.dp),
                 tint = BlockAccent.PROMPT.tint(),
@@ -76,7 +73,7 @@ fun PromptBlockView(
                 modifier = Modifier.weight(1f),
             )
             SmallIconButton(
-                icon = Icons.Filled.ContentCopy,
+                icon = AppIcons.ContentCopy,
                 contentDescription = stringResource(R.string.cd_copy_prompt),
                 onClick = {
                     clipboard.setText(AnnotatedString(block.text))
@@ -87,7 +84,7 @@ fun PromptBlockView(
                 size = 30.dp,
             )
             SmallIconButton(
-                icon = Icons.Filled.Close,
+                icon = AppIcons.Close,
                 contentDescription = stringResource(R.string.cd_remove_prompt),
                 onClick = onRemove,
                 size = 28.dp,

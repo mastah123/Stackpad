@@ -1,5 +1,6 @@
 package com.stackpad.app.ui.notes
 
+import com.stackpad.app.ui.icons.AppIcons
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -7,9 +8,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -43,7 +41,7 @@ fun HomeSearchBar(
         verticalAlignment = Alignment.CenterVertically,
     ) {
         IconButton(onClick = onOpenMenu) {
-            Icon(Icons.Filled.Menu, contentDescription = stringResource(R.string.cd_open_menu), tint = colors.onSurfaceVariant)
+            Icon(AppIcons.Menu, contentDescription = stringResource(R.string.cd_open_menu), tint = colors.onSurfaceVariant)
         }
         InlineTextField(
             text = query,
@@ -57,7 +55,7 @@ fun HomeSearchBar(
         )
         if (query.isNotEmpty()) {
             SmallIconButton(
-                icon = Icons.Filled.Close,
+                icon = AppIcons.Close,
                 contentDescription = stringResource(R.string.cd_clear_search),
                 onClick = { onQueryChange("") },
             )

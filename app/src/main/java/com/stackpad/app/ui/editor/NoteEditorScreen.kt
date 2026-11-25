@@ -1,5 +1,6 @@
 package com.stackpad.app.ui.editor
 
+import com.stackpad.app.ui.icons.AppIcons
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.Dispatchers
 import com.stackpad.app.ui.theme.NoteColors
@@ -23,13 +24,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.automirrored.filled.Redo
-import androidx.compose.material.icons.automirrored.filled.Undo
-import androidx.compose.material.icons.filled.MoreVert
-import androidx.compose.material.icons.filled.PushPin
-import androidx.compose.material.icons.outlined.PushPin
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -477,26 +471,26 @@ private fun NoteEditorContent(
                 },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.cd_back))
+                        Icon(AppIcons.ArrowBack, contentDescription = stringResource(R.string.cd_back))
                     }
                 },
                 actions = {
                     IconButton(onClick = viewModel::undo, enabled = canUndo) {
-                        Icon(Icons.AutoMirrored.Filled.Undo, contentDescription = stringResource(R.string.cd_undo))
+                        Icon(AppIcons.Undo, contentDescription = stringResource(R.string.cd_undo))
                     }
                     IconButton(onClick = viewModel::redo, enabled = canRedo) {
-                        Icon(Icons.AutoMirrored.Filled.Redo, contentDescription = stringResource(R.string.cd_redo))
+                        Icon(AppIcons.Redo, contentDescription = stringResource(R.string.cd_redo))
                     }
                     IconButton(onClick = viewModel::togglePin) {
                         Icon(
-                            imageVector = if (state.pinned) Icons.Filled.PushPin else Icons.Outlined.PushPin,
+                            imageVector = if (state.pinned) AppIcons.PushPin else AppIcons.PushPin,
                             contentDescription = stringResource(if (state.pinned) R.string.cd_unpin else R.string.cd_pin),
                             tint = if (state.pinned) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant,
                         )
                     }
                     IconButton(onClick = { focusManager.clearFocus(); showOptions = true }) {
                         Icon(
-                            Icons.Filled.MoreVert,
+                            AppIcons.MoreVert,
                             contentDescription = stringResource(R.string.cd_more_actions),
                             tint = if (state.color != 0) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant,
                         )

@@ -1,5 +1,6 @@
 package com.stackpad.app.ui.editor
 
+import com.stackpad.app.ui.icons.AppIcons
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
@@ -12,29 +13,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.AutoAwesome
-import androidx.compose.material.icons.filled.CameraAlt
-import androidx.compose.material.icons.filled.CheckBox
-import androidx.compose.material.icons.filled.Code
-import androidx.compose.material.icons.filled.CheckBoxOutlineBlank
-import androidx.compose.material.icons.filled.Checklist
-import androidx.compose.material.icons.filled.FormatListBulleted
-import androidx.compose.material.icons.filled.KeyboardArrowDown
-import androidx.compose.material.icons.filled.KeyboardArrowUp
-import androidx.compose.material.icons.filled.FormatListNumbered
-import androidx.compose.material.icons.filled.FormatQuote
-import androidx.compose.material.icons.filled.HorizontalRule
-import androidx.compose.material.icons.filled.Image
-import androidx.compose.material.icons.filled.Link
-import androidx.compose.material.icons.filled.Mic
-import androidx.compose.material.icons.filled.PhotoLibrary
-import androidx.compose.material.icons.filled.Sell
-import androidx.compose.material.icons.filled.SortByAlpha
-import androidx.compose.material.icons.filled.Style
-import androidx.compose.material.icons.filled.TableChart
-import androidx.compose.material.icons.filled.TextFields
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.LocalContentColor
@@ -102,18 +80,18 @@ fun AddBlockBar(
             OptionButtons {
                 when (group) {
                     StyleRow.IMAGE -> {
-                        OptionButton(Icons.Filled.PhotoLibrary, stringResource(R.string.image_from_gallery)) {
+                        OptionButton(AppIcons.PhotoLibrary, stringResource(R.string.image_from_gallery)) {
                             choose(onPickFromGallery)
                         }
-                        OptionButton(Icons.Filled.CameraAlt, stringResource(R.string.image_from_camera)) {
+                        OptionButton(AppIcons.CameraAlt, stringResource(R.string.image_from_camera)) {
                             choose(onTakePhoto)
                         }
                     }
                     StyleRow.CHECKLIST -> {
-                        OptionButton(Icons.Filled.CheckBoxOutlineBlank, stringResource(R.string.add_checkbox_list)) {
+                        OptionButton(AppIcons.CheckBoxOutlineBlank, stringResource(R.string.add_checkbox_list)) {
                             choose { onAddBlock(BlockFactory.list(ListKind.CHECKBOX)) }
                         }
-                        OptionButton(Icons.Filled.Checklist, stringResource(R.string.add_task_list)) {
+                        OptionButton(AppIcons.Checklist, stringResource(R.string.add_task_list)) {
                             choose { onAddBlock(BlockFactory.checklist()) }
                         }
                     }
@@ -133,53 +111,53 @@ fun AddBlockBar(
         when (openRow) {
             OptionRow.LIST -> OptionButtons {
                 OptionButton(
-                    Icons.Filled.FormatListBulleted,
+                    AppIcons.FormatListBulleted,
                     stringResource(R.string.add_bullets),
                     expanded = styleRow == StyleRow.BULLETS,
                 ) { styleRow = if (styleRow == StyleRow.BULLETS) null else StyleRow.BULLETS }
                 OptionButton(
-                    Icons.Filled.FormatListNumbered,
+                    AppIcons.FormatListNumbered,
                     stringResource(R.string.add_numbers),
                     expanded = styleRow == StyleRow.NUMBERS,
                 ) { styleRow = if (styleRow == StyleRow.NUMBERS) null else StyleRow.NUMBERS }
                 OptionButton(
-                    Icons.Filled.SortByAlpha,
+                    AppIcons.SortByAlpha,
                     stringResource(R.string.add_letters),
                     expanded = styleRow == StyleRow.LETTERS,
                 ) { styleRow = if (styleRow == StyleRow.LETTERS) null else StyleRow.LETTERS }
                 OptionButton(
-                    Icons.Filled.CheckBox,
+                    AppIcons.CheckBox,
                     stringResource(R.string.add_checklist),
                     expanded = styleRow == StyleRow.CHECKLIST,
                 ) { styleRow = if (styleRow == StyleRow.CHECKLIST) null else StyleRow.CHECKLIST }
             }
             OptionRow.PLUS -> OptionButtons {
                 OptionButton(
-                    Icons.Filled.PhotoLibrary,
+                    AppIcons.PhotoLibrary,
                     stringResource(R.string.add_image),
                     expanded = styleRow == StyleRow.IMAGE,
                 ) { styleRow = if (styleRow == StyleRow.IMAGE) null else StyleRow.IMAGE }
                 if (!recordingActive) {
-                    OptionButton(Icons.Filled.Mic, stringResource(R.string.add_audio)) { choose(onRecordAudio) }
+                    OptionButton(AppIcons.Mic, stringResource(R.string.add_audio)) { choose(onRecordAudio) }
                 }
-                OptionButton(Icons.Filled.Link, stringResource(R.string.add_link)) {
+                OptionButton(AppIcons.Link, stringResource(R.string.add_link)) {
                     choose { onAddBlock(BlockFactory.link()) }
                 }
-                OptionButton(Icons.Filled.TableChart, stringResource(R.string.add_table)) {
+                OptionButton(AppIcons.TableChart, stringResource(R.string.add_table)) {
                     choose { onAddBlock(BlockFactory.sheet()) }
                 }
-                OptionButton(Icons.Filled.HorizontalRule, stringResource(R.string.add_divider)) {
+                OptionButton(AppIcons.HorizontalRule, stringResource(R.string.add_divider)) {
                     choose { onAddBlock(BlockFactory.divider()) }
                 }
             }
             OptionRow.CARDS -> OptionButtons {
-                OptionButton(Icons.Filled.AutoAwesome, stringResource(R.string.add_prompt)) {
+                OptionButton(AppIcons.AutoAwesome, stringResource(R.string.add_prompt)) {
                     choose { onAddBlock(BlockFactory.prompt()) }
                 }
-                OptionButton(Icons.Filled.FormatQuote, stringResource(R.string.add_quote)) {
+                OptionButton(AppIcons.FormatQuote, stringResource(R.string.add_quote)) {
                     choose { onAddBlock(BlockFactory.quote()) }
                 }
-                OptionButton(Icons.Filled.Code, stringResource(R.string.add_code)) {
+                OptionButton(AppIcons.Code, stringResource(R.string.add_code)) {
                     choose { onAddBlock(BlockFactory.code()) }
                 }
             }
@@ -192,17 +170,17 @@ fun AddBlockBar(
             horizontalArrangement = Arrangement.spacedBy(6.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            AddChip(Icons.Filled.Add, stringResource(R.string.add_plus), selected = openRow == OptionRow.PLUS) {
+            AddChip(AppIcons.Add, stringResource(R.string.add_plus), selected = openRow == OptionRow.PLUS) {
                 toggle(OptionRow.PLUS)
             }
-            AddChip(Icons.Filled.TextFields, stringResource(R.string.add_text)) {
+            AddChip(AppIcons.TextFields, stringResource(R.string.add_text)) {
                 openRow = null
                 onAddBlock(BlockFactory.text())
             }
-            AddChip(Icons.Filled.FormatListBulleted, stringResource(R.string.add_list), selected = openRow == OptionRow.LIST) {
+            AddChip(AppIcons.FormatListBulleted, stringResource(R.string.add_list), selected = openRow == OptionRow.LIST) {
                 toggle(OptionRow.LIST)
             }
-            AddChip(Icons.Filled.Style, stringResource(R.string.add_cards), selected = openRow == OptionRow.CARDS) {
+            AddChip(AppIcons.Style, stringResource(R.string.add_cards), selected = openRow == OptionRow.CARDS) {
                 toggle(OptionRow.CARDS)
             }
         }
@@ -253,7 +231,7 @@ private fun OptionButton(icon: ImageVector, label: String, expanded: Boolean? = 
         // A small arrow shows that Bullets and Numbers open their own style row.
         if (expanded != null) {
             Icon(
-                imageVector = if (expanded) Icons.Filled.KeyboardArrowDown else Icons.Filled.KeyboardArrowUp,
+                imageVector = if (expanded) AppIcons.KeyboardArrowDown else AppIcons.KeyboardArrowUp,
                 contentDescription = null,
                 modifier = Modifier.size(16.dp),
             )

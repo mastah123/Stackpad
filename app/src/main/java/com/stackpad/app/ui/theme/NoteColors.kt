@@ -10,14 +10,14 @@ import androidx.compose.ui.graphics.toArgb
 /** The colors a note can be given. Index 0 means "no color"; names live in `note_color_names`. */
 object NoteColors {
     private val accents = listOf(
-        Color(0xFFE57373), // red
-        Color(0xFFFFB74D), // orange
-        Color(0xFFFFD54F), // yellow
-        Color(0xFF81C784), // green
+        Color(0xFFE8736A), // red
+        Color(0xFFF2A25C), // orange
+        Color(0xFFF0C94D), // yellow
+        Color(0xFF6DB36B), // green
         Color(0xFF4DB6AC), // teal
-        Color(0xFF64B5F6), // blue
-        Color(0xFFBA68C8), // purple
-        Color(0xFFF06292), // pink
+        Color(0xFF5B8DEF), // blue
+        Color(0xFF8B6FE0), // purple
+        Color(0xFFE877A8), // pink
     )
 
     /** Number of choices including "none". */

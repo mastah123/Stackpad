@@ -1,5 +1,6 @@
 package com.stackpad.app.ui.notes
 
+import com.stackpad.app.ui.icons.AppIcons
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -9,9 +10,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowForward
-import androidx.compose.material.icons.filled.Info
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
@@ -74,7 +72,7 @@ private fun EmptyNotesTip(onCreate: () -> Unit) {
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(6.dp),
         ) {
-            Icon(Icons.Filled.Info, contentDescription = null, modifier = Modifier.size(16.dp), tint = colors.onSurfaceVariant)
+            Icon(AppIcons.Info, contentDescription = null, modifier = Modifier.size(16.dp), tint = colors.onSurfaceVariant)
             Text(
                 text = stringResource(R.string.tip_label).uppercase(),
                 style = MaterialTheme.typography.labelMedium,
@@ -90,7 +88,7 @@ private fun EmptyNotesTip(onCreate: () -> Unit) {
         OutlinedButton(onClick = onCreate, shape = RoundedCornerShape(10.dp), modifier = Modifier.align(Alignment.Start)) {
             Text(stringResource(R.string.empty_create_note))
             Icon(
-                Icons.AutoMirrored.Filled.ArrowForward,
+                AppIcons.ArrowForward,
                 contentDescription = null,
                 modifier = Modifier.padding(start = 8.dp).size(18.dp),
             )

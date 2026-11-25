@@ -1,13 +1,12 @@
 package com.stackpad.app.ui.components
 
+import com.stackpad.app.ui.icons.AppIcons
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.selection.toggleable
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Check
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
@@ -46,7 +45,7 @@ fun CompactCheckbox(
         ) {
             if (checked) {
                 Icon(
-                    imageVector = Icons.Filled.Check,
+                    imageVector = AppIcons.Check,
                     contentDescription = null,
                     modifier = Modifier.size(14.dp),
                     tint = colors.onPrimary,

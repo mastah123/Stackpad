@@ -1,5 +1,6 @@
 package com.stackpad.app.ui.editor.blocks
 
+import com.stackpad.app.ui.icons.AppIcons
 import com.stackpad.app.ui.theme.BlockAccent
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -8,10 +9,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.OpenInNew
-import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.Link
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -47,7 +44,7 @@ fun LinkBlockView(
     BlockSurface(modifier = modifier, accent = BlockAccent.LINK) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             Icon(
-                imageVector = Icons.Filled.Link,
+                imageVector = AppIcons.Link,
                 contentDescription = null,
                 modifier = Modifier.size(18.dp),
                 tint = colors.primary,
@@ -83,7 +80,7 @@ fun LinkBlockView(
                 }
             }
             SmallIconButton(
-                icon = Icons.AutoMirrored.Filled.OpenInNew,
+                icon = AppIcons.OpenInNew,
                 contentDescription = stringResource(R.string.cd_open_link),
                 onClick = { onOpen(block.url) },
                 enabled = validUrl != null,
@@ -91,7 +88,7 @@ fun LinkBlockView(
                 size = 30.dp,
             )
             SmallIconButton(
-                icon = Icons.Filled.Close,
+                icon = AppIcons.Close,
                 contentDescription = stringResource(R.string.cd_remove_link),
                 onClick = onRemove,
                 size = 28.dp,

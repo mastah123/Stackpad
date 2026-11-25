@@ -1,13 +1,11 @@
 package com.stackpad.app.ui.notes
 
+import com.stackpad.app.ui.icons.AppIcons
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Folder
-import androidx.compose.material.icons.filled.FolderOff
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -38,7 +36,7 @@ fun MenuFoldersTab(
         }
         item {
             MenuRow(
-                Icons.Filled.FolderOff,
+                AppIcons.FolderOff,
                 stringResource(R.string.folder_none),
                 selected == FolderFilter.Unfiled,
                 { onSelect(FolderFilter.Unfiled) },
@@ -46,7 +44,7 @@ fun MenuFoldersTab(
         }
         items(folders, key = { it.id }) { folder ->
             MenuRow(
-                Icons.Filled.Folder,
+                AppIcons.Folder,
                 folder.name,
                 (selected as? FolderFilter.InFolder)?.id == folder.id,
                 { onSelect(FolderFilter.InFolder(folder.id)) },

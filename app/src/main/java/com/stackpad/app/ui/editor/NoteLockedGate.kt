@@ -1,13 +1,10 @@
 package com.stackpad.app.ui.editor
 
+import com.stackpad.app.ui.icons.AppIcons
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.Lock
-import androidx.compose.material.icons.filled.LockOpen
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -33,7 +30,7 @@ fun NoteLockedGate(onBack: () -> Unit, onUnlock: () -> Unit) {
                 title = {},
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.cd_back))
+                        Icon(AppIcons.ArrowBack, contentDescription = stringResource(R.string.cd_back))
                     }
                 },
             )
@@ -45,7 +42,7 @@ fun NoteLockedGate(onBack: () -> Unit, onUnlock: () -> Unit) {
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             Icon(
-                Icons.Filled.Lock,
+                AppIcons.Lock,
                 contentDescription = null,
                 modifier = Modifier.padding(bottom = 4.dp),
                 tint = MaterialTheme.colorScheme.primary,
@@ -57,7 +54,7 @@ fun NoteLockedGate(onBack: () -> Unit, onUnlock: () -> Unit) {
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
             Button(onClick = onUnlock) {
-                Icon(Icons.Filled.LockOpen, contentDescription = null, modifier = Modifier.padding(end = 8.dp))
+                Icon(AppIcons.LockOpen, contentDescription = null, modifier = Modifier.padding(end = 8.dp))
                 Text(stringResource(R.string.lock_unlock))
             }
         }

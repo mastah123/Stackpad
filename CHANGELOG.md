@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.21.0] - 2026-11-25
+
+### Changed
+- New look, same layout: Plus Jakarta Sans replaces Inter for all text (with a real italic), the Material icons are replaced by thin rounded Lucide line icons, and the colors move to a warm off-white and navy light theme with a coral accent and lavender and green secondary hues. Dark theme uses the same hues on deep navy. The window background, the widget and the note colors follow.
+- Note colors are softer (coral, orange, yellow, green, teal, blue, purple, pink); notes keep the color index they had.
+
+### Removed
+- Inter font file; the Inter license is replaced by the Plus Jakarta Sans and Lucide licenses in `docs/licenses/`.
+
 ## [2.20.0] - 2026-11-25
 
 ### Added

@@ -1,5 +1,6 @@
 package com.stackpad.app.ui.settings
 
+import com.stackpad.app.ui.icons.AppIcons
 import android.content.Intent
 import android.net.Uri
 import android.text.format.DateUtils
@@ -9,10 +10,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Folder
-import androidx.compose.material.icons.filled.FileUpload
-import androidx.compose.material.icons.filled.Schedule
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -50,7 +47,7 @@ fun AutoBackupSection(settings: AutoBackupSettings, busy: Boolean, viewModel: Se
 
     SectionHeader(R.string.settings_section_auto_backup)
     SwitchRow(
-        icon = Icons.Filled.Schedule,
+        icon = AppIcons.Schedule,
         title = R.string.settings_auto_backup_title,
         subtitle = R.string.settings_auto_backup_subtitle,
         checked = settings.enabled,
@@ -79,14 +76,14 @@ fun AutoBackupSection(settings: AutoBackupSettings, busy: Boolean, viewModel: Se
         )
     }
     ActionRow(
-        icon = Icons.Filled.Folder,
+        icon = AppIcons.Folder,
         title = R.string.settings_auto_backup_folder_title,
         subtitle = if (settings.folderUri == null) R.string.settings_auto_backup_folder_none else R.string.settings_auto_backup_folder_change,
         enabled = !busy,
         onClick = { folderLauncher.launch(null) },
     )
     ActionRow(
-        icon = Icons.Filled.FileUpload,
+        icon = AppIcons.FileUpload,
         title = R.string.settings_auto_backup_now_title,
         subtitle = R.string.settings_auto_backup_now_subtitle,
         enabled = !busy && settings.folderUri != null,

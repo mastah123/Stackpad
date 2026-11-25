@@ -1,11 +1,10 @@
 package com.stackpad.app.ui.editor.blocks
 
+import com.stackpad.app.ui.icons.AppIcons
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Event
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -39,7 +38,7 @@ fun DueDateButton(
     val date = DueDates.parse(dueDate)
     if (date == null) {
         SmallIconButton(
-            icon = Icons.Filled.Event,
+            icon = AppIcons.Event,
             contentDescription = stringResource(R.string.cd_set_due_date),
             onClick = onClick,
             size = 28.dp,

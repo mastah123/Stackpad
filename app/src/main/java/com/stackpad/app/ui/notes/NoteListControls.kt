@@ -1,5 +1,6 @@
 package com.stackpad.app.ui.notes
 
+import com.stackpad.app.ui.icons.AppIcons
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -8,17 +9,9 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.BrightnessMedium
-import androidx.compose.material.icons.filled.Check
-import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.Search
-import androidx.compose.material.icons.filled.SwapVert
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
-import androidx.compose.material.icons.filled.GridView
-import androidx.compose.material.icons.filled.ViewAgenda
 import androidx.compose.material3.IconButton
 import com.stackpad.app.data.prefs.ListLayout
 import androidx.compose.material3.MaterialTheme
@@ -62,7 +55,7 @@ fun SearchField(
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Icon(
-                imageVector = Icons.Filled.Search,
+                imageVector = AppIcons.Search,
                 contentDescription = null,
                 modifier = Modifier.size(18.dp),
                 tint = colors.onSurfaceVariant,
@@ -78,7 +71,7 @@ fun SearchField(
             )
             if (query.isNotEmpty()) {
                 SmallIconButton(
-                    icon = Icons.Filled.Close,
+                    icon = AppIcons.Close,
                     contentDescription = stringResource(R.string.cd_clear_search),
                     onClick = { onQueryChange("") },
                 )
@@ -92,7 +85,7 @@ fun SearchField(
 fun ThemeMenu(
     current: ThemeMode,
     onSelect: (ThemeMode) -> Unit,
-    icon: ImageVector = Icons.Filled.BrightnessMedium,
+    icon: ImageVector = AppIcons.BrightnessMedium,
 ) {
     var open by remember { mutableStateOf(false) }
     Box {
@@ -104,7 +97,7 @@ fun ThemeMenu(
                 DropdownMenuItem(
                     text = { Text(stringResource(mode.labelRes())) },
                     trailingIcon = {
-                        if (mode == current) Icon(Icons.Filled.Check, contentDescription = null)
+                        if (mode == current) Icon(AppIcons.Check, contentDescription = null)
                     },
                     onClick = {
                         open = false
@@ -128,7 +121,7 @@ fun LayoutToggleButton(layout: ListLayout, onChange: (ListLayout) -> Unit) {
     val grid = layout == ListLayout.GRID
     IconButton(onClick = { onChange(if (grid) ListLayout.LIST else ListLayout.GRID) }) {
         Icon(
-            imageVector = if (grid) Icons.Filled.ViewAgenda else Icons.Filled.GridView,
+            imageVector = if (grid) AppIcons.ViewAgenda else AppIcons.GridView,
             contentDescription = stringResource(if (grid) R.string.cd_layout_list else R.string.cd_layout_grid),
         )
     }

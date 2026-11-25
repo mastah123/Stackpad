@@ -1,5 +1,6 @@
 package com.stackpad.app.ui.editor
 
+import com.stackpad.app.ui.icons.AppIcons
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -7,11 +8,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Check
-import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.Sell
 import androidx.compose.material3.AssistChip
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -52,7 +48,7 @@ fun NoteTagsRow(
             AssistChip(
                 onClick = { open = true },
                 label = { Text(stringResource(R.string.tag_add_chip)) },
-                leadingIcon = { Icon(Icons.Filled.Sell, contentDescription = null, modifier = Modifier.size(18.dp)) },
+                leadingIcon = { Icon(AppIcons.Sell, contentDescription = null, modifier = Modifier.size(18.dp)) },
             )
             TagPickerMenu(
                 expanded = open,
@@ -69,7 +65,7 @@ fun NoteTagsRow(
                 onClick = { onRemove(tag) },
                 label = { Text("#$tag") },
                 trailingIcon = {
-                    Icon(Icons.Filled.Close, contentDescription = stringResource(R.string.cd_remove_tag, tag))
+                    Icon(AppIcons.Close, contentDescription = stringResource(R.string.cd_remove_tag, tag))
                 },
             )
         }
@@ -91,7 +87,7 @@ fun TagPickerMenu(
             DropdownMenuItem(
                 text = { Text("#$tag") },
                 leadingIcon = {
-                    if (tag in tags) Icon(Icons.Filled.Check, contentDescription = stringResource(R.string.cd_tag_on_note))
+                    if (tag in tags) Icon(AppIcons.Check, contentDescription = stringResource(R.string.cd_tag_on_note))
                 },
                 onClick = { onToggle(tag) },
             )
@@ -99,7 +95,7 @@ fun TagPickerMenu(
         if (tags.isNotEmpty() || knownTags.isNotEmpty()) HorizontalDivider()
         DropdownMenuItem(
             text = { Text(stringResource(R.string.tag_new)) },
-            leadingIcon = { Icon(Icons.Filled.Add, contentDescription = null) },
+            leadingIcon = { Icon(AppIcons.Add, contentDescription = null) },
             onClick = {
                 onDismiss()
                 onNewTag()

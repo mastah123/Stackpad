@@ -1,5 +1,6 @@
 package com.stackpad.app.ui.notes
 
+import com.stackpad.app.ui.icons.AppIcons
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
@@ -8,11 +9,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Check
-import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.Sell
-import androidx.compose.material.icons.filled.SwapVert
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
@@ -66,7 +62,7 @@ fun MenuTagsTab(
                 trailingIcon = {
                     if (filterText.isNotEmpty()) {
                         IconButton(onClick = { onFilterText("") }) {
-                            Icon(Icons.Filled.Close, contentDescription = stringResource(R.string.cd_clear_filter))
+                            Icon(AppIcons.Close, contentDescription = stringResource(R.string.cd_clear_filter))
                         }
                     }
                 },
@@ -74,7 +70,7 @@ fun MenuTagsTab(
             )
         }
         items(tags, key = { it.tag }) { entry ->
-            MenuRow(Icons.Filled.Sell, entry.tag, selectedTag == entry.tag, { onSelect(entry.tag) }, entry.count)
+            MenuRow(AppIcons.Sell, entry.tag, selectedTag == entry.tag, { onSelect(entry.tag) }, entry.count)
         }
         if (tags.isEmpty()) {
             item {
@@ -95,7 +91,7 @@ fun TagSortMenu(current: TagSort, onSelect: (TagSort) -> Unit) {
     var open by remember { mutableStateOf(false) }
     Box {
         IconButton(onClick = { open = true }) {
-            Icon(Icons.Filled.SwapVert, contentDescription = stringResource(R.string.cd_sort_tags))
+            Icon(AppIcons.SwapVert, contentDescription = stringResource(R.string.cd_sort_tags))
         }
         DropdownMenu(expanded = open, onDismissRequest = { open = false }) {
             TagSort.values().forEach { sort ->
@@ -103,7 +99,7 @@ fun TagSortMenu(current: TagSort, onSelect: (TagSort) -> Unit) {
                     text = {
                         Text(stringResource(if (sort == TagSort.NAME) R.string.tag_sort_name else R.string.tag_sort_count))
                     },
-                    trailingIcon = { if (sort == current) Icon(Icons.Filled.Check, contentDescription = null) },
+                    trailingIcon = { if (sort == current) Icon(AppIcons.Check, contentDescription = null) },
                     onClick = {
                         open = false
                         onSelect(sort)

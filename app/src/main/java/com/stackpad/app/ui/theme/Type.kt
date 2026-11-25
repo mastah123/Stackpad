@@ -24,25 +24,25 @@ private val BaseTypography = Typography(
     labelSmall = TextStyle(fontSize = 11.sp, lineHeight = 14.sp, fontWeight = FontWeight.Medium),
 )
 
-/** Inter for every text style. */
+/** Plus Jakarta Sans for every text style. */
 val StackpadTypography: Typography = BaseTypography.let { t ->
-    fun TextStyle.inter() = copy(fontFamily = InterFamily)
+    fun TextStyle.withAppFont() = copy(fontFamily = AppFontFamily)
     t.copy(
-        displayLarge = t.displayLarge.inter(),
-        displayMedium = t.displayMedium.inter(),
-        displaySmall = t.displaySmall.inter(),
-        headlineLarge = t.headlineLarge.inter(),
-        headlineMedium = t.headlineMedium.inter(),
-        headlineSmall = t.headlineSmall.inter(),
-        titleLarge = t.titleLarge.inter(),
-        titleMedium = t.titleMedium.inter(),
-        titleSmall = t.titleSmall.inter(),
-        bodyLarge = t.bodyLarge.inter(),
-        bodyMedium = t.bodyMedium.inter(),
-        bodySmall = t.bodySmall.inter(),
-        labelLarge = t.labelLarge.inter(),
-        labelMedium = t.labelMedium.inter(),
-        labelSmall = t.labelSmall.inter(),
+        displayLarge = t.displayLarge.withAppFont(),
+        displayMedium = t.displayMedium.withAppFont(),
+        displaySmall = t.displaySmall.withAppFont(),
+        headlineLarge = t.headlineLarge.withAppFont(),
+        headlineMedium = t.headlineMedium.withAppFont(),
+        headlineSmall = t.headlineSmall.withAppFont(),
+        titleLarge = t.titleLarge.withAppFont(),
+        titleMedium = t.titleMedium.withAppFont(),
+        titleSmall = t.titleSmall.withAppFont(),
+        bodyLarge = t.bodyLarge.withAppFont(),
+        bodyMedium = t.bodyMedium.withAppFont(),
+        bodySmall = t.bodySmall.withAppFont(),
+        labelLarge = t.labelLarge.withAppFont(),
+        labelMedium = t.labelMedium.withAppFont(),
+        labelSmall = t.labelSmall.withAppFont(),
     )
 }
 

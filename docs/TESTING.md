@@ -362,10 +362,10 @@ Covers: formula evaluator, span editing, URL detection/validation, list markers,
 - [ ] The Tag button is gone from the add bar. Above the title there is always an "Add tag" chip: it opens a pop-up listing known tags (check mark on this note's tags), tapping toggles one; "New tag" opens the new-tag dialog; tag chips next to it still remove on tap.
 
 ### Fonts (2.15.0)
-- [ ] All text (menus, buttons, chips, previews, note titles, headings, editor text) uses Inter.
+- [ ] All text (menus, buttons, chips, previews, note titles, headings, editor text) uses Plus Jakarta Sans (rounded geometric letters; italic text is a true italic, not slanted).
 - [ ] Bold, semi-bold and medium weights all look different (no flat or missing weights); italic and bold-italic text still render.
 - [ ] Code and prompt blocks are still monospace. Check light and dark themes and the largest Android font size for clipped text.
-- [ ] Hindi/Arabic/CJK or emoji text still shows (the system font fills in what Inter lacks).
+- [ ] Hindi/Arabic/CJK or emoji text still shows (the system font fills in what Plus Jakarta Sans lacks).
 
 ### Editor bars and lists (2.16.0)
 - [ ] Selected chips and text buttons (bold, H1, ...) are clearly highlighted.
@@ -379,6 +379,14 @@ Covers: formula evaluator, span editing, URL detection/validation, list markers,
 - [ ] Group by shows headers: Abc (letters, # for others), Year, Week (This week, Last week, Nov 9 – Nov 15), Month (November 2026). None shows one "All notes" header on Home. Close and reopen the app: the choice is kept.
 - [ ] Crop a picture, then open the editor again: the full original picture is shown (not the cropped one); saving applies the new edit to the original. "Restore original" still works.
 - [ ] More space between the "words · created" line and the first text of a note. The add bar shows Add, Text, List, Cards only.
+
+### New look (2.21.0)
+- [ ] Light theme: warm off-white background, navy text, coral accent (selected menu row, switches, buttons). Dark theme: deep navy background, the same hues lighter.
+- [ ] Every icon is a thin rounded line icon (menu, search, add, close, back, pin, tag, folder, trash, archive, lock, undo/redo, the editor toolbars, settings). None is missing, blank or cut off; the Add block and format toolbars still highlight the active item.
+- [ ] Note colors (pick one in the note options) tint cards in both themes and are readable; existing colored notes keep their color.
+- [ ] Bold, italic, underline in the editor and the format toolbar still work; italic text looks like a true italic.
+- [ ] The window background matches the theme (no white flash in dark mode) and the widget uses the new colors.
+- [ ] The layout of every screen is unchanged.
 
 ### Note options sheet (2.20.0)
 - [ ] In a note, the 3-dot button opens a bottom sheet: title, tags, Created at, Last edited at (format 23-11-2026 06:29 PM), Add tag and Add color chips, then the action grid. Swipe down or tap outside closes it.

@@ -1,5 +1,6 @@
 package com.stackpad.app.ui.settings
 
+import com.stackpad.app.ui.icons.AppIcons
 import android.content.Context
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -15,11 +16,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.FileDownload
-import androidx.compose.material.icons.filled.FileUpload
-import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
@@ -110,7 +106,7 @@ fun SettingsScreen(
                 title = { Text(stringResource(R.string.settings_title), style = MaterialTheme.typography.titleMedium) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.cd_back))
+                        Icon(AppIcons.ArrowBack, contentDescription = stringResource(R.string.cd_back))
                     }
                 },
             )
@@ -122,21 +118,21 @@ fun SettingsScreen(
         ) {
             SectionHeader(R.string.settings_section_backup)
             ActionRow(
-                icon = Icons.Filled.FileUpload,
+                icon = AppIcons.FileUpload,
                 title = R.string.settings_export_title,
                 subtitle = R.string.settings_export_subtitle,
                 enabled = !busy,
                 onClick = { exportLauncher.launch(BackupRules.fileName(System.currentTimeMillis())) },
             )
             ActionRow(
-                icon = Icons.Filled.FileUpload,
+                icon = AppIcons.FileUpload,
                 title = R.string.settings_export_markdown_title,
                 subtitle = R.string.settings_export_markdown_subtitle,
                 enabled = !busy,
                 onClick = { archiveLauncher.launch("stackpad-notes-${java.time.LocalDate.now()}.zip") },
             )
             ActionRow(
-                icon = Icons.Filled.FileDownload,
+                icon = AppIcons.FileDownload,
                 title = R.string.settings_restore_title,
                 subtitle = R.string.settings_restore_subtitle,
                 enabled = !busy,
@@ -145,35 +141,35 @@ fun SettingsScreen(
             AutoBackupSection(settings = autoBackup, busy = busy, viewModel = viewModel)
             SectionHeader(R.string.settings_section_import)
             ActionRow(
-                icon = Icons.Filled.FileDownload,
+                icon = AppIcons.FileDownload,
                 title = R.string.settings_import_keep_title,
                 subtitle = R.string.settings_import_keep_subtitle,
                 enabled = !busy,
                 onClick = { keepLauncher.launch(ANY_FILE) },
             )
             ActionRow(
-                icon = Icons.Filled.FileDownload,
+                icon = AppIcons.FileDownload,
                 title = R.string.settings_import_markdown_title,
                 subtitle = R.string.settings_import_markdown_subtitle,
                 enabled = !busy,
                 onClick = { markdownLauncher.launch(ANY_FILE) },
             )
             ActionRow(
-                icon = Icons.Filled.FileDownload,
+                icon = AppIcons.FileDownload,
                 title = R.string.settings_import_evernote_title,
                 subtitle = R.string.settings_import_evernote_subtitle,
                 enabled = !busy,
                 onClick = { evernoteLauncher.launch(ANY_FILE) },
             )
             ActionRow(
-                icon = Icons.Filled.FileDownload,
+                icon = AppIcons.FileDownload,
                 title = R.string.settings_import_word_title,
                 subtitle = R.string.settings_import_word_subtitle,
                 enabled = !busy,
                 onClick = { wordLauncher.launch(ANY_FILE) },
             )
             ActionRow(
-                icon = Icons.Filled.FileDownload,
+                icon = AppIcons.FileDownload,
                 title = R.string.settings_import_pdf_title,
                 subtitle = R.string.settings_import_pdf_subtitle,
                 enabled = !busy,
@@ -193,7 +189,7 @@ fun SettingsScreen(
             HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
             SectionHeader(R.string.settings_section_security)
             SwitchRow(
-                icon = Icons.Filled.Lock,
+                icon = AppIcons.Lock,
                 title = R.string.settings_lock_title,
                 subtitle = R.string.settings_lock_subtitle,
                 checked = lockOn,

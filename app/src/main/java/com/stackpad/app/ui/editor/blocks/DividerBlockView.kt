@@ -1,10 +1,9 @@
 package com.stackpad.app.ui.editor.blocks
 
+import com.stackpad.app.ui.icons.AppIcons
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
@@ -31,7 +30,7 @@ fun DividerBlockView(
             color = MaterialTheme.colorScheme.outlineVariant,
         )
         SmallIconButton(
-            icon = Icons.Filled.Close,
+            icon = AppIcons.Close,
             contentDescription = stringResource(R.string.cd_remove_divider),
             onClick = onRemove,
             size = 28.dp,

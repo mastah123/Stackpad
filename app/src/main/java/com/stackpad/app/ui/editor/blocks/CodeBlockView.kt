@@ -1,15 +1,12 @@
 package com.stackpad.app.ui.editor.blocks
 
+import com.stackpad.app.ui.icons.AppIcons
 import com.stackpad.app.ui.theme.BlockAccent
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.Code
-import androidx.compose.material.icons.filled.ContentCopy
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -59,7 +56,7 @@ fun CodeBlockView(
     BlockSurface(modifier = modifier.fillMaxWidth(), accent = BlockAccent.CODE) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             Icon(
-                imageVector = Icons.Filled.Code,
+                imageVector = AppIcons.Code,
                 contentDescription = null,
                 modifier = Modifier.size(14.dp),
                 tint = colors.onSurfaceVariant,
@@ -72,7 +69,7 @@ fun CodeBlockView(
                 modifier = Modifier.weight(1f),
             )
             SmallIconButton(
-                icon = Icons.Filled.ContentCopy,
+                icon = AppIcons.ContentCopy,
                 contentDescription = stringResource(R.string.cd_copy_code),
                 onClick = {
                     clipboard.setText(AnnotatedString(block.text))
@@ -82,7 +79,7 @@ fun CodeBlockView(
                 size = 30.dp,
             )
             SmallIconButton(
-                icon = Icons.Filled.Close,
+                icon = AppIcons.Close,
                 contentDescription = stringResource(R.string.cd_remove_code),
                 onClick = onRemove,
                 size = 28.dp,

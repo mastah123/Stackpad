@@ -1,14 +1,12 @@
 package com.stackpad.app.ui.editor
 
+import com.stackpad.app.ui.icons.AppIcons
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.CheckBox
-import androidx.compose.material.icons.filled.CheckBoxOutlineBlank
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
@@ -52,7 +50,7 @@ fun SelectableBlock(
         // Fixed 40 dp column with a 24 dp icon, aligned to the first line of the block.
         Box(modifier = Modifier.size(CHECKBOX_COLUMN), contentAlignment = Alignment.Center) {
             Icon(
-                imageVector = if (selected) Icons.Filled.CheckBox else Icons.Filled.CheckBoxOutlineBlank,
+                imageVector = if (selected) AppIcons.CheckBox else AppIcons.CheckBoxOutlineBlank,
                 contentDescription = null,
                 tint = if (selected) colors.primary else colors.onSurfaceVariant,
                 modifier = Modifier.size(CHECKBOX_ICON),

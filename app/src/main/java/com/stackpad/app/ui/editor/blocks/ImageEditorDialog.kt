@@ -1,5 +1,6 @@
 package com.stackpad.app.ui.editor.blocks
 
+import com.stackpad.app.ui.icons.AppIcons
 import android.graphics.Bitmap
 import android.widget.Toast
 import androidx.compose.material3.OutlinedTextField
@@ -24,14 +25,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.Undo
-import androidx.compose.material.icons.filled.Check
-import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.Flip
-import androidx.compose.material.icons.filled.RestartAlt
-import androidx.compose.material.icons.filled.RotateLeft
-import androidx.compose.material.icons.filled.RotateRight
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.FilterChip
@@ -340,7 +333,7 @@ private fun EditorTopBar(canSave: Boolean, saving: Boolean, onClose: () -> Unit,
         verticalAlignment = Alignment.CenterVertically,
     ) {
         IconButton(onClick = onClose, enabled = !saving) {
-            Icon(Icons.Filled.Close, contentDescription = stringResource(R.string.image_edit_close), tint = Color.White)
+            Icon(AppIcons.Close, contentDescription = stringResource(R.string.image_edit_close), tint = Color.White)
         }
         Text(
             stringResource(R.string.image_edit_title),
@@ -354,7 +347,7 @@ private fun EditorTopBar(canSave: Boolean, saving: Boolean, onClose: () -> Unit,
         } else {
             IconButton(onClick = onSave, enabled = canSave) {
                 Icon(
-                    Icons.Filled.Check,
+                    AppIcons.Check,
                     contentDescription = stringResource(R.string.action_save),
                     tint = if (canSave) Color.White else Color.White.copy(alpha = 0.35f),
                 )
@@ -422,12 +415,12 @@ private fun EditorControls(
                 horizontalArrangement = Arrangement.SpaceEvenly,
                 verticalAlignment = Alignment.CenterVertically,
             ) {
-                ToolButton(Icons.Filled.RotateLeft, R.string.image_edit_rotate_left, enabled, onRotateLeft)
-                ToolButton(Icons.Filled.RotateRight, R.string.image_edit_rotate_right, enabled, onRotateRight)
-                ToolButton(Icons.Filled.Flip, R.string.image_edit_flip_horizontal, enabled, onFlipHorizontal)
-                ToolButton(Icons.Filled.Flip, R.string.image_edit_flip_vertical, enabled, onFlipVertical, turn = 90f)
-                ToolButton(Icons.AutoMirrored.Filled.Undo, R.string.action_undo, enabled && history.canUndo, onUndo)
-                ToolButton(Icons.Filled.RestartAlt, R.string.image_edit_reset, enabled && history.isChanged, onReset)
+                ToolButton(AppIcons.RotateLeft, R.string.image_edit_rotate_left, enabled, onRotateLeft)
+                ToolButton(AppIcons.RotateRight, R.string.image_edit_rotate_right, enabled, onRotateRight)
+                ToolButton(AppIcons.Flip, R.string.image_edit_flip_horizontal, enabled, onFlipHorizontal)
+                ToolButton(AppIcons.Flip, R.string.image_edit_flip_vertical, enabled, onFlipVertical, turn = 90f)
+                ToolButton(AppIcons.Undo, R.string.action_undo, enabled && history.canUndo, onUndo)
+                ToolButton(AppIcons.RestartAlt, R.string.image_edit_reset, enabled && history.isChanged, onReset)
             }
         }
     }

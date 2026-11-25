@@ -1,5 +1,6 @@
 package com.stackpad.app.ui.editor.blocks
 
+import com.stackpad.app.ui.icons.AppIcons
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -10,11 +11,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.Crop
-import androidx.compose.material.icons.filled.Restore
-import androidx.compose.material.icons.filled.TextFields
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
@@ -93,25 +89,25 @@ fun ImageBlockView(
         if (available) {
             Box(modifier = Modifier.align(Alignment.TopStart)) {
                 OverlayButton(
-                    icon = Icons.Filled.Crop,
+                    icon = AppIcons.Crop,
                     description = stringResource(R.string.cd_image_options),
                     onClick = { menuOpen = true },
                 )
                 DropdownMenu(expanded = menuOpen, onDismissRequest = { menuOpen = false }) {
                     DropdownMenuItem(
                         text = { Text(stringResource(R.string.image_edit_menu_edit)) },
-                        leadingIcon = { Icon(Icons.Filled.Crop, contentDescription = null) },
+                        leadingIcon = { Icon(AppIcons.Crop, contentDescription = null) },
                         onClick = { menuOpen = false; editingPicture = true },
                     )
                     DropdownMenuItem(
                         text = { Text(stringResource(R.string.image_menu_read_text)) },
-                        leadingIcon = { Icon(Icons.Filled.TextFields, contentDescription = null) },
+                        leadingIcon = { Icon(AppIcons.TextFields, contentDescription = null) },
                         onClick = { menuOpen = false; onReadText() },
                     )
                     if (hasOriginal) {
                         DropdownMenuItem(
                             text = { Text(stringResource(R.string.image_edit_restore_original)) },
-                            leadingIcon = { Icon(Icons.Filled.Restore, contentDescription = null) },
+                            leadingIcon = { Icon(AppIcons.Restore, contentDescription = null) },
                             onClick = { menuOpen = false; onRestoreOriginal() },
                         )
                     }
@@ -119,7 +115,7 @@ fun ImageBlockView(
             }
         }
         OverlayButton(
-            icon = Icons.Filled.Close,
+            icon = AppIcons.Close,
             description = stringResource(R.string.cd_remove_image),
             onClick = onRemove,
             modifier = Modifier.align(Alignment.TopEnd),

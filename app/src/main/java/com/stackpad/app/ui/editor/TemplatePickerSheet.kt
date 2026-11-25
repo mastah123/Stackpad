@@ -1,5 +1,6 @@
 package com.stackpad.app.ui.editor
 
+import com.stackpad.app.ui.icons.AppIcons
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -9,8 +10,6 @@ import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -109,7 +108,7 @@ private fun TemplateRow(template: NoteTemplate, onClick: () -> Unit, onDelete: (
         Text(template.name, style = MaterialTheme.typography.bodyLarge, modifier = Modifier.weight(1f))
         if (onDelete != null) {
             SmallIconButton(
-                icon = Icons.Filled.Close,
+                icon = AppIcons.Close,
                 contentDescription = stringResource(R.string.cd_delete_template, template.name),
                 onClick = onDelete,
             )

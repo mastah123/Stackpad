@@ -1,8 +1,7 @@
 package com.stackpad.app.ui.editor.blocks
 
+import com.stackpad.app.ui.icons.AppIcons
 import androidx.compose.foundation.layout.Box
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Switch
@@ -41,7 +40,7 @@ fun ChecklistMenu(state: ChecklistMenuState, actions: ChecklistMenuActions) {
     var open by remember { mutableStateOf(false) }
     Box {
         SmallIconButton(
-            icon = Icons.Filled.MoreVert,
+            icon = AppIcons.MoreVert,
             contentDescription = stringResource(R.string.cd_checklist_menu),
             onClick = { open = true },
             size = 28.dp,

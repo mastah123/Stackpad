@@ -1,9 +1,6 @@
 package com.stackpad.app.ui.notes
 
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Menu
-import androidx.compose.material.icons.filled.MoreVert
-import androidx.compose.material.icons.filled.Search
+import com.stackpad.app.ui.icons.AppIcons
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -42,20 +39,20 @@ fun NoteListTopBar(
     TopAppBar(
         navigationIcon = {
             IconButton(onClick = onOpenMenu) {
-                Icon(Icons.Filled.Menu, contentDescription = stringResource(R.string.cd_open_menu))
+                Icon(AppIcons.Menu, contentDescription = stringResource(R.string.cd_open_menu))
             }
         },
         title = { Text(title, style = MaterialTheme.typography.titleMedium, maxLines = 1) },
         actions = {
             IconButton(onClick = onSearch) {
-                Icon(Icons.Filled.Search, contentDescription = stringResource(R.string.cd_search))
+                Icon(AppIcons.Search, contentDescription = stringResource(R.string.cd_search))
             }
             LayoutToggleButton(layout = layout, onChange = onLayout)
             SortButton(order = order, onChange = onOrder)
             if (onRename != null && onDelete != null) {
                 var open by remember { mutableStateOf(false) }
                 IconButton(onClick = { open = true }) {
-                    Icon(Icons.Filled.MoreVert, contentDescription = stringResource(R.string.cd_more_actions))
+                    Icon(AppIcons.MoreVert, contentDescription = stringResource(R.string.cd_more_actions))
                 }
                 DropdownMenu(expanded = open, onDismissRequest = { open = false }) {
                     DropdownMenuItem(

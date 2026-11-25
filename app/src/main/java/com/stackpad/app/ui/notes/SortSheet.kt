@@ -1,5 +1,6 @@
 package com.stackpad.app.ui.notes
 
+import com.stackpad.app.ui.icons.AppIcons
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -11,11 +12,6 @@ import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowDownward
-import androidx.compose.material.icons.filled.ArrowUpward
-import androidx.compose.material.icons.filled.Check
-import androidx.compose.material.icons.filled.SwapVert
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -44,7 +40,7 @@ import com.stackpad.app.domain.notes.NoteSort
 fun SortButton(order: ListOrder, onChange: (ListOrder) -> Unit) {
     var open by remember { mutableStateOf(false) }
     IconButton(onClick = { open = true }) {
-        Icon(Icons.Filled.SwapVert, contentDescription = stringResource(R.string.cd_sort))
+        Icon(AppIcons.SwapVert, contentDescription = stringResource(R.string.cd_sort))
     }
     if (open) SortSheet(order = order, onChange = onChange, onDismiss = { open = false })
 }
@@ -70,7 +66,7 @@ private fun SortSheet(order: ListOrder, onChange: (ListOrder) -> Unit, onDismiss
                 TextButton(onClick = { onChange(order.copy(reversed = !order.reversed)) }) {
                     Text(stringResource(directionLabel(order)))
                     Icon(
-                        imageVector = if (order.reversed) Icons.Filled.ArrowUpward else Icons.Filled.ArrowDownward,
+                        imageVector = if (order.reversed) AppIcons.ArrowUpward else AppIcons.ArrowDownward,
                         contentDescription = null,
                         modifier = Modifier.padding(start = 6.dp),
                     )
@@ -112,7 +108,7 @@ private fun SheetOption(label: String, selected: Boolean, onClick: () -> Unit) {
             style = MaterialTheme.typography.bodyLarge,
             color = if (selected) colors.onSecondaryContainer else colors.onSurface,
         )
-        if (selected) Icon(Icons.Filled.Check, contentDescription = null, tint = colors.primary)
+        if (selected) Icon(AppIcons.Check, contentDescription = null, tint = colors.primary)
     }
 }
 

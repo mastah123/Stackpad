@@ -1,5 +1,6 @@
 package com.stackpad.app.ui.editor.blocks
 
+import com.stackpad.app.ui.icons.AppIcons
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -12,9 +13,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.Undo
-import androidx.compose.material.icons.filled.DeleteSweep
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -104,10 +102,10 @@ fun MarkupControls(
                 }
                 Row(modifier = Modifier.weight(1f), horizontalArrangement = Arrangement.End) {
                     IconButton(onClick = onUndo, enabled = enabled && canUndo) {
-                        Icon(Icons.AutoMirrored.Filled.Undo, contentDescription = stringResource(R.string.action_undo))
+                        Icon(AppIcons.Undo, contentDescription = stringResource(R.string.action_undo))
                     }
                     IconButton(onClick = onClear, enabled = enabled && hasMarks) {
-                        Icon(Icons.Filled.DeleteSweep, contentDescription = stringResource(R.string.image_mark_clear))
+                        Icon(AppIcons.DeleteSweep, contentDescription = stringResource(R.string.image_mark_clear))
                     }
                 }
             }

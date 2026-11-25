@@ -1,5 +1,6 @@
 package com.stackpad.app.ui.editor.blocks
 
+import com.stackpad.app.ui.icons.AppIcons
 import com.stackpad.app.ui.theme.tint
 import com.stackpad.app.ui.theme.container
 import com.stackpad.app.ui.theme.BlockAccent
@@ -15,10 +16,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.Pause
-import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -91,7 +88,7 @@ fun AudioBlockView(
                 contentAlignment = Alignment.Center,
             ) {
                 Icon(
-                    imageVector = if (playing) Icons.Filled.Pause else Icons.Filled.PlayArrow,
+                    imageVector = if (playing) AppIcons.Pause else AppIcons.PlayArrow,
                     contentDescription = stringResource(
                         if (playing) R.string.cd_pause_audio else R.string.cd_play_audio,
                     ),
@@ -137,7 +134,7 @@ fun AudioBlockView(
                 color = colors.onSurfaceVariant,
             )
             SmallIconButton(
-                icon = Icons.Filled.Close,
+                icon = AppIcons.Close,
                 contentDescription = stringResource(R.string.cd_remove_audio),
                 onClick = onRemove,
                 size = 28.dp,

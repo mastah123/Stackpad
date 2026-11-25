@@ -1,8 +1,6 @@
 package com.stackpad.app.ui.notes
 
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.DarkMode
+import com.stackpad.app.ui.icons.AppIcons
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable
@@ -47,9 +45,9 @@ fun NoteSideMenu(
         onSettings = onSettings,
         trailing = {
             when (tab) {
-                MenuTab.HOME -> ThemeMenu(current = themeMode, onSelect = onTheme, icon = Icons.Filled.DarkMode)
+                MenuTab.HOME -> ThemeMenu(current = themeMode, onSelect = onTheme, icon = AppIcons.DarkMode)
                 MenuTab.FOLDERS -> IconButton(onClick = onNewFolder) {
-                    Icon(Icons.Filled.Add, contentDescription = stringResource(R.string.folder_new))
+                    Icon(AppIcons.Add, contentDescription = stringResource(R.string.folder_new))
                 }
                 MenuTab.TAGS -> TagSortMenu(current = tagSort, onSelect = { tagSort = it })
             }

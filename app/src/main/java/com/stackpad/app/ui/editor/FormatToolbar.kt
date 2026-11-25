@@ -1,5 +1,6 @@
 package com.stackpad.app.ui.editor
 
+import com.stackpad.app.ui.icons.AppIcons
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
@@ -11,10 +12,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.FormatBold
-import androidx.compose.material.icons.filled.FormatItalic
-import androidx.compose.material.icons.filled.FormatUnderlined
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
@@ -71,17 +68,17 @@ fun FormatToolbar(
             isSelected = state.bold,
             description = stringResource(R.string.cd_bold),
             onClick = { onToggleSpan(SpanType.BOLD) },
-        ) { FormatIcon(Icons.Filled.FormatBold) }
+        ) { FormatIcon(AppIcons.FormatBold) }
         FormatButton(
             isSelected = state.italic,
             description = stringResource(R.string.cd_italic),
             onClick = { onToggleSpan(SpanType.ITALIC) },
-        ) { FormatIcon(Icons.Filled.FormatItalic) }
+        ) { FormatIcon(AppIcons.FormatItalic) }
         FormatButton(
             isSelected = state.underline,
             description = stringResource(R.string.cd_underline),
             onClick = { onToggleSpan(SpanType.UNDERLINE) },
-        ) { FormatIcon(Icons.Filled.FormatUnderlined) }
+        ) { FormatIcon(AppIcons.FormatUnderlined) }
     }
 }
 

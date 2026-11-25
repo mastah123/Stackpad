@@ -1,5 +1,6 @@
 package com.stackpad.app.ui.editor.blocks
 
+import com.stackpad.app.ui.icons.AppIcons
 import com.stackpad.app.ui.theme.BlockAccent
 import com.stackpad.app.ui.components.keepCaretVisible
 import androidx.compose.animation.AnimatedVisibility
@@ -18,10 +19,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.DragHandle
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
@@ -171,7 +168,7 @@ fun ChecklistBlockView(
                 ),
             )
             SmallIconButton(
-                icon = Icons.Filled.Close,
+                icon = AppIcons.Close,
                 contentDescription = stringResource(R.string.cd_remove_checklist),
                 onClick = onRemove,
                 size = 28.dp,
@@ -291,7 +288,7 @@ fun ChecklistBlockView(
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Icon(
-                imageVector = Icons.Filled.Add,
+                imageVector = AppIcons.Add,
                 contentDescription = null,
                 modifier = Modifier.size(16.dp),
                 tint = colors.primary,
@@ -423,7 +420,7 @@ private fun ChecklistRow(
             contentAlignment = Alignment.Center,
         ) {
             Icon(
-                imageVector = Icons.Filled.DragHandle,
+                imageVector = AppIcons.DragHandle,
                 contentDescription = stringResource(R.string.cd_drag_handle),
                 modifier = Modifier.size(18.dp),
                 tint = colors.onSurfaceVariant,

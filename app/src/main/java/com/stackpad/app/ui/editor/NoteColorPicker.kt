@@ -1,5 +1,6 @@
 package com.stackpad.app.ui.editor
 
+import com.stackpad.app.ui.icons.AppIcons
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
@@ -9,9 +10,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Check
-import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
@@ -54,13 +52,13 @@ fun NoteColorPicker(selected: Int, onSelect: (Int) -> Unit) {
             ) {
                 when {
                     isSelected -> Icon(
-                        Icons.Filled.Check,
+                        AppIcons.Check,
                         contentDescription = null,
                         modifier = Modifier.size(18.dp),
                         tint = if (accent == null) MaterialTheme.colorScheme.onSurfaceVariant else Color.Black.copy(alpha = 0.75f),
                     )
                     accent == null -> Icon(
-                        Icons.Filled.Close,
+                        AppIcons.Close,
                         contentDescription = null,
                         modifier = Modifier.size(16.dp),
                         tint = outline,

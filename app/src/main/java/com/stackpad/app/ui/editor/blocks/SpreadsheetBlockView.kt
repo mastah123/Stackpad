@@ -1,5 +1,6 @@
 package com.stackpad.app.ui.editor.blocks
 
+import com.stackpad.app.ui.icons.AppIcons
 import com.stackpad.app.ui.theme.BlockAccent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -23,8 +24,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -58,7 +57,6 @@ import com.stackpad.app.ui.components.InlineTextField
 import com.stackpad.app.ui.components.SmallIconButton
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.ui.platform.LocalContext
@@ -147,7 +145,7 @@ fun SpreadsheetBlockView(
             )
             Box {
                 SmallIconButton(
-                    icon = Icons.Filled.MoreVert,
+                    icon = AppIcons.MoreVert,
                     contentDescription = stringResource(R.string.table_menu),
                     onClick = { menuOpen = true },
                     size = 28.dp,
@@ -171,7 +169,7 @@ fun SpreadsheetBlockView(
                 }
             }
             SmallIconButton(
-                icon = Icons.Filled.Close,
+                icon = AppIcons.Close,
                 contentDescription = stringResource(R.string.cd_remove_table),
                 onClick = onRemove,
                 size = 28.dp,

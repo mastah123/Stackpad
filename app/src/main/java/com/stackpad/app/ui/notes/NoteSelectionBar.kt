@@ -1,16 +1,10 @@
 package com.stackpad.app.ui.notes
 
+import com.stackpad.app.ui.icons.AppIcons
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.MoreVert
-import androidx.compose.material.icons.filled.PushPin
-import androidx.compose.material.icons.filled.SelectAll
-import androidx.compose.material.icons.outlined.PushPin
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -51,25 +45,25 @@ fun NoteSelectionBar(
         title = { Text(stringResource(R.string.selection_count, count), style = MaterialTheme.typography.titleMedium) },
         navigationIcon = {
             IconButton(onClick = onClose) {
-                Icon(Icons.Filled.Close, contentDescription = stringResource(R.string.cd_close_selection))
+                Icon(AppIcons.Close, contentDescription = stringResource(R.string.cd_close_selection))
             }
         },
         actions = {
             IconButton(onClick = onSelectAll) {
-                Icon(Icons.Filled.SelectAll, contentDescription = stringResource(R.string.action_select_all))
+                Icon(AppIcons.SelectAll, contentDescription = stringResource(R.string.action_select_all))
             }
             IconButton(onClick = onTogglePin) {
                 Icon(
-                    imageVector = if (allPinned) Icons.Outlined.PushPin else Icons.Filled.PushPin,
+                    imageVector = if (allPinned) AppIcons.PushPin else AppIcons.PushPin,
                     contentDescription = stringResource(if (allPinned) R.string.cd_unpin else R.string.cd_pin),
                 )
             }
             IconButton(onClick = onTrash) {
-                Icon(Icons.Filled.Delete, contentDescription = stringResource(R.string.cd_trash_note))
+                Icon(AppIcons.Delete, contentDescription = stringResource(R.string.cd_trash_note))
             }
             Box {
                 IconButton(onClick = { menuOpen = true }) {
-                    Icon(Icons.Filled.MoreVert, contentDescription = stringResource(R.string.cd_selected_notes_more))
+                    Icon(AppIcons.MoreVert, contentDescription = stringResource(R.string.cd_selected_notes_more))
                 }
                 DropdownMenu(expanded = menuOpen, onDismissRequest = { menuOpen = false }) {
                     DropdownMenuItem(

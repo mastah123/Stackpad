@@ -1,5 +1,6 @@
 package com.stackpad.app.ui.editor.blocks
 
+import com.stackpad.app.ui.icons.AppIcons
 import com.stackpad.app.ui.components.keepCaretVisible
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -9,8 +10,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -47,8 +46,6 @@ import androidx.compose.ui.text.rememberTextMeasurer
 import com.stackpad.app.data.model.ListKind
 import com.stackpad.app.domain.text.isBullet
 import androidx.compose.foundation.selection.toggleable
-import androidx.compose.material.icons.filled.CheckBox
-import androidx.compose.material.icons.filled.CheckBoxOutlineBlank
 import androidx.compose.material3.Icon
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.style.TextDecoration
@@ -141,7 +138,7 @@ fun ListBlockView(
             }
         }
         SmallIconButton(
-            icon = Icons.Filled.Close,
+            icon = AppIcons.Close,
             contentDescription = stringResource(R.string.cd_remove_list),
             onClick = onRemove,
             size = 28.dp,
@@ -203,7 +200,7 @@ private fun ListItemRow(
                 contentAlignment = Alignment.CenterStart,
             ) {
                 Icon(
-                    imageVector = if (item.checked) Icons.Filled.CheckBox else Icons.Filled.CheckBoxOutlineBlank,
+                    imageVector = if (item.checked) AppIcons.CheckBox else AppIcons.CheckBoxOutlineBlank,
                     contentDescription = stringResource(if (item.checked) R.string.cd_item_checked else R.string.cd_item_unchecked),
                     tint = if (item.checked) colors.primary else colors.onSurfaceVariant,
                     modifier = Modifier.size(20.dp),

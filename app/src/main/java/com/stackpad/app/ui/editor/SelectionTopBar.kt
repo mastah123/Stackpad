@@ -1,12 +1,6 @@
 package com.stackpad.app.ui.editor
 
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowDownward
-import androidx.compose.material.icons.filled.ArrowUpward
-import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.ContentCopy
-import androidx.compose.material.icons.filled.SelectAll
-import androidx.compose.material.icons.filled.UnfoldMore
+import com.stackpad.app.ui.icons.AppIcons
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -37,24 +31,24 @@ fun SelectionTopBar(
         },
         navigationIcon = {
             IconButton(onClick = onClose) {
-                Icon(Icons.Filled.Close, contentDescription = stringResource(R.string.cd_close_selection))
+                Icon(AppIcons.Close, contentDescription = stringResource(R.string.cd_close_selection))
             }
         },
         actions = {
             IconButton(onClick = onSelectAll) {
-                Icon(Icons.Filled.SelectAll, contentDescription = stringResource(R.string.action_select_all))
+                Icon(AppIcons.SelectAll, contentDescription = stringResource(R.string.action_select_all))
             }
             IconButton(onClick = onSelectRange, enabled = selectedCount >= 2) {
-                Icon(Icons.Filled.UnfoldMore, contentDescription = stringResource(R.string.action_select_range))
+                Icon(AppIcons.UnfoldMore, contentDescription = stringResource(R.string.action_select_range))
             }
             IconButton(onClick = onMoveUp, enabled = canMoveUp) {
-                Icon(Icons.Filled.ArrowUpward, contentDescription = stringResource(R.string.action_move_up))
+                Icon(AppIcons.ArrowUpward, contentDescription = stringResource(R.string.action_move_up))
             }
             IconButton(onClick = onMoveDown, enabled = canMoveDown) {
-                Icon(Icons.Filled.ArrowDownward, contentDescription = stringResource(R.string.action_move_down))
+                Icon(AppIcons.ArrowDownward, contentDescription = stringResource(R.string.action_move_down))
             }
             IconButton(onClick = onCopy, enabled = selectedCount > 0) {
-                Icon(Icons.Filled.ContentCopy, contentDescription = stringResource(R.string.action_copy_selected))
+                Icon(AppIcons.ContentCopy, contentDescription = stringResource(R.string.action_copy_selected))
             }
         },
     )

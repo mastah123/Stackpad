@@ -1,5 +1,6 @@
 package com.stackpad.app.ui.trash
 
+import com.stackpad.app.ui.icons.AppIcons
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -11,10 +12,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.DeleteForever
-import androidx.compose.material.icons.filled.RestoreFromTrash
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -63,7 +60,7 @@ fun TrashScreen(
                 title = { Text(stringResource(R.string.trash_title), style = MaterialTheme.typography.titleMedium) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.cd_back))
+                        Icon(AppIcons.ArrowBack, contentDescription = stringResource(R.string.cd_back))
                     }
                 },
                 actions = {
@@ -181,13 +178,13 @@ private fun TrashCard(
                 )
             }
             SmallIconButton(
-                icon = Icons.Filled.RestoreFromTrash,
+                icon = AppIcons.RestoreFromTrash,
                 contentDescription = stringResource(R.string.cd_restore_note),
                 onClick = onRestore,
                 tint = colors.primary,
             )
             SmallIconButton(
-                icon = Icons.Filled.DeleteForever,
+                icon = AppIcons.DeleteForever,
                 contentDescription = stringResource(R.string.cd_erase_note),
                 onClick = onEraseForever,
             )

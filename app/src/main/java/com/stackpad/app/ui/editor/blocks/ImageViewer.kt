@@ -1,5 +1,6 @@
 package com.stackpad.app.ui.editor.blocks
 
+import com.stackpad.app.ui.icons.AppIcons
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.gestures.detectTransformGestures
@@ -7,9 +8,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawingPadding
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.Crop
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
@@ -97,7 +95,7 @@ fun ImageViewer(
                 modifier = Modifier.align(Alignment.TopStart).safeDrawingPadding().padding(4.dp),
             ) {
                 Icon(
-                    imageVector = Icons.Filled.Crop,
+                    imageVector = AppIcons.Crop,
                     contentDescription = stringResource(R.string.image_edit_menu_edit),
                     tint = Color.White,
                 )
@@ -107,7 +105,7 @@ fun ImageViewer(
                 modifier = Modifier.align(Alignment.TopEnd).safeDrawingPadding().padding(4.dp),
             ) {
                 Icon(
-                    imageVector = Icons.Filled.Close,
+                    imageVector = AppIcons.Close,
                     contentDescription = stringResource(R.string.cd_close_image),
                     tint = Color.White,
                 )

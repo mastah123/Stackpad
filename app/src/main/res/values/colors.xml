@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="stackpad_window_background">#FFFBFBFE</color>
+    <color name="stackpad_window_background">#FFFDFCFA</color>
     <color name="ic_launcher_background">#FF4F46E5</color>
     <color name="widget_background">#FFFFFFFF</color>
-    <color name="widget_text">#FF1B1B22</color>
-    <color name="widget_text_secondary">#FF5C5C6B</color>
-    <color name="widget_accent">#FF4F46E5</color>
+    <color name="widget_text">#FF1C2340</color>
+    <color name="widget_text_secondary">#FF6B7592</color>
+    <color name="widget_accent">#FFDD5148</color>
 </resources>

@@ -1,16 +1,11 @@
 package com.stackpad.app.ui.notes
 
+import com.stackpad.app.ui.icons.AppIcons
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Archive
-import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.Notes
-import androidx.compose.material.icons.filled.Notifications
-import androidx.compose.material.icons.filled.PushPin
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -33,10 +28,10 @@ fun MenuHomeTab(
         modifier = Modifier.verticalScroll(rememberScrollState()).padding(horizontal = 12.dp, vertical = 8.dp),
         verticalArrangement = Arrangement.spacedBy(4.dp),
     ) {
-        MenuRow(Icons.Filled.Notes, stringResource(R.string.section_all_notes), mode == ListMode.ALL, onAll, counts.all)
-        MenuRow(Icons.Filled.PushPin, stringResource(R.string.menu_pinned), mode == ListMode.PINNED, onPinned, counts.pinned)
-        MenuRow(Icons.Filled.Notifications, stringResource(R.string.menu_reminders), false, onReminders, counts.reminders)
-        MenuRow(Icons.Filled.Archive, stringResource(R.string.menu_archive), false, onArchive, counts.archived)
-        MenuRow(Icons.Filled.Delete, stringResource(R.string.menu_trash), false, onTrash, counts.trashed)
+        MenuRow(AppIcons.Notes, stringResource(R.string.section_all_notes), mode == ListMode.ALL, onAll, counts.all)
+        MenuRow(AppIcons.PushPin, stringResource(R.string.menu_pinned), mode == ListMode.PINNED, onPinned, counts.pinned)
+        MenuRow(AppIcons.Notifications, stringResource(R.string.menu_reminders), false, onReminders, counts.reminders)
+        MenuRow(AppIcons.Archive, stringResource(R.string.menu_archive), false, onArchive, counts.archived)
+        MenuRow(AppIcons.Delete, stringResource(R.string.menu_trash), false, onTrash, counts.trashed)
     }
 }
