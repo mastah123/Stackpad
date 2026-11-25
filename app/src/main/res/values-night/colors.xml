@@ -4,5 +4,5 @@
     <color name="widget_background">#FF1D2340</color>
     <color name="widget_text">#FFEDEFF8</color>
     <color name="widget_text_secondary">#FFA9B1CC</color>
-    <color name="widget_accent">#FFFF8D82</color>
+    <color name="widget_accent">#FFEDEFF8</color>
 </resources>

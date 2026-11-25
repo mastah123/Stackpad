@@ -127,13 +127,9 @@ Covers: formula evaluator, span editing, URL detection/validation, list markers,
 - [ ] In a long note, type on a line near the bottom with the keyboard open, then open the + or Tag row: the line with the cursor scrolls up so the cursor is never hidden behind the chips or option row. Same in a list, a checklist, a quote and the title.
 - [ ] Select blocks: every block (a one-line text, a tall image, a table) has the same 24 dp checkbox in the same left column.
 
-### Select blocks, templates and note lock
+### Select blocks and note lock
 - [ ] Menu, Select blocks: the bottom bars disappear, each block gets a checkbox, and tapping a block selects it without opening the keyboard. The top bar shows "N selected".
 - [ ] Select all selects every block. Copy selected copies them in note order; paste elsewhere. Copy is disabled with nothing selected. Close or the back button leaves selection mode.
-- [ ] Menu, Insert template, Meeting notes on an empty note: the note is filled and the title is set. On a note with content, the template is added at the end and the title is kept.
-- [ ] Insert the same template twice: both copies work independently (editing one does not change the other).
-- [ ] Menu, Save as template with a name: "Template saved." It appears under Yours in the picker, also after restarting the app. Images and audio are not in it; checklist items are unchecked.
-- [ ] Save as template on an empty note shows a message and saves nothing. Delete a saved template (asks to confirm); the built-in ones have no delete.
 - [ ] With a screen lock set: Menu, Lock note asks you to unlock, then shows "Note locked". In the list the note has a lock icon and no preview, and searching for words inside it does not find it (its title still does).
 - [ ] Open a locked note: a lock screen shows and the prompt opens; the note's text is not visible. Cancel keeps the lock screen; Unlock asks again. Back works.
 - [ ] After unlocking, leave the app for over 30 seconds and return: the note is locked again. Under 30 seconds: still open.
@@ -380,6 +376,15 @@ Covers: formula evaluator, span editing, URL detection/validation, list markers,
 - [ ] Crop a picture, then open the editor again: the full original picture is shown (not the cropped one); saving applies the new edit to the original. "Restore original" still works.
 - [ ] More space between the "words · created" line and the first text of a note. The add bar shows Add, Text, List, Cards only.
 
+### Changes list (2.22.0)
+- [ ] The editor's 3-dot sheet and the Home note ⋮ sheet open fully expanded. Home sheet: Pin, Archive, Duplicate, Add to home, Move to folder, Move to trash, Add tag (toggle, New tag) and Add color all work; the note updates behind the sheet. Folder, tag and search lists use the same sheet.
+- [ ] There is no Templates or Save template anywhere (editor sheet, README, menus).
+- [ ] Nothing is red: buttons, icons, links and the cursor are navy (light) or near-white (dark). Selected chips, toolbar buttons, menu rows, selected blocks and selected notes all use the same soft pink pill.
+- [ ] Quote is cream, Prompt lavender with a purple label, Code dark navy with a green label and light text, in light and dark themes; copy and close buttons are visible on each.
+- [ ] While typing, no H1/H2/H3/bold row is shown. Tap Format, then Styles: the row appears above; tap Styles again: it hides. Closing Format hides both rows.
+- [ ] Format chip sits between Text and List. In a plain text block: Font, Size, Highlight and Line height each open a menu with a check on the current choice; picking one changes that block at once (highlight is a colored marker behind the text; headings keep their size). Other blocks are unchanged. Reopen the note: the choices are kept. With no text block tapped yet, Format shows "Tap a text block to change its look."
+- [ ] Undo/redo still works after a Format change.
+
 ### New look (2.21.0)
 - [ ] Light theme: warm off-white background, navy text, coral accent (selected menu row, switches, buttons). Dark theme: deep navy background, the same hues lighter.
 - [ ] Every icon is a thin rounded line icon (menu, search, add, close, back, pin, tag, folder, trash, archive, lock, undo/redo, the editor toolbars, settings). None is missing, blank or cut off; the Add block and format toolbars still highlight the active item.
@@ -397,7 +402,7 @@ Covers: formula evaluator, span editing, URL detection/validation, list markers,
 - [ ] History opens the version list. Copy copies the text ("Note copied"); Share opens the share sheet with plain text; Export opens a page with Text, Markdown, Image, PDF and Share options, and Back returns.
 - [ ] Duplicate: "Note duplicated"; a copy titled "... (copy)" appears in the list, not pinned, with the same content and pictures. Duplicate a blank new note: "Nothing to duplicate yet". Erase the original from the trash: the copy still shows its pictures.
 - [ ] Add to home: the launcher asks to add a shortcut; tapping it opens that note. On a launcher without support the tile is not shown.
-- [ ] Select blocks, Templates, Save template and Move to trash work as before (trash asks to confirm).
+- [ ] Select blocks and Move to trash work as before (trash asks to confirm).
 - [ ] Update from 2.19.0 keeps all notes; none are archived.
 
 ### Table handles (2.19.0)

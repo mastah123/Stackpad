@@ -10,7 +10,7 @@
 
 <p align="center">
   <a href="https://github.com/mastah123/stackpad/actions/workflows/android.yml"><img alt="Build" src="https://github.com/mastah123/stackpad/actions/workflows/android.yml/badge.svg"></a>
-  <img alt="Version" src="https://img.shields.io/badge/version-2.21.0-4F46E5">
+  <img alt="Version" src="https://img.shields.io/badge/version-2.22.0-4F46E5">
   <img alt="Platform" src="https://img.shields.io/badge/platform-Android%208.0%2B-3DDC84">
   <img alt="Kotlin" src="https://img.shields.io/badge/Kotlin-2.0-7F52FF">
   <img alt="License" src="https://img.shields.io/badge/license-MIT-blue">
@@ -51,7 +51,6 @@ Also:
 - **Export all notes as Markdown** (Settings): one zip with a `.md` file per note, a folder per Stackpad folder and a shared `media/` folder with pictures. Locked and trashed notes are left out; audio is not included.
 - **Automatic backup** (Settings): pick a folder and a daily or weekly schedule; Stackpad writes `stackpad-auto-<date>.zip` there and keeps the last 7. "Back up now" runs it on demand. Android decides the exact time, and backups are not encrypted.
 - The add bar groups blocks: **+** (image, camera, audio, link, table, divider), Text, List, Cards, Tag.
-- **Templates**: start from Meeting notes, To-do, Journal or Project plan, or save any note as your own template.
 - **Select blocks** to copy them as text or move them up and down, or copy the whole note.
 - **Lock a single note** behind your screen lock, even with app lock off.
 - **Backup and restore**: export every note with its images and audio to a zip, and merge it back later without overwriting newer edits.
@@ -96,7 +95,6 @@ app/src/main/java/com/stackpad/app/
 │   ├── notes/       Sorting, filtering, tags, folder names, trash policy
 │   ├── security/    When the app lock re-locks
 │   ├── sheet/       Table edit operations
-│   ├── templates/   Built-in templates and template rules
 │   └── text/        Span editing, URL detection, list markers
 ├── audio/           Recorder, player, playback speed, waveform helpers
 ├── notifications/   Reminder alarms and notifications

@@ -171,6 +171,20 @@ class NoteRepository(
         scope.launch { save(note) }
     }
 
+    suspend fun setColor(id: String, color: Int) {
+        writeLock.withLock { dao.setColor(id, color) }
+    }
+
+    /** Removes [tag] from one note. */
+    suspend fun removeTag(id: String, tag: String) {
+        writeLock.withLock {
+            val entity = dao.get(id) ?: return@withLock
+            val current = Tags.parse(entity.tags)
+            val updated = current.filterNot { it == tag }
+            if (updated != current) dao.setTags(id, Tags.serialize(updated))
+        }
+    }
+
     suspend fun setArchived(id: String, archived: Boolean) {
         writeLock.withLock { dao.setArchived(id, archived) }
     }

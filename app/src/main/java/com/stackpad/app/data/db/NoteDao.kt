@@ -69,6 +69,9 @@ interface NoteDao {
     @Query("UPDATE notes SET folderId = :folderId WHERE id IN (:ids)")
     suspend fun setFolderIn(ids: List<String>, folderId: String?)
 
+    @Query("UPDATE notes SET color = :color WHERE id = :id")
+    suspend fun setColor(id: String, color: Int)
+
     @Query("UPDATE notes SET archived = :archived WHERE id = :id")
     suspend fun setArchived(id: String, archived: Boolean)
 

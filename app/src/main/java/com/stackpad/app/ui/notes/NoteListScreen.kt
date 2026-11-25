@@ -50,6 +50,10 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.stackpad.app.R
+import com.stackpad.app.util.NoteShortcut
+import com.stackpad.app.ui.editor.NoteOptionsSheet
+import com.stackpad.app.ui.editor.NoteOption
+import com.stackpad.app.domain.notes.AutoTitle
 import com.stackpad.app.data.model.Folder
 import com.stackpad.app.data.model.NoteSummary
 import com.stackpad.app.data.prefs.ListLayout
@@ -97,6 +101,8 @@ fun NoteListScreen(
     var addTagDialog by remember { mutableStateOf(false) }
     // Notes the folder/tag dialogs act on: the selection, or the one note whose three-dot menu was used.
     var actionIds by remember { mutableStateOf(emptySet<String>()) }
+    // The note whose options sheet (the 3 dots on a note) is open.
+    var optionsNoteId by remember { mutableStateOf<String?>(null) }
     var searchOpen by rememberSaveable { mutableStateOf(false) }
     val home = mode == ListMode.ALL || mode == ListMode.PINNED
     val searchWords = remember(query) { SearchQuery.words(query) }
@@ -266,12 +272,7 @@ fun NoteListScreen(
                 }
                 val current = ui.notes
                 val actionsFor: (NoteSummary) -> NoteCardActions = { note ->
-                    NoteCardActions(
-                        onTogglePin = { viewModel.togglePin(note) },
-                        onMoveToFolder = { actionIds = setOf(note.id); folderChoiceDialog = true },
-                        onAddTag = { actionIds = setOf(note.id); addTagDialog = true },
-                        onTrash = { viewModel.moveToTrash(note.id) },
-                    )
+                    NoteCardActions(onOpenOptions = { optionsNoteId = note.id })
                 }
                 val listIcons: @Composable () -> Unit = {
                     LayoutToggleButton(layout = ui.layout, onChange = viewModel::setLayout)
@@ -324,6 +325,65 @@ fun NoteListScreen(
                 selectedIds = emptySet()
             },
             onDismiss = { folderChoiceDialog = false },
+        )
+    }
+
+    val optionsNote = optionsNoteId?.let { id -> ui.notes?.firstOrNull { it.id == id } }
+    if (optionsNote != null) {
+        val sheetOptions = remember {
+            setOfNotNull(
+                NoteOption.PIN,
+                NoteOption.ARCHIVE,
+                NoteOption.DUPLICATE,
+                NoteOption.ADD_TO_HOME.takeIf { NoteShortcut.isSupported(context) },
+                NoteOption.MOVE_TO_FOLDER,
+                NoteOption.TRASH,
+            )
+        }
+        NoteOptionsSheet(
+            title = AutoTitle.orDefault(optionsNote.title, optionsNote.createdAt),
+            tags = optionsNote.tags,
+            knownTags = ui.tags.map { it.tag },
+            createdAt = optionsNote.createdAt,
+            updatedAt = optionsNote.updatedAt,
+            color = optionsNote.color,
+            pinned = optionsNote.pinned,
+            archived = false,
+            locked = optionsNote.locked,
+            options = sheetOptions,
+            canShare = false,
+            onDismiss = { optionsNoteId = null },
+            onToggleTag = { tag -> viewModel.toggleTag(optionsNote.id, tag, tag in optionsNote.tags) },
+            onNewTag = {
+                optionsNoteId = null
+                actionIds = setOf(optionsNote.id)
+                addTagDialog = true
+            },
+            onSelectColor = { viewModel.setColor(optionsNote.id, it) },
+            onShare = {},
+            onOption = { option ->
+                optionsNoteId = null
+                when (option) {
+                    NoteOption.PIN -> viewModel.togglePin(optionsNote)
+                    NoteOption.ARCHIVE -> viewModel.archive(optionsNote.id)
+                    NoteOption.DUPLICATE -> {
+                        viewModel.duplicate(optionsNote.id)
+                        scope.launch { snackbar.showSnackbar(context.getString(R.string.msg_note_duplicated)) }
+                    }
+                    NoteOption.ADD_TO_HOME -> {
+                        val label = AutoTitle.orDefault(optionsNote.title, optionsNote.createdAt)
+                        if (!NoteShortcut.pin(context, optionsNote.id, label)) {
+                            scope.launch { snackbar.showSnackbar(context.getString(R.string.msg_shortcut_failed)) }
+                        }
+                    }
+                    NoteOption.MOVE_TO_FOLDER -> {
+                        actionIds = setOf(optionsNote.id)
+                        folderChoiceDialog = true
+                    }
+                    NoteOption.TRASH -> viewModel.moveToTrash(optionsNote.id)
+                    else -> Unit
+                }
+            },
         )
     }
 

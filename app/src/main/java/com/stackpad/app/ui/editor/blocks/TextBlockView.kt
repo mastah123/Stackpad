@@ -33,6 +33,8 @@ import androidx.compose.ui.input.key.type
 import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.unit.TextUnit
+import com.stackpad.app.ui.theme.TextHighlights
+import com.stackpad.app.ui.theme.family
 import com.stackpad.app.data.model.SpanType
 import com.stackpad.app.data.model.TextLevel
 import androidx.compose.ui.text.input.KeyboardCapitalization
@@ -90,8 +92,16 @@ fun TextBlockView(
         RichTextTransformation(block.spans, colors.primary, headingStyles)
     }
     // No fixed line height: a line with a heading is taller than a body line.
-    val textStyle = TextLevel.PARAGRAPH.textStyle(typography)
-        .copy(color = colors.onSurface, lineHeight = TextUnit.Unspecified)
+    val baseStyle = TextLevel.PARAGRAPH.textStyle(typography)
+    val fontSize = baseStyle.fontSize * block.size.scale
+    val textStyle = baseStyle.copy(
+        color = colors.onSurface,
+        fontSize = fontSize,
+        fontFamily = block.font.family() ?: baseStyle.fontFamily,
+        lineHeight = block.spacing.multiplier?.let { fontSize * it } ?: TextUnit.Unspecified,
+    )
+    val highlight = TextHighlights.background(block.highlight)
+    val fieldStyle = if (highlight != null) textStyle.copy(background = highlight) else textStyle
 
     BasicTextField(
         value = value,
@@ -135,7 +145,7 @@ fun TextBlockView(
                     false
                 }
             },
-        textStyle = textStyle,
+        textStyle = fieldStyle,
         keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Sentences),
         cursorBrush = SolidColor(colors.primary),
         visualTransformation = transformation,

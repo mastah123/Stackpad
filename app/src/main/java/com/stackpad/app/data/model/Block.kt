@@ -56,6 +56,12 @@ data class TextBlock(
     val level: TextLevel = TextLevel.PARAGRAPH,
     val text: String = "",
     val spans: List<TextSpan> = emptyList(),
+    /** How this block is drawn (see [TextLook]). Headings inside it keep their own size. */
+    val font: TextFont = TextFont.DEFAULT,
+    val size: TextSize = TextSize.NORMAL,
+    /** Highlight color: 0 = none, otherwise an index into the highlight colors. */
+    val highlight: Int = 0,
+    val spacing: LineSpacing = LineSpacing.NORMAL,
 ) : Block
 
 @Serializable

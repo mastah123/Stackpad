@@ -100,7 +100,7 @@ internal fun FormatButton(
     val colors = MaterialTheme.colorScheme
     val contentColor = when {
         !enabled -> colors.onSurfaceVariant.copy(alpha = 0.38f)
-        isSelected -> colors.onPrimary
+        isSelected -> colors.onSecondaryContainer
         else -> colors.onSurface
     }
     CompositionLocalProvider(LocalContentColor provides contentColor) {
@@ -109,7 +109,7 @@ internal fun FormatButton(
                 .height(32.dp)
                 .padding(horizontal = 1.dp)
                 .clip(RoundedCornerShape(8.dp))
-                .background(if (isSelected) colors.primary else colors.surface.copy(alpha = 0f))
+                .background(if (isSelected) colors.secondaryContainer else colors.surface.copy(alpha = 0f))
                 .clickable(enabled = enabled, role = Role.Button, onClick = onClick)
                 .semantics {
                     contentDescription = description

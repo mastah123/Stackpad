@@ -1,8 +1,8 @@
 package com.stackpad.app.ui.editor.blocks
 
 import com.stackpad.app.ui.icons.AppIcons
-import com.stackpad.app.ui.theme.tint
-import com.stackpad.app.ui.theme.container
+import com.stackpad.app.ui.theme.look
+import androidx.compose.foundation.border
 import com.stackpad.app.ui.theme.BlockAccent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -42,6 +42,7 @@ fun QuoteBlockView(
     modifier: Modifier = Modifier,
 ) {
     val colors = MaterialTheme.colorScheme
+    val look = BlockAccent.QUOTE.look()
     val focusRequester = remember { FocusRequester() }
 
     LaunchedEffect(requestFocus) {
@@ -56,7 +57,8 @@ fun QuoteBlockView(
             .fillMaxWidth()
             .height(IntrinsicSize.Min)
             .clip(RoundedCornerShape(8.dp))
-            .background(BlockAccent.QUOTE.container()),
+            .background(look.container)
+            .border(1.dp, look.border ?: look.container, RoundedCornerShape(8.dp)),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Box(
@@ -64,7 +66,7 @@ fun QuoteBlockView(
                 .width(3.dp)
                 .fillMaxHeight()
                 .clip(RoundedCornerShape(2.dp))
-                .background(BlockAccent.QUOTE.tint()),
+                .background(look.label),
         )
         InlineTextField(
             text = block.text,
@@ -72,7 +74,7 @@ fun QuoteBlockView(
             placeholder = stringResource(R.string.quote_hint),
             textStyle = MaterialTheme.typography.bodyMedium.copy(
                 fontStyle = FontStyle.Italic,
-                color = colors.onSurfaceVariant,
+                color = look.content,
             ),
             focusRequester = focusRequester,
             onFocusChange = { if (it) onBlockFocused() },
@@ -82,6 +84,7 @@ fun QuoteBlockView(
             icon = AppIcons.Close,
             contentDescription = stringResource(R.string.cd_remove_quote),
             onClick = onRemove,
+            tint = look.label,
             size = 28.dp,
             iconSize = 16.dp,
         )

@@ -7,6 +7,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.22.0] - 2026-11-25
+
+### Added
+- Format chip between Text and List. It opens Styles (headings, bold, italic, underline) and the drop-downs Font, Size, Highlight and Line height, which change the plain text block you are editing: font (Default, Serif, Monospace, Handwriting), size (Small to Huge), highlight color (six colors) and line spacing (Tight to Loose). Headings inside the block keep their own size. The choices are saved with the note.
+- The note options sheet now also opens from the 3 dots on a note in Home, folders, tags and search. There it offers Pin, Archive, Duplicate, Add to home, Move to folder and Move to trash, plus Add tag and Add color. Lock, History, Copy, Share, Export and Select blocks stay in the editor's sheet.
+
+### Changed
+- The note options sheet opens fully expanded.
+- The text style toolbar (H1, H2, H3, bold, italic, underline) is hidden until you open Format and tap Styles.
+- Colors: buttons, icons, links and the cursor are navy instead of coral. Every selected item (menu rows, chips, toolbar buttons, selected blocks) uses the soft pink pill from the menu.
+- Quote, Prompt and Code blocks use new colors: cream, lavender and dark navy, in light and dark themes.
+
+### Removed
+- Templates (Insert template, Save as template and the built-in templates). Templates you had saved are no longer shown.
+
 ## [2.21.0] - 2026-11-25
 
 ### Changed

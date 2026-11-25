@@ -313,30 +313,17 @@
     <string name="folders_empty">No folders yet.</string>
     <string name="action_lock_note">Lock note</string>
     <string name="action_unlock_note">Remove note lock</string>
-    <string name="action_templates">Insert template</string>
-    <string name="action_save_template">Save as template</string>
     <string name="action_select_blocks">Select blocks</string>
     <string name="action_copy_selected">Copy selected</string>
     <string name="action_select_all">Select all</string>
     <string name="cd_close_selection">Close selection</string>
     <string name="cd_block_selected">Selected</string>
     <string name="cd_block_not_selected">Not selected</string>
-    <string name="cd_delete_template" formatted="true">Delete template %1$s</string>
     <string name="cd_locked_note">Locked note</string>
     <string name="selection_count" formatted="true">%1$d selected</string>
     <string name="msg_blocks_copied">Selected blocks copied to clipboard.</string>
-    <string name="msg_template_saved">Template saved.</string>
-    <string name="msg_template_empty">Add some text, lists or tables first. Images and audio are not saved in templates.</string>
-    <string name="msg_template_limit">You can keep up to 20 templates. Delete one first.</string>
     <string name="msg_note_lock_on">Note locked. It needs your screen lock to open.</string>
     <string name="msg_note_lock_off">Note lock removed.</string>
-    <string name="templates_title">Templates</string>
-    <string name="templates_built_in">Built in</string>
-    <string name="templates_yours">Yours</string>
-    <string name="templates_none_saved">Templates you save appear here.</string>
-    <string name="template_name_hint">Template name</string>
-    <string name="dialog_delete_template_title" formatted="true">Delete template “%1$s”?</string>
-    <string name="dialog_delete_template_message">Notes made from it are not affected.</string>
     <string name="gate_title">This note is locked</string>
     <string name="gate_message">Unlock with your fingerprint, face or screen lock to read it.</string>
     <string name="widget_locked_note">Locked note</string>
@@ -526,8 +513,6 @@
     <string name="sheet_duplicate">Duplicate</string>
     <string name="sheet_add_to_home">Add to home</string>
     <string name="sheet_select_blocks">Select blocks</string>
-    <string name="sheet_templates">Templates</string>
-    <string name="sheet_save_template">Save template</string>
     <string name="menu_archive">Archive</string>
     <string name="archive_title">Archive</string>
     <string name="archive_empty">No archived notes. Archive a note from its note options to keep it out of your list.</string>
@@ -535,4 +520,30 @@
     <string name="msg_note_duplicated">Note duplicated</string>
     <string name="msg_duplicate_empty">Nothing to duplicate yet</string>
     <string name="msg_shortcut_failed">Your launcher could not add the shortcut</string>
+    <string name="add_format">Format</string>
+    <string name="format_styles">Styles</string>
+    <string name="format_font">Font</string>
+    <string name="format_size">Size</string>
+    <string name="format_highlight">Highlight</string>
+    <string name="format_line_height">Line height</string>
+    <string name="format_pick_text">Tap a text block to change its look.</string>
+    <string name="font_default">Default</string>
+    <string name="font_serif">Serif</string>
+    <string name="font_mono">Monospace</string>
+    <string name="font_handwriting">Handwriting</string>
+    <string name="size_small">Small</string>
+    <string name="size_normal">Normal</string>
+    <string name="size_large">Large</string>
+    <string name="size_huge">Huge</string>
+    <string name="spacing_tight">Tight</string>
+    <string name="spacing_normal">Normal</string>
+    <string name="spacing_relaxed">Relaxed</string>
+    <string name="spacing_loose">Loose</string>
+    <string name="highlight_none">None</string>
+    <string name="highlight_yellow">Yellow</string>
+    <string name="highlight_green">Green</string>
+    <string name="highlight_blue">Blue</string>
+    <string name="highlight_pink">Pink</string>
+    <string name="highlight_purple">Purple</string>
+    <string name="highlight_orange">Orange</string>
 </resources>

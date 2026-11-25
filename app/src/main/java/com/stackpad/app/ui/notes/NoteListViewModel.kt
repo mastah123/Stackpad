@@ -113,6 +113,25 @@ class NoteListViewModel(
         viewModelScope.launch { repository.setPinned(note.id, !note.pinned) }
     }
 
+    fun archive(id: String) {
+        viewModelScope.launch { repository.setArchived(id, true) }
+    }
+
+    fun duplicate(id: String) {
+        viewModelScope.launch { repository.duplicate(id) }
+    }
+
+    fun setColor(id: String, color: Int) {
+        viewModelScope.launch { repository.setColor(id, color) }
+    }
+
+    /** Adds [tag] to the note, or removes it when [present] says the note already has it. */
+    fun toggleTag(id: String, tag: String, present: Boolean) {
+        viewModelScope.launch {
+            if (present) repository.removeTag(id, tag) else repository.addTag(listOf(id), tag)
+        }
+    }
+
     fun moveToTrash(id: String) {
         viewModelScope.launch {
             repository.moveToTrash(id)

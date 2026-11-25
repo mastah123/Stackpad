@@ -2,6 +2,7 @@ package com.stackpad.app.ui.editor.blocks
 
 import com.stackpad.app.ui.icons.AppIcons
 import com.stackpad.app.ui.theme.BlockAccent
+import com.stackpad.app.ui.theme.look
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -43,6 +44,7 @@ fun CodeBlockView(
     modifier: Modifier = Modifier,
 ) {
     val colors = MaterialTheme.colorScheme
+    val look = BlockAccent.CODE.look()
     val clipboard = LocalClipboardManager.current
     val focusRequester = remember { FocusRequester() }
 
@@ -59,13 +61,13 @@ fun CodeBlockView(
                 imageVector = AppIcons.Code,
                 contentDescription = null,
                 modifier = Modifier.size(14.dp),
-                tint = colors.onSurfaceVariant,
+                tint = look.label,
             )
             Spacer(Modifier.width(6.dp))
             Text(
                 text = stringResource(R.string.block_code),
                 style = MaterialTheme.typography.labelSmall,
-                color = colors.onSurfaceVariant,
+                color = look.label,
                 modifier = Modifier.weight(1f),
             )
             SmallIconButton(
@@ -76,12 +78,14 @@ fun CodeBlockView(
                     onCopied()
                 },
                 enabled = block.text.isNotBlank(),
+                tint = look.content,
                 size = 30.dp,
             )
             SmallIconButton(
                 icon = AppIcons.Close,
                 contentDescription = stringResource(R.string.cd_remove_code),
                 onClick = onRemove,
+                tint = look.content,
                 size = 28.dp,
                 iconSize = 16.dp,
             )
@@ -94,7 +98,7 @@ fun CodeBlockView(
                 fontFamily = FontFamily.Monospace,
                 fontSize = 13.sp,
                 lineHeight = 17.sp,
-                color = colors.onSurface,
+                color = look.content,
             ),
             keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.None),
             focusRequester = focusRequester,

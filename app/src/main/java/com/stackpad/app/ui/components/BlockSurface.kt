@@ -1,6 +1,6 @@
 package com.stackpad.app.ui.components
 
-import com.stackpad.app.ui.theme.container
+import com.stackpad.app.ui.theme.look
 import com.stackpad.app.ui.theme.BlockAccent
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Column
@@ -27,11 +27,12 @@ fun BlockSurface(
     accent: BlockAccent? = null,
     content: @Composable ColumnScope.() -> Unit,
 ) {
+    val look = accent?.look()
     Surface(
         modifier = modifier.fillMaxWidth(),
         shape = shape,
-        color = accent?.container() ?: color,
-        border = border,
+        color = look?.container ?: color,
+        border = border ?: look?.border?.let { BorderStroke(1.dp, it) },
     ) {
         Column(
             modifier = Modifier.padding(horizontal = 8.dp, vertical = 6.dp),

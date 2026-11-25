@@ -69,6 +69,7 @@ import com.stackpad.app.audio.AudioPlayer
 import com.stackpad.app.data.media.MediaStorage
 import com.stackpad.app.data.model.SpanType
 import com.stackpad.app.data.model.TextBlock
+import com.stackpad.app.data.model.look
 import com.stackpad.app.data.model.TextLevel
 import com.stackpad.app.domain.notes.TrashPolicy
 import com.stackpad.app.notifications.ReminderNotifications
@@ -88,7 +89,6 @@ import android.os.SystemClock
 import androidx.activity.compose.BackHandler
 import androidx.compose.runtime.saveable.rememberSaveable
 import com.stackpad.app.domain.security.LockPolicy
-import com.stackpad.app.domain.templates.TemplateRules
 import com.stackpad.app.security.AppLockController
 import com.stackpad.app.ui.components.TextInputDialog
 import com.stackpad.app.domain.export.ExportFormat
@@ -166,14 +166,12 @@ private fun NoteEditorContent(
     var confirmDelete by remember { mutableStateOf(false) }
     var barHeight by remember { mutableIntStateOf(0) }
     var newTagDialog by remember { mutableStateOf(false) }
-    var optionRowOpen by remember { mutableStateOf(false) }
-    var showTemplates by remember { mutableStateOf(false) }
-    var saveTemplateDialog by remember { mutableStateOf(false) }
+    // The text block the Format chips change; kept after the block loses focus (the drop-down menus take it).
+    var formatTarget by remember { mutableStateOf<String?>(null) }
     var selecting by remember { mutableStateOf(false) }
     var selectedIds by remember { mutableStateOf(emptySet<String>()) }
     var showHistory by remember { mutableStateOf(false) }
     var showOptions by remember { mutableStateOf(false) }
-    val templates by viewModel.templates.collectAsStateWithLifecycle()
     val clipboard = LocalClipboardManager.current
 
     fun showMessage(resId: Int) {
@@ -410,6 +408,9 @@ private fun NoteEditorContent(
     }
     BackHandler(enabled = selecting, onBack = closeSelection)
 
+    LaunchedEffect(activeText?.blockId) { activeText?.blockId?.let { formatTarget = it } }
+    val formatLook = (state.blocks.firstOrNull { it.id == formatTarget } as? TextBlock)?.look()
+
     val formatState = activeText?.let { active ->
         (state.blocks.firstOrNull { it.id == active.blockId } as? TextBlock)?.let { block ->
             // With a selection, show what the selected text has. With only a caret, show the
@@ -509,21 +510,17 @@ private fun NoteEditorContent(
                     recording?.let { live ->
                         RecordingBar(state = live, onStop = viewModel::stopRecording, onCancel = viewModel::cancelRecording)
                     }
-                    // The text toolbar steps aside while an option row (+, List, Cards, Tag) or a recording is open.
-                    formatState?.takeIf { !optionRowOpen && recording == null }?.let { format ->
-                        FormatToolbar(
-                            state = format,
-                            onToggleLevel = viewModel::toggleLevel,
-                            onToggleSpan = viewModel::toggleSpan,
-                        )
-                    }
                     AddBlockBar(
                         recordingActive = recording != null,
                         onAddBlock = viewModel::addBlock,
                         onPickFromGallery = pickFromGallery,
                         onTakePhoto = takePhoto,
                         onRecordAudio = recordAudio,
-                        onOptionRowChange = { optionRowOpen = it },
+                        format = formatState?.takeIf { recording == null },
+                        onToggleLevel = viewModel::toggleLevel,
+                        onToggleSpan = viewModel::toggleSpan,
+                        look = formatLook,
+                        onLookChange = { look -> formatTarget?.let { viewModel.setTextLook(it, look) } },
                     )
                 }
             }
@@ -624,7 +621,14 @@ private fun NoteEditorContent(
             pinned = state.pinned,
             archived = state.archived,
             locked = state.locked,
-            canAddToHome = remember { com.stackpad.app.util.NoteShortcut.isSupported(context) },
+            options = remember {
+                buildSet {
+                    addAll(NoteOption.values())
+                    remove(NoteOption.MOVE_TO_FOLDER)
+                    if (!com.stackpad.app.util.NoteShortcut.isSupported(context)) remove(NoteOption.ADD_TO_HOME)
+                }
+            },
+            canShare = true,
             onDismiss = { showOptions = false },
             onToggleTag = { tag -> if (tag in state.tags) viewModel.removeTag(tag) else viewModel.addTag(tag) },
             onNewTag = {
@@ -672,8 +676,7 @@ private fun NoteEditorContent(
                         selectedIds = emptySet()
                         selecting = true
                     }
-                    NoteOption.TEMPLATES -> showTemplates = true
-                    NoteOption.SAVE_TEMPLATE -> saveTemplateDialog = true
+                    NoteOption.MOVE_TO_FOLDER -> Unit
                     NoteOption.TRASH -> confirmDelete = true
                 }
             },
@@ -685,33 +688,6 @@ private fun NoteEditorContent(
             loadVersions = viewModel::loadVersions,
             onRestore = viewModel::restoreVersion,
             onDismiss = { showHistory = false },
-        )
-    }
-
-    if (showTemplates) {
-        TemplatePickerSheet(
-            templates = templates,
-            onPick = {
-                viewModel.applyTemplate(it)
-                showTemplates = false
-            },
-            onDelete = { viewModel.deleteTemplate(it.id) },
-            onDismiss = { showTemplates = false },
-        )
-    }
-
-    if (saveTemplateDialog) {
-        TextInputDialog(
-            title = stringResource(R.string.action_save_template),
-            initialText = state.title,
-            placeholder = stringResource(R.string.template_name_hint),
-            confirmLabel = stringResource(R.string.action_save),
-            maxLength = TemplateRules.MAX_NAME_LENGTH,
-            onConfirm = {
-                saveTemplateDialog = false
-                viewModel.saveAsTemplate(it)
-            },
-            onDismiss = { saveTemplateDialog = false },
         )
     }
 

@@ -21,6 +21,7 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -62,7 +63,10 @@ fun NoteOptionsSheet(
     pinned: Boolean,
     archived: Boolean,
     locked: Boolean,
-    canAddToHome: Boolean,
+    /** The action tiles to show (the list and the editor offer different ones). */
+    options: Set<NoteOption>,
+    /** Whether Copy, Share and Export are offered (they need the open note). */
+    canShare: Boolean,
     onDismiss: () -> Unit,
     onToggleTag: (String) -> Unit,
     onNewTag: () -> Unit,
@@ -75,7 +79,7 @@ fun NoteOptionsSheet(
     var showColors by remember { mutableStateOf(false) }
     var tagMenu by remember { mutableStateOf(false) }
 
-    ModalBottomSheet(onDismissRequest = onDismiss) {
+    ModalBottomSheet(onDismissRequest = onDismiss, sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)) {
         Column(modifier = Modifier.verticalScroll(rememberScrollState()).padding(bottom = 16.dp)) {
             if (page == SheetPage.EXPORT) {
                 ExportPage(onBack = { page = SheetPage.MAIN }, onShare = onShare)
@@ -134,19 +138,21 @@ fun NoteOptionsSheet(
                 HorizontalDivider()
                 Spacer(Modifier.height(8.dp))
                 val tiles = buildList {
-                    add(Tile(if (pinned) AppIcons.PushPin else AppIcons.PushPin, if (pinned) R.string.sheet_unpin else R.string.sheet_pin) { onOption(NoteOption.PIN) })
-                    add(Tile(if (archived) AppIcons.Unarchive else AppIcons.Archive, if (archived) R.string.sheet_unarchive else R.string.sheet_archive) { onOption(NoteOption.ARCHIVE) })
-                    add(Tile(if (locked) AppIcons.LockOpen else AppIcons.Lock, if (locked) R.string.sheet_unlock else R.string.sheet_lock) { onOption(NoteOption.LOCK) })
-                    add(Tile(AppIcons.History, R.string.sheet_history) { onOption(NoteOption.HISTORY) })
-                    add(Tile(AppIcons.ContentCopy, R.string.sheet_copy) { onShare(ShareTarget.COPY) })
-                    add(Tile(AppIcons.Share, R.string.action_share) { onShare(ShareTarget.TEXT) })
-                    add(Tile(AppIcons.FileUpload, R.string.sheet_export) { page = SheetPage.EXPORT })
-                    add(Tile(AppIcons.FileCopy, R.string.sheet_duplicate) { onOption(NoteOption.DUPLICATE) })
-                    if (canAddToHome) add(Tile(AppIcons.AddToHomeScreen, R.string.sheet_add_to_home) { onOption(NoteOption.ADD_TO_HOME) })
-                    add(Tile(AppIcons.Checklist, R.string.sheet_select_blocks) { onOption(NoteOption.SELECT_BLOCKS) })
-                    add(Tile(AppIcons.Dashboard, R.string.sheet_templates) { onOption(NoteOption.TEMPLATES) })
-                    add(Tile(AppIcons.BookmarkAdd, R.string.sheet_save_template) { onOption(NoteOption.SAVE_TEMPLATE) })
-                    add(Tile(AppIcons.Delete, R.string.action_move_to_trash, danger = true) { onOption(NoteOption.TRASH) })
+                    fun has(option: NoteOption) = option in options
+                    if (has(NoteOption.PIN)) add(Tile(AppIcons.PushPin, if (pinned) R.string.sheet_unpin else R.string.sheet_pin) { onOption(NoteOption.PIN) })
+                    if (has(NoteOption.ARCHIVE)) add(Tile(if (archived) AppIcons.Unarchive else AppIcons.Archive, if (archived) R.string.sheet_unarchive else R.string.sheet_archive) { onOption(NoteOption.ARCHIVE) })
+                    if (has(NoteOption.LOCK)) add(Tile(if (locked) AppIcons.LockOpen else AppIcons.Lock, if (locked) R.string.sheet_unlock else R.string.sheet_lock) { onOption(NoteOption.LOCK) })
+                    if (has(NoteOption.HISTORY)) add(Tile(AppIcons.History, R.string.sheet_history) { onOption(NoteOption.HISTORY) })
+                    if (canShare) {
+                        add(Tile(AppIcons.ContentCopy, R.string.sheet_copy) { onShare(ShareTarget.COPY) })
+                        add(Tile(AppIcons.Share, R.string.action_share) { onShare(ShareTarget.TEXT) })
+                        add(Tile(AppIcons.FileUpload, R.string.sheet_export) { page = SheetPage.EXPORT })
+                    }
+                    if (has(NoteOption.DUPLICATE)) add(Tile(AppIcons.FileCopy, R.string.sheet_duplicate) { onOption(NoteOption.DUPLICATE) })
+                    if (has(NoteOption.ADD_TO_HOME)) add(Tile(AppIcons.AddToHomeScreen, R.string.sheet_add_to_home) { onOption(NoteOption.ADD_TO_HOME) })
+                    if (has(NoteOption.MOVE_TO_FOLDER)) add(Tile(AppIcons.Folder, R.string.action_move_to_folder) { onOption(NoteOption.MOVE_TO_FOLDER) })
+                    if (has(NoteOption.SELECT_BLOCKS)) add(Tile(AppIcons.Checklist, R.string.sheet_select_blocks) { onOption(NoteOption.SELECT_BLOCKS) })
+                    if (has(NoteOption.TRASH)) add(Tile(AppIcons.Delete, R.string.action_move_to_trash, danger = true) { onOption(NoteOption.TRASH) })
                 }
                 tiles.chunked(TILES_PER_ROW).forEach { rowTiles ->
                     Row(

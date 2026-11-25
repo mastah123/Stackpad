@@ -15,6 +15,8 @@ import com.stackpad.app.data.model.Note
 import com.stackpad.app.data.model.SpanType
 import com.stackpad.app.data.model.NoteVersion
 import com.stackpad.app.data.model.TextBlock
+import com.stackpad.app.data.model.TextLook
+import com.stackpad.app.data.model.withLook
 import com.stackpad.app.data.model.TextLevel
 import com.stackpad.app.data.model.TextSpan
 import com.stackpad.app.data.model.isBlank
@@ -25,9 +27,6 @@ import com.stackpad.app.domain.image.ImageEdit
 import com.stackpad.app.domain.share.ShareOptions
 import com.stackpad.app.domain.blocks.BlockOrder
 import com.stackpad.app.domain.export.ExportFormat
-import com.stackpad.app.domain.templates.BuiltInTemplates
-import com.stackpad.app.domain.templates.NoteTemplate
-import com.stackpad.app.domain.templates.TemplateRules
 import com.stackpad.app.domain.export.NoteExporter
 import com.stackpad.app.domain.history.UndoHistory
 import com.stackpad.app.domain.notes.Tags
@@ -81,11 +80,6 @@ class NoteEditorViewModel(
     val knownTags: StateFlow<List<String>> = repository.observeTagCounts()
         .map { counts -> counts.map { it.tag } }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(STOP_TIMEOUT_MS), emptyList())
-
-    /** Built-in templates followed by the ones the user saved. */
-    val templates: StateFlow<List<NoteTemplate>> = container.templatePreferences.templates
-        .map { saved -> BuiltInTemplates.all() + saved }
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(STOP_TIMEOUT_MS), BuiltInTemplates.all())
 
     /** The saved options for sharing as an image or PDF, and whether their sheet opens before every share. */
     val shareOptions: StateFlow<ShareOptions> = container.sharePreferences.options
@@ -406,6 +400,11 @@ class NoteEditorViewModel(
      * Toggles a heading on the lines the selection touches (tapping the level they all have turns it
      * off). On an empty line the heading is picked for the text typed next.
      */
+    /** Changes the font, size, highlight and line spacing of the text block [blockId]. */
+    fun setTextLook(blockId: String, look: TextLook) {
+        edit<TextBlock>(blockId) { it.withLook(look) }
+    }
+
     fun toggleLevel(level: TextLevel) {
         val active = _activeText.value ?: return
         val block = _state.value.blocks.firstOrNull { it.id == active.blockId } as? TextBlock ?: return
@@ -615,43 +614,6 @@ class NoteEditorViewModel(
     fun canMove(ids: Set<String>, up: Boolean): Boolean {
         val blocks = _state.value.blocks
         return if (up) BlockOrder.canMoveUp(blocks, ids) else BlockOrder.canMoveDown(blocks, ids)
-    }
-
-    /** Adds [template] to the note (it replaces the note while that is still empty). */
-    fun applyTemplate(template: NoteTemplate) = mutate { s ->
-        s.copy(
-            blocks = TemplateRules.apply(s.blocks, template),
-            title = s.title.ifBlank { template.title },
-        )
-    }
-
-    /** Saves the note's content (without images and audio) as a template called [name]. */
-    fun saveAsTemplate(name: String) {
-        val clean = TemplateRules.normalizeName(name) ?: return
-        val blocks = TemplateRules.storableBlocks(_state.value.blocks)
-        if (blocks.isEmpty()) {
-            emit(EditorMessage.TEMPLATE_EMPTY)
-            return
-        }
-        viewModelScope.launch {
-            if (container.templatePreferences.count() >= TemplateRules.MAX_USER_TEMPLATES) {
-                emit(EditorMessage.TEMPLATE_LIMIT)
-                return@launch
-            }
-            container.templatePreferences.add(
-                NoteTemplate(
-                    id = BlockFactory.newId(),
-                    name = clean,
-                    title = _state.value.title,
-                    blocks = blocks,
-                ),
-            )
-            emit(EditorMessage.TEMPLATE_SAVED)
-        }
-    }
-
-    fun deleteTemplate(id: String) {
-        viewModelScope.launch { container.templatePreferences.remove(id) }
     }
 
     /** Locks or unlocks the note. The caller has already verified the user. */

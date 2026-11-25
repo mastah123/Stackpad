@@ -42,7 +42,7 @@ fun SelectableBlock(
     Row(
         modifier = Modifier
             .clip(RoundedCornerShape(10.dp))
-            .background(if (selected) colors.primary.copy(alpha = 0.14f) else Color.Transparent)
+            .background(if (selected) colors.secondaryContainer else Color.Transparent)
             .clickable(role = Role.Checkbox, onClick = onToggle)
             .semantics(mergeDescendants = true) { contentDescription = description },
         verticalAlignment = Alignment.Top,

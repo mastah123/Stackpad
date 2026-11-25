@@ -32,6 +32,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
 import com.stackpad.app.R
+import com.stackpad.app.data.model.TextLook
+import com.stackpad.app.data.model.SpanType
+import com.stackpad.app.data.model.TextLevel
 import com.stackpad.app.ui.editor.blocks.BulletMark
 import com.stackpad.app.data.model.Block
 import com.stackpad.app.data.model.BlockFactory
@@ -39,16 +42,16 @@ import com.stackpad.app.data.model.ListKind
 import com.stackpad.app.domain.text.ListMarkers
 import com.stackpad.app.domain.text.isBullet
 
-private enum class OptionRow { PLUS, LIST, CARDS }
+private enum class OptionRow { PLUS, FORMAT, LIST, CARDS }
 
 /** The third row that opens above the List row (Bullets, Numbers, Letters) or the + row (Image). */
-private enum class StyleRow { BULLETS, NUMBERS, LETTERS, CHECKLIST, IMAGE }
+private enum class StyleRow { BULLETS, NUMBERS, LETTERS, CHECKLIST, IMAGE, TEXT }
 
 /**
  * Scrollable row of chips; each one inserts a block of that type into the note.
  * "+", List and Cards open an option row above the chips, styled like the text format toolbar;
  * in the List row, Bullets, Numbers, Letters and Checklist open a third row (styles, or Checkbox list and Task list), and Image in the + row opens Gallery and Photo.
- * [onOptionRowChange] reports whether such a row is open, so the editor can hide the text toolbar.
+ * The Format chip opens Styles (headings, bold, italic, underline, in a third row), Font, Size, Highlight and Line height for the plain text block being edited.
  */
 @Composable
 fun AddBlockBar(
@@ -57,7 +60,11 @@ fun AddBlockBar(
     onPickFromGallery: () -> Unit,
     onTakePhoto: () -> Unit,
     onRecordAudio: () -> Unit,
-    onOptionRowChange: (Boolean) -> Unit,
+    format: FormatState?,
+    onToggleLevel: (TextLevel) -> Unit,
+    onToggleSpan: (SpanType) -> Unit,
+    look: TextLook?,
+    onLookChange: (TextLook) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     var openRow by remember { mutableStateOf<OptionRow?>(null) }
@@ -66,7 +73,6 @@ fun AddBlockBar(
         styleRow = null
         openRow = if (openRow == row) null else row
     }
-    LaunchedEffect(openRow) { onOptionRowChange(openRow != null) }
     // Picks an option and closes the row.
     fun choose(action: () -> Unit) {
         openRow = null
@@ -77,7 +83,9 @@ fun AddBlockBar(
     Column(modifier = modifier) {
         // The third row (styles, or Gallery and Photo) sits above the option row that opened it.
         styleRow?.let { group ->
-            OptionButtons {
+            if (group == StyleRow.TEXT) {
+                if (format != null) FormatToolbar(state = format, onToggleLevel = onToggleLevel, onToggleSpan = onToggleSpan)
+            } else OptionButtons {
                 when (group) {
                     StyleRow.IMAGE -> {
                         OptionButton(AppIcons.PhotoLibrary, stringResource(R.string.image_from_gallery)) {
@@ -150,6 +158,23 @@ fun AddBlockBar(
                     choose { onAddBlock(BlockFactory.divider()) }
                 }
             }
+            OptionRow.FORMAT -> if (look == null) {
+                Text(
+                    text = stringResource(R.string.format_pick_text),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+                )
+            } else OptionButtons {
+                if (format != null) {
+                    OptionButton(
+                        AppIcons.TextFields,
+                        stringResource(R.string.format_styles),
+                        expanded = styleRow == StyleRow.TEXT,
+                    ) { styleRow = if (styleRow == StyleRow.TEXT) null else StyleRow.TEXT }
+                }
+                TextFormatChips(look = look, onChange = onLookChange)
+            }
             OptionRow.CARDS -> OptionButtons {
                 OptionButton(AppIcons.AutoAwesome, stringResource(R.string.add_prompt)) {
                     choose { onAddBlock(BlockFactory.prompt()) }
@@ -176,6 +201,9 @@ fun AddBlockBar(
             AddChip(AppIcons.TextFields, stringResource(R.string.add_text)) {
                 openRow = null
                 onAddBlock(BlockFactory.text())
+            }
+            AddChip(AppIcons.Palette, stringResource(R.string.add_format), selected = openRow == OptionRow.FORMAT) {
+                toggle(OptionRow.FORMAT)
             }
             AddChip(AppIcons.FormatListBulleted, stringResource(R.string.add_list), selected = openRow == OptionRow.LIST) {
                 toggle(OptionRow.LIST)
@@ -250,12 +278,12 @@ private fun AddChip(
     val colors = MaterialTheme.colorScheme
     val contentColor = when {
         !enabled -> colors.onSurface.copy(alpha = 0.38f)
-        selected -> colors.onPrimary
+        selected -> colors.onSecondaryContainer
         else -> colors.onSurface
     }
     Surface(
         shape = RoundedCornerShape(16.dp),
-        color = if (selected) colors.primary else colors.surfaceVariant,
+        color = if (selected) colors.secondaryContainer else colors.surfaceVariant,
         modifier = Modifier
             .height(32.dp)
             .clip(RoundedCornerShape(16.dp))
@@ -269,7 +297,7 @@ private fun AddChip(
                 imageVector = icon,
                 contentDescription = null,
                 modifier = Modifier.size(16.dp),
-                tint = if (selected || !enabled) contentColor else colors.primary,
+                tint = contentColor,
             )
             Spacer(Modifier.width(5.dp))
             Text(text = label, style = MaterialTheme.typography.labelMedium, color = contentColor)

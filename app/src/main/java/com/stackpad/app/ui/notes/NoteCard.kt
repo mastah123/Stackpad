@@ -162,7 +162,7 @@ fun NoteCard(
                     modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp),
                 )
             } else {
-                NoteCardMenu(pinned = note.pinned, actions = actions)
+                NoteCardMenu(actions = actions)
             }
         }
     }
