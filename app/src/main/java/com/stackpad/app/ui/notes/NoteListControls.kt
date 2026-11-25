@@ -122,40 +122,6 @@ private fun ThemeMode.labelRes(): Int = when (this) {
     ThemeMode.DARK -> R.string.theme_dark
 }
 
-/** Top-bar menu to choose how notes are sorted. */
-@Composable
-fun SortMenu(
-    current: NoteSort,
-    onSelect: (NoteSort) -> Unit,
-) {
-    var open by remember { mutableStateOf(false) }
-    Box {
-        IconButton(onClick = { open = true }) {
-            Icon(Icons.Filled.SwapVert, contentDescription = stringResource(R.string.cd_sort))
-        }
-        DropdownMenu(expanded = open, onDismissRequest = { open = false }) {
-            NoteSort.values().forEach { sort ->
-                DropdownMenuItem(
-                    text = { Text(stringResource(sort.labelRes())) },
-                    trailingIcon = {
-                        if (sort == current) Icon(Icons.Filled.Check, contentDescription = null)
-                    },
-                    onClick = {
-                        open = false
-                        onSelect(sort)
-                    },
-                )
-            }
-        }
-    }
-}
-
-private fun NoteSort.labelRes(): Int = when (this) {
-    NoteSort.LAST_EDITED -> R.string.sort_last_edited
-    NoteSort.CREATED -> R.string.sort_created
-    NoteSort.TITLE -> R.string.sort_title
-}
-
 /** Switches between the list and the grid; shows the icon of the layout it would switch to. */
 @Composable
 fun LayoutToggleButton(layout: ListLayout, onChange: (ListLayout) -> Unit) {

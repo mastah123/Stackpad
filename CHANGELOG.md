@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.17.0] - 2026-11-25
+
+### Added
+- Sort by / Group by sheet (opened from the sort icon): date edited, date created or title with a direction button (New - old / Old - new, A - Z / Z - A), and grouping by default (Pinned/Recent), none, Abc, year, week or month. The choice is remembered.
+
+### Changed
+- Editing a picture always starts from the untouched original, so you can crop it again from scratch (the edited picture is still what the note shows).
+- More space between the note info line and the first text.
+- The "Text options" chip was removed; the add bar chips are back to Add, Text, List and Cards.
+- "Last edited" is now called "Date edited".
+
 ## [2.16.0] - 2026-11-24
 
 ### Added

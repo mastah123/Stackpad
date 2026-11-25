@@ -16,7 +16,7 @@ import com.stackpad.app.domain.notes.FolderFilter
 import com.stackpad.app.domain.notes.MenuCounts
 import com.stackpad.app.domain.notes.NoteFilter
 import com.stackpad.app.domain.notes.NoteOrganizer
-import com.stackpad.app.domain.notes.NoteSort
+import com.stackpad.app.domain.notes.ListOrder
 import com.stackpad.app.domain.notes.TagCount
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
@@ -38,7 +38,7 @@ data class NoteListUiState(
     val notes: List<NoteSummary>? = null,
     val folders: List<Folder> = emptyList(),
     val tags: List<TagCount> = emptyList(),
-    val sort: NoteSort = NoteSort.LAST_EDITED,
+    val order: ListOrder = ListOrder(),
     val layout: ListLayout = ListLayout.LIST,
     val filter: NoteFilter = NoteFilter(),
 )
@@ -68,9 +68,9 @@ class NoteListViewModel(
         repository.observeFolders(),
         repository.observeTagCounts(),
         // combine() only has typed overloads up to five flows, so sort and layout travel as a pair.
-        combine(listPreferences.sort, listPreferences.layout) { sort, layout -> sort to layout },
+        combine(listPreferences.order, listPreferences.layout) { order, layout -> order to layout },
         _filter,
-    ) { notes, folders, tags, (sort, layout), filter ->
+    ) { notes, folders, tags, (order, layout), filter ->
         // A filter pointing at a deleted folder or an unused tag quietly falls back to "all".
         val folder = filter.folder
         val folderOk = folder !is FolderFilter.InFolder || folders.any { it.id == folder.id }
@@ -82,10 +82,10 @@ class NoteListViewModel(
             color = filter.color,
         )
         NoteListUiState(
-            notes = NoteOrganizer.organize(notes, sort, effective),
+            notes = NoteOrganizer.organize(notes, order.sort, effective, order.reversed),
             folders = folders,
             tags = tags,
-            sort = sort,
+            order = order,
             layout = layout,
             filter = effective,
         )
@@ -157,8 +157,8 @@ class NoteListViewModel(
         viewModelScope.launch { repository.restore(id) }
     }
 
-    fun setSort(sort: NoteSort) {
-        viewModelScope.launch { listPreferences.setSort(sort) }
+    fun setOrder(order: ListOrder) {
+        viewModelScope.launch { listPreferences.setOrder(order) }
     }
 
     fun setLayout(layout: ListLayout) {

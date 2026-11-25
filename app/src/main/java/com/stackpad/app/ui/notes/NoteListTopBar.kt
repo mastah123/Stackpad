@@ -20,7 +20,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.res.stringResource
 import com.stackpad.app.R
 import com.stackpad.app.data.prefs.ListLayout
-import com.stackpad.app.domain.notes.NoteSort
+import com.stackpad.app.domain.notes.ListOrder
 
 /**
  * Top bar for folder and tag views: menu button, title, then Search, List/Grid and Sort icons.
@@ -31,11 +31,11 @@ import com.stackpad.app.domain.notes.NoteSort
 fun NoteListTopBar(
     title: String,
     layout: ListLayout,
-    sort: NoteSort,
+    order: ListOrder,
     onOpenMenu: () -> Unit,
     onSearch: () -> Unit,
     onLayout: (ListLayout) -> Unit,
-    onSort: (NoteSort) -> Unit,
+    onOrder: (ListOrder) -> Unit,
     onRename: (() -> Unit)? = null,
     onDelete: (() -> Unit)? = null,
 ) {
@@ -51,7 +51,7 @@ fun NoteListTopBar(
                 Icon(Icons.Filled.Search, contentDescription = stringResource(R.string.cd_search))
             }
             LayoutToggleButton(layout = layout, onChange = onLayout)
-            SortMenu(current = sort, onSelect = onSort)
+            SortButton(order = order, onChange = onOrder)
             if (onRename != null && onDelete != null) {
                 var open by remember { mutableStateOf(false) }
                 IconButton(onClick = { open = true }) {

@@ -28,16 +28,21 @@ import androidx.compose.ui.unit.dp
 import com.stackpad.app.R
 import com.stackpad.app.data.model.NoteSummary
 import com.stackpad.app.data.prefs.ListLayout
-import com.stackpad.app.domain.notes.NoteSections
+import com.stackpad.app.domain.notes.ListOrder
+import com.stackpad.app.domain.notes.NoteGrouping
+import com.stackpad.app.domain.notes.NoteSection
+import com.stackpad.app.domain.notes.SectionLabel
 
 /**
- * The notes as PINNED and RECENT sections, as a list or a two-column grid (the change cross-fades).
- * [headerActions] (sort and layout icons) are drawn on the right of the first section header.
- * Section headers always show when [alwaysShowHeaders] is set; otherwise only when something is pinned.
+ * The notes under section headers (PINNED, RECENT, or the chosen grouping), as a list or a two-column
+ * grid (the change cross-fades). [headerActions] (sort and layout icons) are drawn on the right of the
+ * first header. With the default grouping the RECENT header only shows when something is pinned,
+ * unless [alwaysShowHeaders] is set.
  */
 @Composable
 fun NoteList(
     notes: List<NoteSummary>,
+    order: ListOrder,
     layout: ListLayout,
     highlight: List<String>,
     selecting: Boolean,
@@ -48,12 +53,15 @@ fun NoteList(
     actionsFor: (NoteSummary) -> NoteCardActions,
     headerActions: (@Composable () -> Unit)? = null,
 ) {
-    val sections = remember(notes) { NoteSections.of(notes) }
-    val showPinnedHeader = sections.pinned.isNotEmpty()
-    val showRecentHeader = sections.recent.isNotEmpty() && (alwaysShowHeaders || showPinnedHeader)
-    val actionsOnPinned = showPinnedHeader
-    val recentTitle = stringResource(R.string.section_recent)
-    val pinnedTitle = stringResource(R.string.section_pinned)
+    val sections = remember(notes, order) { NoteGrouping.group(notes, order) }
+    val hasPinned = sections.any { it.label == SectionLabel.Pinned }
+    // The label to draw above a section, or null for none.
+    fun headerOf(section: NoteSection): SectionLabel? = when {
+        section.label == SectionLabel.All && !alwaysShowHeaders -> null
+        section.label == SectionLabel.Recent && !alwaysShowHeaders && !hasPinned -> null
+        else -> section.label
+    }
+    val firstHeaderKey = sections.firstOrNull { headerOf(it) != null }?.key
 
     Crossfade(targetState = layout, animationSpec = tween(220), label = "noteLayout") { current ->
         val grid = current == ListLayout.GRID
@@ -74,6 +82,14 @@ fun NoteList(
             previewItems = if (grid) GRID_PREVIEW_ITEMS else LIST_PREVIEW_ITEMS,
         )
 
+        @Composable
+        fun header(section: NoteSection, label: SectionLabel, modifier: Modifier) = SectionHeader(
+            title = label.text(),
+            modifier = modifier,
+            horizontalInset = 4.dp,
+            trailing = if (section.key == firstHeaderKey) headerActions else null,
+        )
+
         if (grid) {
             LazyVerticalStaggeredGrid(
                 columns = StaggeredGridCells.Fixed(2),
@@ -82,23 +98,14 @@ fun NoteList(
                 verticalItemSpacing = 8.dp,
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
             ) {
-                if (showPinnedHeader) {
-                    item(key = "header_pinned", span = StaggeredGridItemSpan.FullLine) {
-                        SectionHeader(pinnedTitle, Modifier.animateItem(), horizontalInset = 4.dp, trailing = headerActions)
+                sections.forEach { section ->
+                    headerOf(section)?.let { label ->
+                        item(key = "header_${section.key}", span = StaggeredGridItemSpan.FullLine) {
+                            header(section, label, Modifier.animateItem())
+                        }
                     }
-                    items(sections.pinned, key = { it.id }) { note -> card(note, Modifier.animateItem()) }
+                    items(section.notes, key = { it.id }) { note -> card(note, Modifier.animateItem()) }
                 }
-                if (showRecentHeader) {
-                    item(key = "header_recent", span = StaggeredGridItemSpan.FullLine) {
-                        SectionHeader(
-                            recentTitle,
-                            Modifier.animateItem(),
-                            horizontalInset = 4.dp,
-                            trailing = if (actionsOnPinned) null else headerActions,
-                        )
-                    }
-                }
-                items(sections.recent, key = { it.id }) { note -> card(note, Modifier.animateItem()) }
             }
         } else {
             LazyColumn(
@@ -106,26 +113,27 @@ fun NoteList(
                 contentPadding = PaddingValues(start = 12.dp, end = 12.dp, bottom = 88.dp),
                 verticalArrangement = Arrangement.spacedBy(8.dp),
             ) {
-                if (showPinnedHeader) {
-                    item(key = "header_pinned") {
-                        SectionHeader(pinnedTitle, Modifier.animateItem(), horizontalInset = 4.dp, trailing = headerActions)
+                sections.forEach { section ->
+                    headerOf(section)?.let { label ->
+                        item(key = "header_${section.key}") {
+                            header(section, label, Modifier.animateItem())
+                        }
                     }
-                    items(sections.pinned, key = { it.id }) { note -> card(note, Modifier.animateItem()) }
+                    items(section.notes, key = { it.id }) { note -> card(note, Modifier.animateItem()) }
                 }
-                if (showRecentHeader) {
-                    item(key = "header_recent") {
-                        SectionHeader(
-                            recentTitle,
-                            Modifier.animateItem(),
-                            horizontalInset = 4.dp,
-                            trailing = if (actionsOnPinned) null else headerActions,
-                        )
-                    }
-                }
-                items(sections.recent, key = { it.id }) { note -> card(note, Modifier.animateItem()) }
             }
         }
     }
+}
+
+@Composable
+private fun SectionLabel.text(): String = when (this) {
+    SectionLabel.Pinned -> stringResource(R.string.section_pinned)
+    SectionLabel.Recent -> stringResource(R.string.section_recent)
+    SectionLabel.All -> stringResource(R.string.section_all_notes)
+    SectionLabel.ThisWeek -> stringResource(R.string.section_this_week)
+    SectionLabel.LastWeek -> stringResource(R.string.section_last_week)
+    is SectionLabel.Text -> text
 }
 
 private const val LIST_PREVIEW_LINES = 2

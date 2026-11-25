@@ -424,11 +424,11 @@ class NoteEditorViewModel(
 
     /**
      * Saves [change] as a new picture file for the image block [id] and points the block at it.
-     * The first edit keeps the untouched picture so it can be restored. Returns false (and shows a message) on failure.
+     * Every edit starts from the untouched picture (kept after the first edit), so it can be re-cropped or restored. Returns false (and shows a message) on failure.
      */
     suspend fun saveImageEdit(id: String, change: ImageEdit): Boolean {
         val block = _state.value.blocks.firstOrNull { it.id == id } as? ImageBlock ?: return false
-        val saved = container.imageEditSaver.save(block.fileName, change)
+        val saved = container.imageEditSaver.save(block.originalFileName ?: block.fileName, change)
         if (saved == null) {
             emit(EditorMessage.IMAGE_EDIT_FAILED)
             return false

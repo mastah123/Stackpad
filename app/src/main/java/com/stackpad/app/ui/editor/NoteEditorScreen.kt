@@ -172,7 +172,6 @@ private fun NoteEditorContent(
     var barHeight by remember { mutableIntStateOf(0) }
     var newTagDialog by remember { mutableStateOf(false) }
     var optionRowOpen by remember { mutableStateOf(false) }
-    var showTextOptions by rememberSaveable { mutableStateOf(true) }
     var showTemplates by remember { mutableStateOf(false) }
     var saveTemplateDialog by remember { mutableStateOf(false) }
     var selecting by remember { mutableStateOf(false) }
@@ -536,7 +535,7 @@ private fun NoteEditorContent(
                         RecordingBar(state = live, onStop = viewModel::stopRecording, onCancel = viewModel::cancelRecording)
                     }
                     // The text toolbar steps aside while an option row (+, List, Cards, Tag) or a recording is open.
-                    formatState?.takeIf { showTextOptions && !optionRowOpen && recording == null }?.let { format ->
+                    formatState?.takeIf { !optionRowOpen && recording == null }?.let { format ->
                         FormatToolbar(
                             state = format,
                             onToggleLevel = viewModel::toggleLevel,
@@ -550,8 +549,6 @@ private fun NoteEditorContent(
                         onTakePhoto = takePhoto,
                         onRecordAudio = recordAudio,
                         onOptionRowChange = { optionRowOpen = it },
-                        textOptionsShown = showTextOptions,
-                        onToggleTextOptions = { showTextOptions = !showTextOptions },
                     )
                 }
             }
@@ -595,7 +592,7 @@ private fun NoteEditorContent(
                     NoteInfoLine(
                         wordCount = remember(state.title, state.blocks) { WordCount.of(state.title, state.blocks) },
                         createdAt = state.createdAt,
-                        modifier = Modifier.padding(bottom = 8.dp),
+                        modifier = Modifier.padding(bottom = 16.dp),
                     )
                 }
                 items(state.blocks, key = { it.id }) { block ->

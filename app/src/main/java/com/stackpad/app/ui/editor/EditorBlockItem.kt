@@ -90,6 +90,8 @@ fun EditorBlockItem(
 
         is ImageBlock -> ImageBlockView(
             file = media.file(block.fileName),
+            // Editing always starts from the untouched picture, so it can be cropped again from scratch.
+            editSource = media.file(block.originalFileName ?: block.fileName),
             hasOriginal = block.originalFileName != null,
             onSaveEdit = { change -> viewModel.saveImageEdit(id, change) },
             onRestoreOriginal = { viewModel.restoreOriginalImage(id) },

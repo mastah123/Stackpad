@@ -213,11 +213,11 @@ fun NoteListScreen(
                         2 -> NoteListTopBar(
                             title = sectionTitle(ui, mode),
                             layout = ui.layout,
-                            sort = ui.sort,
+                            order = ui.order,
                             onOpenMenu = { scope.launch { menu.open() } },
                             onSearch = { searchOpen = !searchOpen },
                             onLayout = viewModel::setLayout,
-                            onSort = viewModel::setSort,
+                            onOrder = viewModel::setOrder,
                             onRename = currentFolder?.let { folder -> { renameTarget = folder } },
                             onDelete = currentFolder?.let { folder -> { deleteTarget = folder } },
                         )
@@ -279,7 +279,7 @@ fun NoteListScreen(
                 }
                 val listIcons: @Composable () -> Unit = {
                     LayoutToggleButton(layout = ui.layout, onChange = viewModel::setLayout)
-                    SortMenu(current = ui.sort, onSelect = viewModel::setSort)
+                    SortButton(order = ui.order, onChange = viewModel::setOrder)
                 }
                 Crossfade(
                     targetState = when {
@@ -299,6 +299,7 @@ fun NoteListScreen(
                         )
                         else -> NoteList(
                             notes = current,
+                            order = ui.order,
                             layout = ui.layout,
                             highlight = searchWords,
                             selecting = selecting,

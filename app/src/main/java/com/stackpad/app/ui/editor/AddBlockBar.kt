@@ -19,7 +19,6 @@ import androidx.compose.material.icons.filled.CameraAlt
 import androidx.compose.material.icons.filled.CheckBox
 import androidx.compose.material.icons.filled.Code
 import androidx.compose.material.icons.filled.FormatListBulleted
-import androidx.compose.material.icons.filled.FormatSize
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.icons.filled.FormatListNumbered
@@ -69,7 +68,6 @@ private enum class StyleRow { BULLETS, NUMBERS, LETTERS, IMAGE }
  * Scrollable row of chips; each one inserts a block of that type into the note.
  * "+", List and Cards open an option row above the chips, styled like the text format toolbar;
  * in the List row, Bullets, Numbers and Letters open a third row with their styles, and Image in the + row opens Gallery and Photo.
- * The first chip shows or hides the text format toolbar.
  * [onOptionRowChange] reports whether such a row is open, so the editor can hide the text toolbar.
  */
 @Composable
@@ -80,9 +78,6 @@ fun AddBlockBar(
     onTakePhoto: () -> Unit,
     onRecordAudio: () -> Unit,
     onOptionRowChange: (Boolean) -> Unit,
-    /** Whether the text format toolbar is shown, and how to show or hide it. */
-    textOptionsShown: Boolean,
-    onToggleTextOptions: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     var openRow by remember { mutableStateOf<OptionRow?>(null) }
@@ -185,9 +180,6 @@ fun AddBlockBar(
             horizontalArrangement = Arrangement.spacedBy(6.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            AddChip(Icons.Filled.FormatSize, stringResource(R.string.add_text_options), selected = textOptionsShown) {
-                onToggleTextOptions()
-            }
             AddChip(Icons.Filled.Add, stringResource(R.string.add_plus), selected = openRow == OptionRow.PLUS) {
                 toggle(OptionRow.PLUS)
             }

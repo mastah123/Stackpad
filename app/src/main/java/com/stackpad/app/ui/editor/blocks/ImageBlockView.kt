@@ -46,6 +46,8 @@ import java.io.File
 @Composable
 fun ImageBlockView(
     file: File,
+    /** The picture the editor opens: the untouched original when there is one. */
+    editSource: File = file,
     hasOriginal: Boolean,
     onSaveEdit: suspend (ImageEdit) -> Boolean,
     onRestoreOriginal: () -> Unit,
@@ -132,7 +134,7 @@ fun ImageBlockView(
         )
     }
     if (editingPicture) {
-        ImageEditorDialog(file = file, onDismiss = { editingPicture = false }, onSave = onSaveEdit)
+        ImageEditorDialog(file = editSource, onDismiss = { editingPicture = false }, onSave = onSaveEdit)
     }
 }
 

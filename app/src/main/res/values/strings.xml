@@ -181,7 +181,7 @@
     <string name="msg_moved_to_trash">Moved to trash.</string>
     <string name="quote_hint">Quote…</string>
     <string name="sort_created">Date created</string>
-    <string name="sort_last_edited">Last edited</string>
+    <string name="sort_last_edited">Date edited</string>
     <string name="sort_title">Title</string>
     <string name="tag_hint">Add a tag</string>
     <string name="trash_empty">The trash is empty.</string>
@@ -483,5 +483,18 @@
     <string name="list_style_upper_roman">Capital roman numerals I. II. III.</string>
     <string name="list_style_lower_roman">Roman numerals i. ii. iii.</string>
     <string name="list_style_greek">Greek letters α. β. γ.</string>
-    <string name="add_text_options">Text options</string>
+    <string name="sort_by">Sort by</string>
+    <string name="group_by">Group by</string>
+    <string name="sort_dir_new_old">New - old</string>
+    <string name="sort_dir_old_new">Old - new</string>
+    <string name="sort_dir_a_z">A - Z</string>
+    <string name="sort_dir_z_a">Z - A</string>
+    <string name="group_default">Default</string>
+    <string name="group_none">None</string>
+    <string name="group_abc">Abc</string>
+    <string name="group_year">Year</string>
+    <string name="group_week">Week</string>
+    <string name="group_month">Month</string>
+    <string name="section_this_week">This week</string>
+    <string name="section_last_week">Last week</string>
 </resources>
