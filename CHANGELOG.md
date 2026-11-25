@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.19.0] - 2026-11-25
+
+### Added
+- Table handles: while you type in a top-row cell a small handle sits on the right border of that column, and in a left-most cell a handle sits on the bottom border of that row (cell A1 shows both). The handles float over the table and take no space. Tap one for a menu: insert left/right (above/below), move, clear or delete the column (row). Drag the column handle sideways or the row handle up and down to resize.
+- Column widths and row heights are saved with the table.
+- Formulas follow their cells when rows or columns are inserted, moved or deleted. A formula that pointed at a deleted cell shows `#REF!`.
+
+### Changed
+- The "+ Row", "− Row", "+ Col" and "− Col" buttons in the table header are replaced by the handles. To add a row or column at the end, use "Insert below" or "Insert right" on the last one.
+- Importing a CSV resets column widths and row heights.
+
 ## [2.18.0] - 2026-11-25
 
 ### Added

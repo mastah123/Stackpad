@@ -274,7 +274,7 @@ Covers: formula evaluator, span editing, URL detection/validation, list markers,
 ### Table
 - [ ] Tap a cell and type `2`, in another `3`, in a third `=A1+B1`. The result shows `5` when not editing.
 - [ ] Try `=2+3*4` (14), `=(2+3)*4` (20), `=1/0` (`#DIV/0!`), `=A1` inside A1 (`#CYCLE!`), `=2+` (`#ERR!`).
-- [ ] Add/remove rows and columns. The table scrolls sideways when wide.
+- [ ] Table rows and columns are changed with the handles (see "Table handles (2.19.0)"). The table scrolls sideways when wide.
 - [ ] Three-dot menu, **Export CSV**: the share sheet opens with `table.csv`. Open it in a spreadsheet app: values match (formulas show their results, text with commas and quotes is intact, accents are correct).
 - [ ] **Import CSV**: pick a comma, a semicolon and a tab separated file; the table is replaced and shows the data. A message offers Undo, which restores the old table.
 - [ ] Import a file with more than 50 rows or 12 columns: the message says extra rows or columns were left out. Import an empty file or a picture: "Could not read that file as a table" and the table is unchanged.
@@ -379,6 +379,17 @@ Covers: formula evaluator, span editing, URL detection/validation, list markers,
 - [ ] Group by shows headers: Abc (letters, # for others), Year, Week (This week, Last week, Nov 9 – Nov 15), Month (November 2026). None shows one "All notes" header on Home. Close and reopen the app: the choice is kept.
 - [ ] Crop a picture, then open the editor again: the full original picture is shown (not the cropped one); saving applies the new edit to the original. "Restore original" still works.
 - [ ] More space between the "words · created" line and the first text of a note. The add bar shows Add, Text, List, Cards only.
+
+### Table handles (2.19.0)
+- [ ] The header no longer has + Row, - Row, + Col, - Col. Tap a top-row cell: a small rounded handle appears on the right border of that column, centered in the row. It does not move or wrap the text. Tap a cell that is neither in the top row nor the left column: no handle.
+- [ ] Tap a left-most cell: a handle appears centered on the bottom border of that row. Cell A1 shows both handles.
+- [ ] Column handle menu: insert left, insert right, move left, move right, clear column, delete column. Each works; move left is disabled on the first column, move right on the last, delete when only one column is left, inserts at 12 columns.
+- [ ] Row handle menu: same with above/below/up/down; limits at 1 and 50 rows.
+- [ ] The handle stays while its menu is open, and disappears after choosing or dismissing when no cell is being edited.
+- [ ] Formulas: put 1 in A1, 2 in A2 and =A1+A2 in B1. Insert a row above row 1: the formula becomes =A2+A3 and still shows 3. Delete row 2 (the old A1): the formula shows #REF!.
+- [ ] Drag the column handle sideways: the column resizes live and stops at a minimum and maximum width; drag the row handle up and down for the row height. Reopen the note: sizes are kept.
+- [ ] Undo after a resize or a menu action restores it in one step.
+- [ ] Import a CSV: sizes reset. Export CSV still works. A table from an older version opens with default sizes.
 
 ### Checkbox list and Task list (2.18.0)
 - [ ] List row: Bullets, Numbers, Letters, Checklist. Checklist (with an arrow) opens a row above with Checkbox list and Task list.

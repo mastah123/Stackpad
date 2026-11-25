@@ -87,10 +87,6 @@
     <string name="search_hint">Search notes</string>
     <string name="section_notes">Notes</string>
     <string name="section_pinned">Pinned</string>
-    <string name="table_add_column">+ Col</string>
-    <string name="table_add_row">+ Row</string>
-    <string name="table_remove_column">− Col</string>
-    <string name="table_remove_row">− Row</string>
     <string name="theme_dark">Dark</string>
     <string name="theme_light">Light</string>
     <string name="theme_system">System default</string>
@@ -501,4 +497,18 @@
     <string name="add_task_list">Task list</string>
     <string name="cd_item_checked">Checked</string>
     <string name="cd_item_unchecked">Not checked</string>
+    <string name="table_insert_column_left">Insert column left</string>
+    <string name="table_insert_column_right">Insert column right</string>
+    <string name="table_move_column_left">Move column left</string>
+    <string name="table_move_column_right">Move column right</string>
+    <string name="table_clear_column">Clear column</string>
+    <string name="table_delete_column">Delete column</string>
+    <string name="table_insert_row_above">Insert row above</string>
+    <string name="table_insert_row_below">Insert row below</string>
+    <string name="table_move_row_up">Move row up</string>
+    <string name="table_move_row_down">Move row down</string>
+    <string name="table_clear_row">Clear row</string>
+    <string name="table_delete_row">Delete row</string>
+    <string name="cd_table_column_handle">Column options. Drag to resize</string>
+    <string name="cd_table_row_handle">Row options. Drag to resize</string>
 </resources>
