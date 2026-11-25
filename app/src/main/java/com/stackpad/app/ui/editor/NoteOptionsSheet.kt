@@ -40,13 +40,6 @@ import androidx.compose.ui.unit.dp
 import com.stackpad.app.R
 import com.stackpad.app.util.formatStamp
 
-/** Everything the Share and Export pages can do with the open note. */
-/** [OPTIONS] opens the share options without sharing anything. */
-enum class ShareTarget { COPY, TEXT, MARKDOWN, IMAGE, PDF, OPTIONS }
-
-/** The actions on the sheet that the editor screen carries out itself (sharing goes through [ShareTarget]). */
-enum class NoteOption { PIN, ARCHIVE, LOCK, HISTORY, DUPLICATE, ADD_TO_HOME, SELECT_BLOCKS, TEMPLATES, SAVE_TEMPLATE, TRASH }
-
 private enum class SheetPage { MAIN, EXPORT }
 
 private const val TILES_PER_ROW = 5
