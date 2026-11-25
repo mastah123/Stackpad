@@ -31,6 +31,7 @@ fun NoteSideMenu(
     onAll: () -> Unit,
     onPinned: () -> Unit,
     onReminders: () -> Unit,
+    onArchive: () -> Unit,
     onTrash: () -> Unit,
     onSettings: () -> Unit,
     onFolder: (FolderFilter) -> Unit,
@@ -55,7 +56,7 @@ fun NoteSideMenu(
         },
     ) {
         when (tab) {
-            MenuTab.HOME -> MenuHomeTab(mode, counts, onAll, onPinned, onReminders, onTrash)
+            MenuTab.HOME -> MenuHomeTab(mode, counts, onAll, onPinned, onReminders, onArchive, onTrash)
             MenuTab.FOLDERS -> MenuFoldersTab(
                 folders = ui.folders,
                 selected = if (mode == ListMode.FOLDERS) ui.filter.folder else FolderFilter.All,

@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.20.0] - 2026-11-25
+
+### Added
+- Note options sheet: the editor's 3-dot menu now opens a bottom sheet with the note's title, tags, Created at and Last edited at dates, **Add tag** and **Add color**, and a grid of actions: Pin, Archive, Lock, History, Copy, Share, Export, Duplicate, Add to home, Select blocks, Templates, Save template and Move to trash. Export opens a second page with Text, Markdown, Image, PDF and Share options.
+- Archive: archived notes leave the main list, search and tags but are not deleted. They are listed under **Archive** in the side menu's Home tab (with a count), where a note can be opened or unarchived.
+- Duplicate: saves a copy titled "... (copy)" that is not pinned or archived. The copy shares its pictures and recordings with the original.
+- Add to home: asks your launcher to pin a shortcut that opens the note (only shown when the launcher supports it).
+
+### Changed
+- Database version 5 (adds the archived flag); existing notes are not archived.
+- Erasing a note no longer deletes pictures or recordings that another note still uses.
+- Backups keep the archived flag.
+
 ## [2.19.0] - 2026-11-25
 
 ### Added

@@ -3,6 +3,13 @@ package com.stackpad.app.data.db
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 
+/** 4 -> 5 (app 2.20.0): the archive. Existing notes are not archived. */
+val MIGRATION_4_5 = object : Migration(4, 5) {
+    override fun migrate(db: SupportSQLiteDatabase) {
+        db.execSQL("ALTER TABLE notes ADD COLUMN archived INTEGER NOT NULL DEFAULT 0")
+    }
+}
+
 /** 3 -> 4 (app 2.9.0): earlier versions of notes. Existing notes simply start with no history. */
 val MIGRATION_3_4 = object : Migration(3, 4) {
     override fun migrate(db: SupportSQLiteDatabase) {

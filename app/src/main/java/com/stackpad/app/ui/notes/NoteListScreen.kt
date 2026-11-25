@@ -76,6 +76,7 @@ fun NoteListScreen(
     /** Called with the folder selected in the list (or null), so a new note starts in it. */
     onNewNote: (folderId: String?) -> Unit,
     onOpenTrash: () -> Unit,
+    onOpenArchive: () -> Unit,
     onOpenReminders: () -> Unit,
     onOpenSettings: () -> Unit,
 ) {
@@ -161,6 +162,7 @@ fun NoteListScreen(
                     }
                 },
                 onReminders = { closeMenu(onOpenReminders) },
+                onArchive = { closeMenu(onOpenArchive) },
                 onTrash = { closeMenu(onOpenTrash) },
                 onSettings = { closeMenu(onOpenSettings) },
                 onFolder = { folder ->

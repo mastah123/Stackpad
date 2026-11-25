@@ -25,4 +25,6 @@ data class NoteEntity(
     val trashedAt: Long? = null,
     /** True when opening the note requires the phone's screen lock. Its content is then hidden from search and previews. */
     @ColumnInfo(defaultValue = "0") val locked: Boolean = false,
+    /** True when the note is in the archive: outside the main list but not in the trash. */
+    @ColumnInfo(defaultValue = "0") val archived: Boolean = false,
 )

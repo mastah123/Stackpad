@@ -33,3 +33,9 @@ fun formatListStamp(epochMillis: Long, nowMillis: Long = System.currentTimeMilli
     val today = Instant.ofEpochMilli(nowMillis).atZone(zone).toLocalDate()
     return if (day == today) timeFormatter.format(Instant.ofEpochMilli(epochMillis)) else formatDate(epochMillis)
 }
+
+private val stampFormatter = java.time.format.DateTimeFormatter.ofPattern("dd-MM-yyyy hh:mm a")
+
+/** Full date and time, e.g. `23-11-2026 06:29 PM`. Used on the note options sheet. */
+fun formatStamp(epochMillis: Long): String =
+    stampFormatter.withZone(ZoneId.systemDefault()).format(Instant.ofEpochMilli(epochMillis))

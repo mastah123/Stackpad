@@ -54,26 +54,14 @@ fun NoteTagsRow(
                 label = { Text(stringResource(R.string.tag_add_chip)) },
                 leadingIcon = { Icon(Icons.Filled.Sell, contentDescription = null, modifier = Modifier.size(18.dp)) },
             )
-            DropdownMenu(expanded = open, onDismissRequest = { open = false }) {
-                (tags + knownTags.filterNot { it in tags }.sorted()).forEach { tag ->
-                    DropdownMenuItem(
-                        text = { Text("#$tag") },
-                        leadingIcon = {
-                            if (tag in tags) Icon(Icons.Filled.Check, contentDescription = stringResource(R.string.cd_tag_on_note))
-                        },
-                        onClick = { onToggle(tag) },
-                    )
-                }
-                if (tags.isNotEmpty() || knownTags.isNotEmpty()) HorizontalDivider()
-                DropdownMenuItem(
-                    text = { Text(stringResource(R.string.tag_new)) },
-                    leadingIcon = { Icon(Icons.Filled.Add, contentDescription = null) },
-                    onClick = {
-                        open = false
-                        onNewTag()
-                    },
-                )
-            }
+            TagPickerMenu(
+                expanded = open,
+                onDismiss = { open = false },
+                tags = tags,
+                knownTags = knownTags,
+                onToggle = onToggle,
+                onNewTag = onNewTag,
+            )
         }
         tags.forEach { tag ->
             InputChip(
@@ -85,5 +73,37 @@ fun NoteTagsRow(
                 },
             )
         }
+    }
+}
+
+/** Pop-up listing every tag in use: tap to add or remove it from the note, or create a new one. */
+@Composable
+fun TagPickerMenu(
+    expanded: Boolean,
+    onDismiss: () -> Unit,
+    tags: List<String>,
+    knownTags: List<String>,
+    onToggle: (String) -> Unit,
+    onNewTag: () -> Unit,
+) {
+    DropdownMenu(expanded = expanded, onDismissRequest = onDismiss) {
+        (tags + knownTags.filterNot { it in tags }.sorted()).forEach { tag ->
+            DropdownMenuItem(
+                text = { Text("#$tag") },
+                leadingIcon = {
+                    if (tag in tags) Icon(Icons.Filled.Check, contentDescription = stringResource(R.string.cd_tag_on_note))
+                },
+                onClick = { onToggle(tag) },
+            )
+        }
+        if (tags.isNotEmpty() || knownTags.isNotEmpty()) HorizontalDivider()
+        DropdownMenuItem(
+            text = { Text(stringResource(R.string.tag_new)) },
+            leadingIcon = { Icon(Icons.Filled.Add, contentDescription = null) },
+            onClick = {
+                onDismiss()
+                onNewTag()
+            },
+        )
     }
 }

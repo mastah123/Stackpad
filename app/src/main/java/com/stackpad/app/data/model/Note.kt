@@ -16,6 +16,8 @@ data class Note(
     val trashedAt: Long? = null,
     /** True when opening the note requires the phone's screen lock. */
     val locked: Boolean = false,
+    /** True when the note is kept out of the main list in the archive. */
+    val archived: Boolean = false,
 )
 
 /** Lightweight note projection shown in the note list and the trash. */

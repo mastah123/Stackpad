@@ -380,6 +380,18 @@ Covers: formula evaluator, span editing, URL detection/validation, list markers,
 - [ ] Crop a picture, then open the editor again: the full original picture is shown (not the cropped one); saving applies the new edit to the original. "Restore original" still works.
 - [ ] More space between the "words · created" line and the first text of a note. The add bar shows Add, Text, List, Cards only.
 
+### Note options sheet (2.20.0)
+- [ ] In a note, the 3-dot button opens a bottom sheet: title, tags, Created at, Last edited at (format 23-11-2026 06:29 PM), Add tag and Add color chips, then the action grid. Swipe down or tap outside closes it.
+- [ ] Add tag opens the tag list (tap to add or remove, New tag creates one). Add color shows the color swatches; picking one colors the note and the 3-dot icon is tinted.
+- [ ] Pin / Unpin toggles the pin (the label changes). Lock / Unlock asks for the screen lock and works as before.
+- [ ] Archive: the note closes and leaves the Home list. Side menu, Home tab: **Archive** shows the count; the note is there. Tap it to open; the sheet says Unarchive. The unarchive button on the Archive screen puts it back in the list.
+- [ ] Archived notes do not show in search, the tag counts or the widget's latest note; they are still in a backup and in a restore.
+- [ ] History opens the version list. Copy copies the text ("Note copied"); Share opens the share sheet with plain text; Export opens a page with Text, Markdown, Image, PDF and Share options, and Back returns.
+- [ ] Duplicate: "Note duplicated"; a copy titled "... (copy)" appears in the list, not pinned, with the same content and pictures. Duplicate a blank new note: "Nothing to duplicate yet". Erase the original from the trash: the copy still shows its pictures.
+- [ ] Add to home: the launcher asks to add a shortcut; tapping it opens that note. On a launcher without support the tile is not shown.
+- [ ] Select blocks, Templates, Save template and Move to trash work as before (trash asks to confirm).
+- [ ] Update from 2.19.0 keeps all notes; none are archived.
+
 ### Table handles (2.19.0)
 - [ ] The header no longer has + Row, - Row, + Col, - Col. Tap a top-row cell: a small rounded handle appears on the right border of that column, centered in the row. It does not move or wrap the text. Tap a cell that is neither in the top row nor the left column: no handle.
 - [ ] Tap a left-most cell: a handle appears centered on the bottom border of that row. Cell A1 shows both handles.

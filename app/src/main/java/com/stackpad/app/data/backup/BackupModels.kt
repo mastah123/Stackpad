@@ -30,6 +30,7 @@ data class BackupNote(
     val color: Int = 0,
     val trashedAt: Long? = null,
     val locked: Boolean = false,
+    val archived: Boolean = false,
 )
 
 internal val backupJson = Json {

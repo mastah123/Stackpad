@@ -28,6 +28,7 @@ import com.stackpad.app.domain.notes.TagCount
 import com.stackpad.app.domain.notes.Tags
 import com.stackpad.app.domain.notes.TrashPolicy
 import com.stackpad.app.domain.notes.AutoTitle
+import com.stackpad.app.domain.notes.DuplicateTitle
 import com.stackpad.app.domain.reminders.ReminderEntry
 import com.stackpad.app.domain.reminders.ReminderList
 import com.stackpad.app.domain.reminders.ReminderPlanner
@@ -80,6 +81,10 @@ class NoteRepository(
 
     fun observeTrashed(): Flow<List<NoteSummary>> =
         dao.observeTrashed().map { list -> list.map { it.toSummary() } }
+
+    /** Notes in the archive (not in the trash), most recently edited first. */
+    fun observeArchived(): Flow<List<NoteSummary>> =
+        dao.observeArchived().map { list -> list.map { it.toSummary() } }
 
     fun observeFolders(): Flow<List<Folder>> =
         folderDao.observeAll().map { list -> list.map { it.toFolder() } }
@@ -164,6 +169,27 @@ class NoteRepository(
     /** Saves on the app-wide scope so the write survives the caller being destroyed. */
     fun saveAsync(note: Note) {
         scope.launch { save(note) }
+    }
+
+    suspend fun setArchived(id: String, archived: Boolean) {
+        writeLock.withLock { dao.setArchived(id, archived) }
+    }
+
+    /** Saves a copy of the note (new id, titled "... (copy)", not pinned or archived). Returns its id, or null if the note is gone. */
+    suspend fun duplicate(id: String): String? = writeLock.withLock {
+        val source = dao.get(id)?.toNote() ?: return@withLock null
+        val now = System.currentTimeMillis()
+        val copy = source.copy(
+            id = BlockFactory.newId(),
+            title = DuplicateTitle.of(source.title, now),
+            pinned = false,
+            archived = false,
+            trashedAt = null,
+            createdAt = now,
+        )
+        dao.upsert(copy.toEntity(updatedAt = now))
+        scheduleReminders(copy)
+        copy.id
     }
 
     suspend fun setPinned(id: String, pinned: Boolean) {
@@ -253,17 +279,23 @@ class NoteRepository(
     }
 
     private suspend fun deleteNotes(notes: List<NoteEntity>) {
+        val candidates = HashSet<String>()
         notes.forEach { entity ->
             val note = entity.toNote()
             ReminderPlanner.dueKeys(note).forEach(reminders::cancel)
-            note.blocks.flatMap { it.mediaFileNames() }.forEach(media::delete)
-            versionDao.forNote(entity.id)
+            candidates += note.blocks.flatMap { it.mediaFileNames() }
+            candidates += versionDao.forNote(entity.id)
                 .flatMap { BlockJsonCodec.decode(it.blocksJson) }
                 .flatMap { it.mediaFileNames() }
-                .forEach(media::delete)
             versionDao.deleteForNote(entity.id)
             dao.delete(entity.id)
         }
+        // A duplicated note shares its pictures and recordings with the original, so only files nothing else uses are removed.
+        val stillUsed = (dao.allBlocksJson() + versionDao.allBlocksJson())
+            .flatMap { BlockJsonCodec.decode(it) }
+            .flatMap { it.mediaFileNames() }
+            .toSet()
+        candidates.filterNot { it in stillUsed }.forEach(media::delete)
     }
 
     /** Removes media files that no note refers to (left behind by undo history or a crash). */

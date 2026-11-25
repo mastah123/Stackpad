@@ -55,7 +55,7 @@ import kotlinx.coroutines.launch
  */
 class NoteEditorViewModel(
     private val container: AppContainer,
-    private val noteId: String,
+    val noteId: String,
     /** Folder a brand-new note starts in (the one selected in the note list); ignored for existing notes. */
     private val initialFolderId: String? = null,
 ) : ViewModel() {
@@ -142,6 +142,8 @@ class NoteEditorViewModel(
                     color = note.color,
                     locked = note.locked,
                     createdAt = note.createdAt,
+                    updatedAt = note.updatedAt,
+                    archived = note.archived,
                 )
             } else {
                 _state.value = EditorUiState(
@@ -658,6 +660,22 @@ class NoteEditorViewModel(
         flush()
     }
 
+    /** Moves the note to the archive (or back to the notes) with its latest edits, then calls [onDone]. */
+    fun toggleArchived(onDone: () -> Unit) {
+        mutate(record = false) { it.copy(archived = !it.archived) }
+        flush()
+        onDone()
+    }
+
+    /** Saves the note, then stores a copy of it. [onDone] gets false when there was nothing to copy. */
+    fun duplicateNote(onDone: (Boolean) -> Unit) {
+        val note = snapshot()
+        viewModelScope.launch {
+            if (note != null) repository.save(note)
+            onDone(note != null && repository.duplicate(noteId) != null)
+        }
+    }
+
     /** The blocks with these ids (in note order) as plain text, or null when they hold nothing to copy. */
     fun exportBlocks(ids: Set<String>): String? {
         val chosen = _state.value.blocks.filter { it.id in ids }
@@ -703,7 +721,7 @@ class NoteEditorViewModel(
             history.record(before.toSnapshot(), coalesceKey, SystemClock.elapsedRealtime())
             publishHistory()
         }
-        _state.value = after
+        _state.value = after.copy(updatedAt = System.currentTimeMillis())
         markChanged()
     }
 
@@ -747,6 +765,7 @@ class NoteEditorViewModel(
             tags = s.tags,
             color = s.color,
             locked = s.locked,
+            archived = s.archived,
             createdAt = createdAt,
             updatedAt = System.currentTimeMillis(),
         )

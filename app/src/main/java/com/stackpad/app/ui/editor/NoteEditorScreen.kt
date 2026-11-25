@@ -27,6 +27,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.Redo
 import androidx.compose.material.icons.automirrored.filled.Undo
+import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.PushPin
 import androidx.compose.material.icons.outlined.PushPin
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -177,6 +178,7 @@ private fun NoteEditorContent(
     var selecting by remember { mutableStateOf(false) }
     var selectedIds by remember { mutableStateOf(emptySet<String>()) }
     var showHistory by remember { mutableStateOf(false) }
+    var showOptions by remember { mutableStateOf(false) }
     val templates by viewModel.templates.collectAsStateWithLifecycle()
     val clipboard = LocalClipboardManager.current
 
@@ -492,34 +494,13 @@ private fun NoteEditorContent(
                             tint = if (state.pinned) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant,
                         )
                     }
-                    NoteActionsMenu(
-                        color = state.color,
-                        onSelectColor = viewModel::setColor,
-                        locked = state.locked,
-                        onToggleLock = {
-                            if (!appLock.canVerify()) {
-                                showMessage(R.string.msg_lock_unavailable)
-                            } else {
-                                appLock.verify(context.getString(R.string.lock_prompt_title)) { ok ->
-                                    if (ok) {
-                                        val nowLocked = !viewModel.state.value.locked
-                                        viewModel.toggleLocked()
-                                        showMessage(if (nowLocked) R.string.msg_note_lock_on else R.string.msg_note_lock_off)
-                                    }
-                                }
-                            }
-                        },
-                        onInsertTemplate = { showTemplates = true },
-                        onSaveTemplate = { saveTemplateDialog = true },
-                        onSelectBlocks = {
-                            focusManager.clearFocus()
-                            selectedIds = emptySet()
-                            selecting = true
-                        },
-                        onHistory = { focusManager.clearFocus(); showHistory = true },
-                        onShare = ::share,
-                        onTrash = { confirmDelete = true },
-                    )
+                    IconButton(onClick = { focusManager.clearFocus(); showOptions = true }) {
+                        Icon(
+                            Icons.Filled.MoreVert,
+                            contentDescription = stringResource(R.string.cd_more_actions),
+                            tint = if (state.color != 0) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
+                    }
                 },
             )
         },
@@ -635,6 +616,73 @@ private fun NoteEditorContent(
                 viewModel.addTag(it)
             },
             onDismiss = { newTagDialog = false },
+        )
+    }
+
+    if (showOptions) {
+        NoteOptionsSheet(
+            title = com.stackpad.app.domain.notes.AutoTitle.orDefault(state.title, state.createdAt),
+            tags = state.tags,
+            knownTags = knownTags,
+            createdAt = state.createdAt,
+            updatedAt = state.updatedAt,
+            color = state.color,
+            pinned = state.pinned,
+            archived = state.archived,
+            locked = state.locked,
+            canAddToHome = remember { com.stackpad.app.util.NoteShortcut.isSupported(context) },
+            onDismiss = { showOptions = false },
+            onToggleTag = { tag -> if (tag in state.tags) viewModel.removeTag(tag) else viewModel.addTag(tag) },
+            onNewTag = {
+                showOptions = false
+                newTagDialog = true
+            },
+            onSelectColor = viewModel::setColor,
+            onShare = { target ->
+                showOptions = false
+                share(target)
+            },
+            onOption = { option ->
+                showOptions = false
+                when (option) {
+                    NoteOption.PIN -> viewModel.togglePin()
+                    NoteOption.ARCHIVE -> viewModel.toggleArchived(onDone = onBack)
+                    NoteOption.LOCK ->
+                        if (!appLock.canVerify()) {
+                            showMessage(R.string.msg_lock_unavailable)
+                        } else {
+                            appLock.verify(context.getString(R.string.lock_prompt_title)) { ok ->
+                                if (ok) {
+                                    val nowLocked = !viewModel.state.value.locked
+                                    viewModel.toggleLocked()
+                                    showMessage(if (nowLocked) R.string.msg_note_lock_on else R.string.msg_note_lock_off)
+                                }
+                            }
+                        }
+                    NoteOption.HISTORY -> {
+                        focusManager.clearFocus()
+                        showHistory = true
+                    }
+                    NoteOption.DUPLICATE -> viewModel.duplicateNote { ok ->
+                        showMessage(if (ok) R.string.msg_note_duplicated else R.string.msg_duplicate_empty)
+                    }
+                    NoteOption.ADD_TO_HOME -> {
+                        viewModel.flush()
+                        val label = com.stackpad.app.domain.notes.AutoTitle.orDefault(state.title, state.createdAt)
+                        if (!com.stackpad.app.util.NoteShortcut.pin(context, viewModel.noteId, label)) {
+                            showMessage(R.string.msg_shortcut_failed)
+                        }
+                    }
+                    NoteOption.SELECT_BLOCKS -> {
+                        focusManager.clearFocus()
+                        selectedIds = emptySet()
+                        selecting = true
+                    }
+                    NoteOption.TEMPLATES -> showTemplates = true
+                    NoteOption.SAVE_TEMPLATE -> saveTemplateDialog = true
+                    NoteOption.TRASH -> confirmDelete = true
+                }
+            },
         )
     }
 

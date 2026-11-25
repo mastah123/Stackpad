@@ -22,11 +22,14 @@ import com.stackpad.app.ui.settings.SettingsScreen
 import com.stackpad.app.ui.settings.SettingsViewModel
 import com.stackpad.app.ui.reminders.RemindersScreen
 import com.stackpad.app.ui.reminders.RemindersViewModel
+import com.stackpad.app.ui.archive.ArchiveScreen
+import com.stackpad.app.ui.archive.ArchiveViewModel
 import com.stackpad.app.ui.trash.TrashScreen
 import com.stackpad.app.ui.trash.TrashViewModel
 
 private const val ROUTE_NOTES = "notes"
 private const val ROUTE_TRASH = "trash"
+private const val ROUTE_ARCHIVE = "archive"
 private const val ROUTE_REMINDERS = "reminders"
 private const val ROUTE_SETTINGS = "settings"
 private const val ARG_NOTE_ID = "noteId"
@@ -71,6 +74,7 @@ fun AppNavigation(
                     )
                 },
                 onOpenTrash = { navController.navigate(ROUTE_TRASH) },
+                onOpenArchive = { navController.navigate(ROUTE_ARCHIVE) },
                 onOpenReminders = { navController.navigate(ROUTE_REMINDERS) },
                 onOpenSettings = { navController.navigate(ROUTE_SETTINGS) },
             )
@@ -82,6 +86,14 @@ fun AppNavigation(
         composable(ROUTE_REMINDERS) {
             val viewModel: RemindersViewModel = viewModel(factory = RemindersViewModel.factory(container))
             RemindersScreen(
+                viewModel = viewModel,
+                onBack = { navController.popBackStack() },
+                onOpenNote = { id -> navController.navigate("editor/$id") },
+            )
+        }
+        composable(ROUTE_ARCHIVE) {
+            val viewModel: ArchiveViewModel = viewModel(factory = ArchiveViewModel.factory(container))
+            ArchiveScreen(
                 viewModel = viewModel,
                 onBack = { navController.popBackStack() },
                 onOpenNote = { id -> navController.navigate("editor/$id") },

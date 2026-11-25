@@ -16,7 +16,7 @@ interface NoteDao {
     @Query(
         """
         SELECT * FROM notes
-        WHERE trashedAt IS NULL AND (
+        WHERE trashedAt IS NULL AND archived = 0 AND (
               :query = ''
            OR title LIKE '%' || :query || '%' ESCAPE '\'
            OR searchText LIKE '%' || :query || '%' ESCAPE '\'
@@ -26,14 +26,17 @@ interface NoteDao {
     )
     fun observeActive(query: String): Flow<List<NoteEntity>>
 
+    @Query("SELECT * FROM notes WHERE trashedAt IS NULL AND archived = 1 ORDER BY updatedAt DESC")
+    fun observeArchived(): Flow<List<NoteEntity>>
+
     @Query("SELECT * FROM notes WHERE trashedAt IS NOT NULL ORDER BY trashedAt DESC")
     fun observeTrashed(): Flow<List<NoteEntity>>
 
     /** Raw tag strings of every active note that has tags. */
-    @Query("SELECT tags FROM notes WHERE trashedAt IS NULL AND tags != ''")
+    @Query("SELECT tags FROM notes WHERE trashedAt IS NULL AND archived = 0 AND tags != ''")
     fun observeTagStrings(): Flow<List<String>>
 
-    @Query("SELECT * FROM notes WHERE trashedAt IS NULL ORDER BY updatedAt DESC LIMIT 1")
+    @Query("SELECT * FROM notes WHERE trashedAt IS NULL AND archived = 0 ORDER BY updatedAt DESC LIMIT 1")
     suspend fun latestActive(): NoteEntity?
 
     @Query("SELECT * FROM notes WHERE id = :id")
@@ -65,6 +68,9 @@ interface NoteDao {
 
     @Query("UPDATE notes SET folderId = :folderId WHERE id IN (:ids)")
     suspend fun setFolderIn(ids: List<String>, folderId: String?)
+
+    @Query("UPDATE notes SET archived = :archived WHERE id = :id")
+    suspend fun setArchived(id: String, archived: Boolean)
 
     @Query("UPDATE notes SET tags = :tags WHERE id = :id")
     suspend fun setTags(id: String, tags: String)

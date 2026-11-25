@@ -16,6 +16,7 @@ import com.stackpad.app.data.share.SharedNoteCreator
 import com.stackpad.app.data.db.MIGRATION_1_2
 import com.stackpad.app.data.db.MIGRATION_2_3
 import com.stackpad.app.data.db.MIGRATION_3_4
+import com.stackpad.app.data.db.MIGRATION_4_5
 import com.stackpad.app.data.db.StackpadDatabase
 import com.stackpad.app.data.importing.DocxImporter
 import com.stackpad.app.data.importing.EvernoteImporter
@@ -48,7 +49,7 @@ class AppContainer(context: Context) {
 
     private val database: StackpadDatabase =
         Room.databaseBuilder(appContext, StackpadDatabase::class.java, "stackpad.db")
-            .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4)
+            .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5)
             .build()
 
     val mediaStorage = MediaStorage(appContext)

@@ -23,6 +23,7 @@ internal fun NoteEntity.toNote(): Note = Note(
     color = color,
     trashedAt = trashedAt,
     locked = locked,
+    archived = archived,
 )
 
 internal fun Note.toEntity(updatedAt: Long): NoteEntity = NoteEntity(
@@ -39,6 +40,7 @@ internal fun Note.toEntity(updatedAt: Long): NoteEntity = NoteEntity(
     color = color,
     trashedAt = trashedAt,
     locked = locked,
+    archived = archived,
 )
 
 internal fun NoteEntity.toSummary(): NoteSummary = NoteSummary(
@@ -70,6 +72,7 @@ internal fun NoteEntity.toBackupNote(): BackupNote = BackupNote(
     color = color,
     trashedAt = trashedAt,
     locked = locked,
+    archived = archived,
 )
 
 /** Cleans a note read from a backup: unknown folders are dropped and tags/color are made valid. */
@@ -85,4 +88,5 @@ internal fun BackupNote.toNote(folderKnown: Boolean): Note = Note(
     color = color.coerceAtLeast(0),
     trashedAt = trashedAt,
     locked = locked,
+    archived = archived,
 )

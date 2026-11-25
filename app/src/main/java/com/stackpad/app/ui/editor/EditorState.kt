@@ -18,6 +18,10 @@ data class EditorUiState(
     val locked: Boolean = false,
     /** When the note was first created (epoch millis); 0 until loaded. */
     val createdAt: Long = 0L,
+    /** When the note was last changed (epoch millis); 0 until loaded. */
+    val updatedAt: Long = 0L,
+    /** True when the note is in the archive. */
+    val archived: Boolean = false,
     /** Block that should grab keyboard focus once it is on screen. */
     val focusBlockId: String? = null,
     /** Caret position to use when focusing [focusBlockId]; null means the end of the text. */
