@@ -65,6 +65,10 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LifecycleEventEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.stackpad.app.R
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.clickable
 import com.stackpad.app.audio.AudioPlayer
 import com.stackpad.app.data.media.MediaStorage
 import com.stackpad.app.data.model.SpanType
@@ -568,6 +572,7 @@ private fun NoteEditorContent(
                     )
                 }
                 items(state.blocks, key = { it.id }) { block ->
+                    Column {
                     SelectableBlock(
                         selecting = selecting,
                         selected = block.id in selectedIds,
@@ -589,6 +594,31 @@ private fun NoteEditorContent(
                         // Consecutive text lines sit close together; cards get a little more air.
                         modifier = Modifier.padding(vertical = if (block is TextBlock) 1.dp else 2.dp),
                     )
+                    }
+                    // The space below a card: tap it to type under the card.
+                    if (!selecting && block !is TextBlock) {
+                        Box(
+                            Modifier
+                                .fillMaxWidth()
+                                .height(16.dp)
+                                .clickable(interactionSource = remember { MutableInteractionSource() }, indication = null) {
+                                    viewModel.addTextBelow(block.id)
+                                },
+                        )
+                    }
+                    }
+                }
+                if (!selecting) {
+                    // The empty space under the last block puts the cursor at the end of the note.
+                    item(key = "tail") {
+                        Box(
+                            Modifier
+                                .fillMaxWidth()
+                                .height(160.dp)
+                                .clickable(interactionSource = remember { MutableInteractionSource() }, indication = null) {
+                                    state.blocks.lastOrNull()?.let { viewModel.addTextBelow(it.id) }
+                                },
+                        )
                     }
                 }
             }

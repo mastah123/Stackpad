@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.22.1] - 2026-11-25
+
+### Changed
+- The Text chip now works like the other chips: tap it to highlight it and open its row (H1, H2, H3, bold, italic, underline), tap it again to hide the row. It no longer adds a text block.
+- Tapping the space just below a card (table, checklist, image...) puts the cursor in the text under it, adding a blank text block there if the next block is not text. Tapping the empty space under the last block puts the cursor at the end of the note.
+- The Format chip holds only Font, Size, Highlight and Line height (the Styles button is gone).
+
 ## [2.22.0] - 2026-11-25
 
 ### Added
@@ -15,7 +22,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 - The note options sheet opens fully expanded.
-- The text style toolbar (H1, H2, H3, bold, italic, underline) is hidden until you open Format and tap Styles.
+- The text style toolbar (H1, H2, H3, bold, italic, underline) is hidden until you open it from the Text chip.
 - Colors: buttons, icons, links and the cursor are navy instead of coral. Every selected item (menu rows, chips, toolbar buttons, selected blocks) uses the soft pink pill from the menu.
 - Quote, Prompt and Code blocks use new colors: cream, lavender and dark navy, in light and dark themes.
 

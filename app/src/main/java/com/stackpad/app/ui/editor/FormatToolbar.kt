@@ -40,20 +40,13 @@ data class FormatState(
     val underline: Boolean,
 )
 
-/** Heading and inline-format controls, shown while a text block is focused. */
+/** Heading and inline-format buttons for the focused text block; they go inside the caller's Row. */
 @Composable
-fun FormatToolbar(
+fun FormatButtons(
     state: FormatState,
     onToggleLevel: (TextLevel) -> Unit,
     onToggleSpan: (SpanType) -> Unit,
-    modifier: Modifier = Modifier,
 ) {
-    Row(
-        modifier = modifier
-            .horizontalScroll(rememberScrollState())
-            .padding(horizontal = 8.dp, vertical = 2.dp),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
         listOf(TextLevel.H1 to "H1", TextLevel.H2 to "H2", TextLevel.H3 to "H3").forEach { (level, label) ->
             FormatButton(
                 isSelected = state.level == level,
@@ -79,7 +72,6 @@ fun FormatToolbar(
             description = stringResource(R.string.cd_underline),
             onClick = { onToggleSpan(SpanType.UNDERLINE) },
         ) { FormatIcon(AppIcons.FormatUnderlined) }
-    }
 }
 
 @Composable

@@ -252,6 +252,29 @@ class NoteEditorViewModel(
     }
 
     /**
+     * Tapping the space below a block: puts the cursor in the text block that follows it, or adds a
+     * blank text block there when the next block is not text. A text block is just focused.
+     */
+    fun addTextBelow(id: String) {
+        val blocks = _state.value.blocks
+        val index = blocks.indexOfFirst { it.id == id }
+        if (index < 0) return
+        val target = blocks[index].takeIf { it is TextBlock } ?: blocks.getOrNull(index + 1)?.takeIf { it is TextBlock }
+        if (target != null) {
+            mutate(record = false) { it.copy(focusBlockId = target.id, focusCaret = null) }
+            lastFocusedId = target.id
+            return
+        }
+        val fresh = BlockFactory.text()
+        mutate { s ->
+            val list = s.blocks.toMutableList()
+            list.add(index + 1, fresh)
+            s.copy(blocks = list, focusBlockId = fresh.id, focusCaret = null)
+        }
+        lastFocusedId = fresh.id
+    }
+
+    /**
      * Removes a block and deletes its media file. With [viaBackspace] (empty text block), the
      * trailing text block is kept when it is the only thing after a non-text block, and focus
      * moves to the previous block.

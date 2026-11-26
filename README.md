@@ -10,7 +10,7 @@
 
 <p align="center">
   <a href="https://github.com/mastah123/stackpad/actions/workflows/android.yml"><img alt="Build" src="https://github.com/mastah123/stackpad/actions/workflows/android.yml/badge.svg"></a>
-  <img alt="Version" src="https://img.shields.io/badge/version-2.22.0-4F46E5">
+  <img alt="Version" src="https://img.shields.io/badge/version-2.22.1-4F46E5">
   <img alt="Platform" src="https://img.shields.io/badge/platform-Android%208.0%2B-3DDC84">
   <img alt="Kotlin" src="https://img.shields.io/badge/Kotlin-2.0-7F52FF">
   <img alt="License" src="https://img.shields.io/badge/license-MIT-blue">

@@ -42,16 +42,16 @@ import com.stackpad.app.data.model.ListKind
 import com.stackpad.app.domain.text.ListMarkers
 import com.stackpad.app.domain.text.isBullet
 
-private enum class OptionRow { PLUS, FORMAT, LIST, CARDS }
+private enum class OptionRow { PLUS, TEXT, FORMAT, LIST, CARDS }
 
 /** The third row that opens above the List row (Bullets, Numbers, Letters) or the + row (Image). */
-private enum class StyleRow { BULLETS, NUMBERS, LETTERS, CHECKLIST, IMAGE, TEXT }
+private enum class StyleRow { BULLETS, NUMBERS, LETTERS, CHECKLIST, IMAGE }
 
 /**
  * Scrollable row of chips; each one inserts a block of that type into the note.
  * "+", List and Cards open an option row above the chips, styled like the text format toolbar;
  * in the List row, Bullets, Numbers, Letters and Checklist open a third row (styles, or Checkbox list and Task list), and Image in the + row opens Gallery and Photo.
- * The Format chip opens Styles (headings, bold, italic, underline, in a third row), Font, Size, Highlight and Line height for the plain text block being edited.
+ * Text opens the heading, bold, italic and underline buttons; Format opens Font, Size, Highlight and Line height for the plain text block being edited.
  */
 @Composable
 fun AddBlockBar(
@@ -83,9 +83,7 @@ fun AddBlockBar(
     Column(modifier = modifier) {
         // The third row (styles, or Gallery and Photo) sits above the option row that opened it.
         styleRow?.let { group ->
-            if (group == StyleRow.TEXT) {
-                if (format != null) FormatToolbar(state = format, onToggleLevel = onToggleLevel, onToggleSpan = onToggleSpan)
-            } else OptionButtons {
+            OptionButtons {
                 when (group) {
                     StyleRow.IMAGE -> {
                         OptionButton(AppIcons.PhotoLibrary, stringResource(R.string.image_from_gallery)) {
@@ -158,6 +156,16 @@ fun AddBlockBar(
                     choose { onAddBlock(BlockFactory.divider()) }
                 }
             }
+            OptionRow.TEXT -> if (format == null) {
+                Text(
+                    text = stringResource(R.string.text_options_pick),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+                )
+            } else OptionButtons {
+                FormatButtons(state = format, onToggleLevel = onToggleLevel, onToggleSpan = onToggleSpan)
+            }
             OptionRow.FORMAT -> if (look == null) {
                 Text(
                     text = stringResource(R.string.format_pick_text),
@@ -166,13 +174,6 @@ fun AddBlockBar(
                     modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
                 )
             } else OptionButtons {
-                if (format != null) {
-                    OptionButton(
-                        AppIcons.TextFields,
-                        stringResource(R.string.format_styles),
-                        expanded = styleRow == StyleRow.TEXT,
-                    ) { styleRow = if (styleRow == StyleRow.TEXT) null else StyleRow.TEXT }
-                }
                 TextFormatChips(look = look, onChange = onLookChange)
             }
             OptionRow.CARDS -> OptionButtons {
@@ -198,9 +199,8 @@ fun AddBlockBar(
             AddChip(AppIcons.Add, stringResource(R.string.add_plus), selected = openRow == OptionRow.PLUS) {
                 toggle(OptionRow.PLUS)
             }
-            AddChip(AppIcons.TextFields, stringResource(R.string.add_text)) {
-                openRow = null
-                onAddBlock(BlockFactory.text())
+            AddChip(AppIcons.TextFields, stringResource(R.string.add_text), selected = openRow == OptionRow.TEXT) {
+                toggle(OptionRow.TEXT)
             }
             AddChip(AppIcons.Palette, stringResource(R.string.add_format), selected = openRow == OptionRow.FORMAT) {
                 toggle(OptionRow.FORMAT)
