@@ -15,8 +15,10 @@ import com.stackpad.app.data.model.Note
 import com.stackpad.app.data.model.SpanType
 import com.stackpad.app.data.model.NoteVersion
 import com.stackpad.app.data.model.TextBlock
-import com.stackpad.app.data.model.TextLook
-import com.stackpad.app.data.model.withLook
+import com.stackpad.app.data.model.LineSpacing
+import com.stackpad.app.data.model.TextFont
+import com.stackpad.app.data.model.TextSize
+import com.stackpad.app.domain.text.FormatSpans
 import com.stackpad.app.data.model.TextLevel
 import com.stackpad.app.data.model.TextSpan
 import com.stackpad.app.data.model.isBlank
@@ -375,14 +377,15 @@ class NoteEditorViewModel(
         mutate(coalesceKey = if (lineBreakEdit) null else "text:$id") { s ->
             val index = s.blocks.indexOfFirst { it.id == id }
             val block = s.blocks.getOrNull(index) as? TextBlock ?: return@mutate s
-            val (headings, others) = block.spans.partition { HeadingSpans.isHeading(it.type) }
-            val styled = SpanEditing.applyEdit(others, block.text, newText, typing?.filterNot(HeadingSpans::isHeading)?.toSet())
+            // Headings and line spacing belong to whole lines; the rest follows the typed letters.
+            val (headings, others) = block.spans.partition { HeadingSpans.isHeading(it.type) || FormatSpans.isLine(it.type) }
+            val styled = SpanEditing.applyEdit(others, block.text, newText, typing?.filterNot { HeadingSpans.isHeading(it) || FormatSpans.isLine(it) }?.toSet())
             val grown = SpanEditing.adjustForEdit(headings, block.text, newText).toMutableList()
             typing?.firstOrNull(HeadingSpans::isHeading)?.let { type ->
                 val change = SpanEditing.diff(block.text, newText)
                 if (change.newEnd > change.prefix) grown += TextSpan(change.prefix, change.newEnd, type)
             }
-            val spans = HeadingSpans.normalize(newText, styled + grown)
+            val spans = FormatSpans.normalizeLines(newText, HeadingSpans.normalize(newText, styled + grown))
             val list = s.blocks.toMutableList()
             list[index] = block.copy(text = newText, spans = spans)
             s.copy(blocks = list)
@@ -419,15 +422,43 @@ class NoteEditorViewModel(
         lastFocusedId = previous.id
     }
 
+    /** Changes the size of the whole text block that has the cursor. */
+    fun setTextSize(size: TextSize) {
+        val active = _activeText.value ?: return
+        edit<TextBlock>(active.blockId) { it.copy(size = size) }
+    }
+
+    /** Font for the selected letters, or for the next typed ones when only the caret is placed. */
+    fun setFont(font: TextFont) = setPickOne(FormatSpans.FONTS, FormatSpans.fontType(font))
+
+    /** Highlight (1..6, 0 = none) for the selected letters, or for the next typed ones. */
+    fun setHighlight(index: Int) = setPickOne(FormatSpans.HIGHLIGHTS, FormatSpans.highlightType(index))
+
+    private fun setPickOne(group: List<SpanType>, chosen: SpanType?) {
+        val active = _activeText.value ?: return
+        if (active.start != active.end) {
+            edit<TextBlock>(active.blockId) {
+                it.copy(spans = FormatSpans.setInline(it.spans, active.start, active.end, group, chosen))
+            }
+            return
+        }
+        val block = _state.value.blocks.firstOrNull { it.id == active.blockId } as? TextBlock ?: return
+        val current = _typingStyles.value ?: SpanEditing.stylesAt(block.spans, active.start - 1)
+        _typingStyles.value = current.filterNot { it in group }.toSet() + listOfNotNull(chosen)
+    }
+
+    /** Line spacing for the lines the selection (or caret) touches. */
+    fun setLineSpacing(spacing: LineSpacing) {
+        val active = _activeText.value ?: return
+        edit<TextBlock>(active.blockId) {
+            it.copy(spans = FormatSpans.setLines(it.text, it.spans, active.start, active.end, FormatSpans.lineType(spacing)))
+        }
+    }
+
     /**
      * Toggles a heading on the lines the selection touches (tapping the level they all have turns it
      * off). On an empty line the heading is picked for the text typed next.
      */
-    /** Changes the font, size, highlight and line spacing of the text block [blockId]. */
-    fun setTextLook(blockId: String, look: TextLook) {
-        edit<TextBlock>(blockId) { it.withLook(look) }
-    }
-
     fun toggleLevel(level: TextLevel) {
         val active = _activeText.value ?: return
         val block = _state.value.blocks.firstOrNull { it.id == active.blockId } as? TextBlock ?: return

@@ -12,7 +12,13 @@ enum class TextLevel { PARAGRAPH, H1, H2, H3 }
  * one whole line, and a line has at most one.
  */
 @Serializable
-enum class SpanType { BOLD, ITALIC, UNDERLINE, H1, H2, H3 }
+enum class SpanType {
+    BOLD, ITALIC, UNDERLINE, H1, H2, H3,
+    /** Per-letter font and highlight, and per-line spacing (see FormatSpans). */
+    FONT_SERIF, FONT_MONO, FONT_HANDWRITING,
+    HIGHLIGHT_1, HIGHLIGHT_2, HIGHLIGHT_3, HIGHLIGHT_4, HIGHLIGHT_5, HIGHLIGHT_6,
+    LINE_TIGHT, LINE_RELAXED, LINE_LOOSE,
+}
 
 /** A formatted range `[start, end)` inside a text block. */
 @Serializable
@@ -56,12 +62,8 @@ data class TextBlock(
     val level: TextLevel = TextLevel.PARAGRAPH,
     val text: String = "",
     val spans: List<TextSpan> = emptyList(),
-    /** How this block is drawn (see [TextLook]). Headings inside it keep their own size. */
-    val font: TextFont = TextFont.DEFAULT,
+    /** Size of the whole block (font, highlight and line spacing are per letter and per line, in [spans]). */
     val size: TextSize = TextSize.NORMAL,
-    /** Highlight color: 0 = none, otherwise an index into the highlight colors. */
-    val highlight: Int = 0,
-    val spacing: LineSpacing = LineSpacing.NORMAL,
 ) : Block
 
 @Serializable

@@ -38,6 +38,7 @@ data class FormatState(
     val bold: Boolean,
     val italic: Boolean,
     val underline: Boolean,
+    val look: TextLookState,
 )
 
 /** Heading and inline-format buttons for the focused text block; they go inside the caller's Row. */

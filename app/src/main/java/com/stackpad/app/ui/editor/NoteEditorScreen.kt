@@ -77,6 +77,7 @@ import com.stackpad.app.data.model.look
 import com.stackpad.app.data.model.TextLevel
 import com.stackpad.app.domain.notes.TrashPolicy
 import com.stackpad.app.notifications.ReminderNotifications
+import com.stackpad.app.domain.text.FormatSpans
 import com.stackpad.app.domain.text.HeadingSpans
 import com.stackpad.app.domain.text.SpanEditing
 import com.stackpad.app.ui.components.ConfirmDialog
@@ -171,7 +172,6 @@ private fun NoteEditorContent(
     var barHeight by remember { mutableIntStateOf(0) }
     var newTagDialog by remember { mutableStateOf(false) }
     // The text block the Format chips change; kept after the block loses focus (the drop-down menus take it).
-    var formatTarget by remember { mutableStateOf<String?>(null) }
     var selecting by remember { mutableStateOf(false) }
     var selectedIds by remember { mutableStateOf(emptySet<String>()) }
     var showHistory by remember { mutableStateOf(false) }
@@ -412,8 +412,6 @@ private fun NoteEditorContent(
     }
     BackHandler(enabled = selecting, onBack = closeSelection)
 
-    LaunchedEffect(activeText?.blockId) { activeText?.blockId?.let { formatTarget = it } }
-    val formatLook = (state.blocks.firstOrNull { it.id == formatTarget } as? TextBlock)?.look()
 
     val formatState = activeText?.let { active ->
         (state.blocks.firstOrNull { it.id == active.blockId } as? TextBlock)?.let { block ->
@@ -433,7 +431,24 @@ private fun NoteEditorContent(
                 pendingHeading != null -> HeadingSpans.levelOf(pendingHeading)
                 else -> HeadingSpans.levelAt(block.text, block.spans, active.start)
             }
+            val group = { types: List<SpanType> ->
+                if (collapsed) {
+                    types.firstOrNull { it in atCaret }
+                } else {
+                    FormatSpans.commonInline(block.spans, active.start, active.end, types) as? SpanType
+                }
+            }
+            val mixed = { types: List<SpanType> ->
+                !collapsed && FormatSpans.commonInline(block.spans, active.start, active.end, types) === FormatSpans.MIXED
+            }
+            val look = TextLookState(
+                font = if (mixed(FormatSpans.FONTS)) null else FormatSpans.fontOf(group(FormatSpans.FONTS)),
+                size = block.size,
+                highlight = if (mixed(FormatSpans.HIGHLIGHTS)) null else FormatSpans.highlightIndex(group(FormatSpans.HIGHLIGHTS)),
+                spacing = FormatSpans.commonLine(block.text, block.spans, active.start, active.end),
+            )
             FormatState(
+                look = look,
                 level = level,
                 bold = hasStyle(SpanType.BOLD),
                 italic = hasStyle(SpanType.ITALIC),
@@ -523,8 +538,10 @@ private fun NoteEditorContent(
                         format = formatState?.takeIf { recording == null },
                         onToggleLevel = viewModel::toggleLevel,
                         onToggleSpan = viewModel::toggleSpan,
-                        look = formatLook,
-                        onLookChange = { look -> formatTarget?.let { viewModel.setTextLook(it, look) } },
+                        onFont = viewModel::setFont,
+                        onSize = viewModel::setTextSize,
+                        onHighlight = viewModel::setHighlight,
+                        onSpacing = viewModel::setLineSpacing,
                     )
                 }
             }

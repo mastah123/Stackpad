@@ -32,7 +32,10 @@ import androidx.compose.ui.input.key.onPreviewKeyEvent
 import androidx.compose.ui.input.key.type
 import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.TextRange
-import androidx.compose.ui.unit.TextUnit
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.unit.em
+import com.stackpad.app.data.model.LineSpacing
+import com.stackpad.app.domain.text.FormatSpans
 import com.stackpad.app.ui.theme.TextHighlights
 import com.stackpad.app.ui.theme.family
 import com.stackpad.app.data.model.SpanType
@@ -40,6 +43,7 @@ import com.stackpad.app.data.model.TextLevel
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.TextFieldValue
 import com.stackpad.app.data.model.TextBlock
+import com.stackpad.app.data.model.TextFont
 import com.stackpad.app.domain.text.UrlUtils
 import com.stackpad.app.ui.theme.textStyle
 
@@ -81,15 +85,28 @@ fun TextBlockView(
     }
 
     val typography = MaterialTheme.typography
-    val headingStyles = remember(typography) {
+    val highlights = (1..FormatSpans.HIGHLIGHT_COUNT).mapNotNull { index ->
+        val color = TextHighlights.background(index) ?: return@mapNotNull null
+        FormatSpans.highlightType(index)!! to SpanStyle(background = color)
+    }
+    val spanStyles = remember(typography, highlights) {
         mapOf(
             SpanType.H1 to TextLevel.H1.textStyle(typography).toSpanStyle(),
             SpanType.H2 to TextLevel.H2.textStyle(typography).toSpanStyle(),
             SpanType.H3 to TextLevel.H3.textStyle(typography).toSpanStyle(),
-        )
+        ) + TextFont.values().mapNotNull { font ->
+            val type = FormatSpans.fontType(font) ?: return@mapNotNull null
+            font.family()?.let { type to SpanStyle(fontFamily = it) }
+        } + highlights
     }
-    val transformation = remember(block.spans, colors.primary, headingStyles) {
-        RichTextTransformation(block.spans, colors.primary, headingStyles)
+    val lineHeights = remember {
+        LineSpacing.values().mapNotNull { spacing ->
+            val type = FormatSpans.lineType(spacing) ?: return@mapNotNull null
+            spacing.multiplier?.let { type to it.em }
+        }.toMap()
+    }
+    val transformation = remember(block.spans, colors.primary, spanStyles) {
+        RichTextTransformation(block.spans, colors.primary, spanStyles, lineHeights)
     }
     // No fixed line height: a line with a heading is taller than a body line.
     val baseStyle = TextLevel.PARAGRAPH.textStyle(typography)
@@ -97,11 +114,7 @@ fun TextBlockView(
     val textStyle = baseStyle.copy(
         color = colors.onSurface,
         fontSize = fontSize,
-        fontFamily = block.font.family() ?: baseStyle.fontFamily,
-        lineHeight = block.spacing.multiplier?.let { fontSize * it } ?: TextUnit.Unspecified,
     )
-    val highlight = TextHighlights.background(block.highlight)
-    val fieldStyle = if (highlight != null) textStyle.copy(background = highlight) else textStyle
 
     BasicTextField(
         value = value,
@@ -145,7 +158,7 @@ fun TextBlockView(
                     false
                 }
             },
-        textStyle = fieldStyle,
+        textStyle = textStyle,
         keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Sentences),
         cursorBrush = SolidColor(colors.primary),
         visualTransformation = transformation,

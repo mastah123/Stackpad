@@ -6,15 +6,15 @@ import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 
-// Warm off-white with navy text and controls. Highlights (selected items) are a soft pink pill; the coral is only a tint.
+// Warm off-white with navy text and controls. Highlights (selected items) are a light purple pill.
 private val LightColors = lightColorScheme(
     primary = Color(0xFF1C2340),
     onPrimary = Color.White,
-    primaryContainer = Color(0xFFFDECEA),
+    primaryContainer = Color(0xFFE9E3FA),
     onPrimaryContainer = Color(0xFF1C2340),
     secondary = Color(0xFF6B54C9),
     onSecondary = Color.White,
-    secondaryContainer = Color(0xFFFDECEA),
+    secondaryContainer = Color(0xFFE9E3FA),
     onSecondaryContainer = Color(0xFF1C2340),
     tertiary = Color(0xFF4C9150),
     onTertiary = Color.White,
@@ -47,12 +47,12 @@ private val LightColors = lightColorScheme(
 private val DarkColors = darkColorScheme(
     primary = Color(0xFFEDEFF8),
     onPrimary = Color(0xFF11152A),
-    primaryContainer = Color(0xFF4A2F3A),
-    onPrimaryContainer = Color(0xFFFFE5E2),
+    primaryContainer = Color(0xFF3A3068),
+    onPrimaryContainer = Color(0xFFE9E3FA),
     secondary = Color(0xFFB7A8F5),
     onSecondary = Color(0xFF2A1F6B),
-    secondaryContainer = Color(0xFF4A2F3A),
-    onSecondaryContainer = Color(0xFFFFE5E2),
+    secondaryContainer = Color(0xFF3A3068),
+    onSecondaryContainer = Color(0xFFE9E3FA),
     tertiary = Color(0xFF9ED39B),
     onTertiary = Color(0xFF0F3A12),
     tertiaryContainer = Color(0xFF2A4D2C),

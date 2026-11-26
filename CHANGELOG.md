@@ -13,6 +13,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - The Text chip now works like the other chips: tap it to highlight it and open its row (H1, H2, H3, bold, italic, underline), tap it again to hide the row. It no longer adds a text block.
 - Tapping the space just below a card (table, checklist, image...) puts the cursor in the text under it, adding a blank text block there if the next block is not text. Tapping the empty space under the last block puts the cursor at the end of the note.
 - The Format chip holds only Font, Size, Highlight and Line height (the Styles button is gone).
+- Font and Highlight now work like bold and italic: they apply to the letters you select (or to what you type next when only the cursor is placed), so one line can mix fonts and highlight colors. Line height applies to the lines the selection touches. Size still applies to the whole text block. The Format chip no longer saves one font/highlight/spacing for the whole block.
+- The Text and Format chips are greyed out and do nothing unless the cursor is in a plain text block (not in a card or table, or nowhere). An open Text or Format row closes when the cursor leaves a text block.
+- The selected-item highlight is light purple again (it was pink in 2.22.0): menu rows, chips, toolbar buttons, selected blocks and notes, in light and dark.
+- Icons and text are a little thicker: icon lines 2.0 instead of 1.75, and note and body text use the Medium weight.
 
 ## [2.22.0] - 2026-11-25
 

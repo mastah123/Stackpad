@@ -521,12 +521,10 @@
     <string name="msg_duplicate_empty">Nothing to duplicate yet</string>
     <string name="msg_shortcut_failed">Your launcher could not add the shortcut</string>
     <string name="add_format">Format</string>
-    <string name="text_options_pick">Tap a text block to use the text options.</string>
     <string name="format_font">Font</string>
     <string name="format_size">Size</string>
     <string name="format_highlight">Highlight</string>
     <string name="format_line_height">Line height</string>
-    <string name="format_pick_text">Tap a text block to change its look.</string>
     <string name="font_default">Default</string>
     <string name="font_serif">Serif</string>
     <string name="font_mono">Monospace</string>

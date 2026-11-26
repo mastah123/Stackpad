@@ -14,7 +14,7 @@ import androidx.compose.ui.unit.dp
  * `tint` of the Icon that shows it.
  */
 object AppIcons {
-    private const val STROKE_WIDTH = 1.75f
+    private const val STROKE_WIDTH = 2.0f
 
     private fun lucide(name: String, vararg paths: String): ImageVector =
         ImageVector.Builder(

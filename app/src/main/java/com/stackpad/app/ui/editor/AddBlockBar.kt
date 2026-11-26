@@ -32,7 +32,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
 import com.stackpad.app.R
-import com.stackpad.app.data.model.TextLook
+import com.stackpad.app.data.model.LineSpacing
+import com.stackpad.app.data.model.TextFont
+import com.stackpad.app.data.model.TextSize
 import com.stackpad.app.data.model.SpanType
 import com.stackpad.app.data.model.TextLevel
 import com.stackpad.app.ui.editor.blocks.BulletMark
@@ -63,8 +65,10 @@ fun AddBlockBar(
     format: FormatState?,
     onToggleLevel: (TextLevel) -> Unit,
     onToggleSpan: (SpanType) -> Unit,
-    look: TextLook?,
-    onLookChange: (TextLook) -> Unit,
+    onFont: (TextFont) -> Unit,
+    onSize: (TextSize) -> Unit,
+    onHighlight: (Int) -> Unit,
+    onSpacing: (LineSpacing) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     var openRow by remember { mutableStateOf<OptionRow?>(null) }
@@ -79,6 +83,9 @@ fun AddBlockBar(
         styleRow = null
         action()
     }
+
+    // Text and Format only work with the cursor in a plain text block; close them when it leaves.
+    if (format == null && (openRow == OptionRow.TEXT || openRow == OptionRow.FORMAT)) openRow = null
 
     Column(modifier = modifier) {
         // The third row (styles, or Gallery and Photo) sits above the option row that opened it.
@@ -156,25 +163,17 @@ fun AddBlockBar(
                     choose { onAddBlock(BlockFactory.divider()) }
                 }
             }
-            OptionRow.TEXT -> if (format == null) {
-                Text(
-                    text = stringResource(R.string.text_options_pick),
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
-                )
-            } else OptionButtons {
+            OptionRow.TEXT -> if (format != null) OptionButtons {
                 FormatButtons(state = format, onToggleLevel = onToggleLevel, onToggleSpan = onToggleSpan)
             }
-            OptionRow.FORMAT -> if (look == null) {
-                Text(
-                    text = stringResource(R.string.format_pick_text),
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+            OptionRow.FORMAT -> if (format != null) OptionButtons {
+                TextFormatChips(
+                    look = format.look,
+                    onFont = onFont,
+                    onSize = onSize,
+                    onHighlight = onHighlight,
+                    onSpacing = onSpacing,
                 )
-            } else OptionButtons {
-                TextFormatChips(look = look, onChange = onLookChange)
             }
             OptionRow.CARDS -> OptionButtons {
                 OptionButton(AppIcons.AutoAwesome, stringResource(R.string.add_prompt)) {
@@ -199,10 +198,10 @@ fun AddBlockBar(
             AddChip(AppIcons.Add, stringResource(R.string.add_plus), selected = openRow == OptionRow.PLUS) {
                 toggle(OptionRow.PLUS)
             }
-            AddChip(AppIcons.TextFields, stringResource(R.string.add_text), selected = openRow == OptionRow.TEXT) {
+            AddChip(AppIcons.TextFields, stringResource(R.string.add_text), enabled = format != null, selected = openRow == OptionRow.TEXT) {
                 toggle(OptionRow.TEXT)
             }
-            AddChip(AppIcons.Palette, stringResource(R.string.add_format), selected = openRow == OptionRow.FORMAT) {
+            AddChip(AppIcons.Palette, stringResource(R.string.add_format), enabled = format != null, selected = openRow == OptionRow.FORMAT) {
                 toggle(OptionRow.FORMAT)
             }
             AddChip(AppIcons.FormatListBulleted, stringResource(R.string.add_list), selected = openRow == OptionRow.LIST) {

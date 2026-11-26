@@ -33,42 +33,60 @@ import androidx.compose.ui.unit.dp
 import com.stackpad.app.R
 import com.stackpad.app.data.model.LineSpacing
 import com.stackpad.app.data.model.TextFont
-import com.stackpad.app.data.model.TextLook
+import com.stackpad.app.domain.text.FormatSpans
 import com.stackpad.app.data.model.TextSize
 import com.stackpad.app.ui.icons.AppIcons
 import com.stackpad.app.ui.theme.TextHighlights
 
-/** The four drop-down chips of the Format row: Font, Size, Highlight and Line height. They go inside the caller's Row. */
+/** What the Format chips show as chosen. A null means the selection is mixed (nothing is ticked). */
+data class TextLookState(
+    val font: TextFont?,
+    val size: TextSize,
+    val highlight: Int?,
+    val spacing: LineSpacing?,
+)
+
+/**
+ * The four drop-down chips of the Format row: Font, Size, Highlight and Line height. Font and
+ * Highlight apply to the selected letters, Line height to the touched lines, Size to the block.
+ * They go inside the caller's Row.
+ */
 @Composable
-fun TextFormatChips(look: TextLook, onChange: (TextLook) -> Unit) {
+fun TextFormatChips(
+    look: TextLookState,
+    onFont: (TextFont) -> Unit,
+    onSize: (TextSize) -> Unit,
+    onHighlight: (Int) -> Unit,
+    onSpacing: (LineSpacing) -> Unit,
+) {
     LookChip(
         label = stringResource(R.string.format_font),
         options = TextFont.values().toList(),
         selected = look.font,
         optionLabel = { stringResource(it.labelRes()) },
-        onSelect = { onChange(look.copy(font = it)) },
+        onSelect = onFont,
     )
     LookChip(
         label = stringResource(R.string.format_size),
         options = TextSize.values().toList(),
         selected = look.size,
         optionLabel = { stringResource(it.labelRes()) },
-        onSelect = { onChange(look.copy(size = it)) },
+        onSelect = onSize,
     )
     LookChip(
         label = stringResource(R.string.format_highlight),
-        options = (0..TextLook.HIGHLIGHT_COUNT).toList(),
+        options = (0..FormatSpans.HIGHLIGHT_COUNT).toList(),
         selected = look.highlight,
         optionLabel = { stringResource(highlightLabel(it)) },
         swatch = { TextHighlights.swatch(it) },
-        onSelect = { onChange(look.copy(highlight = it)) },
+        onSelect = onHighlight,
     )
     LookChip(
         label = stringResource(R.string.format_line_height),
         options = LineSpacing.values().toList(),
         selected = look.spacing,
         optionLabel = { stringResource(it.labelRes()) },
-        onSelect = { onChange(look.copy(spacing = it)) },
+        onSelect = onSpacing,
     )
 }
 
@@ -76,7 +94,7 @@ fun TextFormatChips(look: TextLook, onChange: (TextLook) -> Unit) {
 private fun <T> LookChip(
     label: String,
     options: List<T>,
-    selected: T,
+    selected: T?,
     optionLabel: @Composable (T) -> String,
     onSelect: (T) -> Unit,
     swatch: ((T) -> Color?)? = null,

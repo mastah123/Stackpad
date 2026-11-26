@@ -2,6 +2,7 @@ package com.stackpad.app.ui.editor.blocks
 
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.ParagraphStyle
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontStyle
@@ -10,8 +11,10 @@ import androidx.compose.ui.text.input.OffsetMapping
 import androidx.compose.ui.text.input.TransformedText
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.unit.TextUnit
 import com.stackpad.app.data.model.SpanType
 import com.stackpad.app.data.model.TextSpan
+import com.stackpad.app.domain.text.FormatSpans
 import com.stackpad.app.domain.text.UrlUtils
 
 /**
@@ -21,8 +24,10 @@ import com.stackpad.app.domain.text.UrlUtils
 class RichTextTransformation(
     private val spans: List<TextSpan>,
     private val linkColor: Color,
-    /** Looks of the line headings (H1 to H3). */
-    private val headings: Map<SpanType, SpanStyle> = emptyMap(),
+    /** Looks of the spans that depend on the theme: headings, fonts and highlights. */
+    private val styles: Map<SpanType, SpanStyle> = emptyMap(),
+    /** Line height of each line-spacing span. */
+    private val lineHeights: Map<SpanType, TextUnit> = emptyMap(),
 ) : VisualTransformation {
 
     override fun filter(text: AnnotatedString): TransformedText {
@@ -32,7 +37,14 @@ class RichTextTransformation(
             spans.forEach { span ->
                 val start = span.start.coerceIn(0, raw.length)
                 val end = span.end.coerceIn(0, raw.length)
-                if (end > start) addStyle(span.type.toSpanStyle(), start, end)
+                if (end <= start) return@forEach
+                if (FormatSpans.isLine(span.type)) {
+                    val height = lineHeights[span.type] ?: return@forEach
+                    // The paragraph includes its line break, so neighbouring lines never overlap.
+                    addStyle(ParagraphStyle(lineHeight = height), start, minOf(end + 1, raw.length))
+                } else {
+                    addStyle(span.type.toSpanStyle(), start, end)
+                }
             }
             UrlUtils.findUrls(raw).forEach { url ->
                 addStyle(
@@ -49,6 +61,6 @@ class RichTextTransformation(
         SpanType.BOLD -> SpanStyle(fontWeight = FontWeight.Bold)
         SpanType.ITALIC -> SpanStyle(fontStyle = FontStyle.Italic)
         SpanType.UNDERLINE -> SpanStyle(textDecoration = TextDecoration.Underline)
-        SpanType.H1, SpanType.H2, SpanType.H3 -> headings[this] ?: SpanStyle()
+        else -> styles[this] ?: SpanStyle()
     }
 }
