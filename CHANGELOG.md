@@ -16,6 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Font and Highlight now work like bold and italic: they apply to the letters you select (or to what you type next when only the cursor is placed), so one line can mix fonts and highlight colors. Line height applies to the lines the selection touches. Size still applies to the whole text block. The Format chip no longer saves one font/highlight/spacing for the whole block.
 - The Text and Format chips are greyed out and do nothing unless the cursor is in a plain text block (not in a card or table, or nowhere). An open Text or Format row closes when the cursor leaves a text block.
 - The selected-item highlight is light purple again (it was pink in 2.22.0): menu rows, chips, toolbar buttons, selected blocks and notes, in light and dark.
+- The colored bar on the left of cards is gone: Quote blocks (editor and previews) and notes in the list no longer have it. Colored notes keep their tinted background and pinned notes keep their pin.
 - Icons and text are a little thicker: icon lines 2.0 instead of 1.75, and note and body text use the Medium weight.
 
 ## [2.22.0] - 2026-11-25

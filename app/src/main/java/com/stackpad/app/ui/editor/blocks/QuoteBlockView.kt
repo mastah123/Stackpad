@@ -30,7 +30,7 @@ import com.stackpad.app.data.model.QuoteBlock
 import com.stackpad.app.ui.components.InlineTextField
 import com.stackpad.app.ui.components.SmallIconButton
 
-/** Indented, italic quotation with an accent bar on the left. */
+/** Italic quotation on a cream card. */
 @Composable
 fun QuoteBlockView(
     block: QuoteBlock,
@@ -61,13 +61,6 @@ fun QuoteBlockView(
             .border(1.dp, look.border ?: look.container, RoundedCornerShape(8.dp)),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        Box(
-            Modifier
-                .width(3.dp)
-                .fillMaxHeight()
-                .clip(RoundedCornerShape(2.dp))
-                .background(look.label),
-        )
         InlineTextField(
             text = block.text,
             onTextChange = { text -> onEdit { it.copy(text = text) } },

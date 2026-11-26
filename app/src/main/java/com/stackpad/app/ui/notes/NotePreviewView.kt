@@ -165,7 +165,6 @@ private fun PreviewItem(item: DocItem) {
                 .clip(RoundedCornerShape(6.dp))
                 .background(BlockTone.QUOTE.container()),
         ) {
-            Box(Modifier.width(3.dp).fillMaxHeight().background(Color(BlockTone.QUOTE.argb)))
             Text(
                 text = item.text,
                 style = body.copy(fontStyle = FontStyle.Italic),

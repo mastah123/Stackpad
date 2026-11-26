@@ -386,6 +386,7 @@ Covers: formula evaluator, span editing, URL detection/validation, list markers,
 - [ ] Format chip sits between Text and List. Select some letters in a text block: Font and Highlight change only those letters (a line can mix fonts and colors); the menu shows a check on what the selection has (no check when it is mixed). With only the cursor placed, pick Font or Highlight and type: the new letters get it. Pick Default / None on selected letters: they go back to normal. Line height changes every line the selection touches (the cursor line when nothing is selected) and the lines keep it when you type; Size changes the whole block. Reopen the note: everything is kept. Headings keep their size.
 - [ ] Put the cursor in a table cell, a checklist, a quote/prompt/code card, or leave no cursor: the Text and Format chips are greyed out and do nothing. Open Format in a text block, then tap into a card: the row closes and the chip is greyed.
 - [ ] Selected items (menu rows, chips, toolbar buttons, selected blocks and notes) are light purple, not pink, in light and dark. Icons and note text look a little thicker than in the first 2.22.0 build.
+- [ ] No card has a colored bar on its left edge: Quote blocks (editor, note previews in Home, exports are unchanged), and notes in the list, pinned or colored. A colored note is still tinted and a pinned note still shows its pin.
 - [ ] Undo/redo still works after a Format change.
 
 ### New look (2.21.0)

@@ -22,10 +22,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.drawBehind
-import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
@@ -36,14 +33,13 @@ import com.stackpad.app.R
 import com.stackpad.app.data.model.NoteSummary
 import com.stackpad.app.ui.components.highlightMatches
 import com.stackpad.app.domain.notes.AutoTitle
-import com.stackpad.app.ui.theme.NoteColors
 import com.stackpad.app.ui.theme.noteCardColor
 import com.stackpad.app.util.formatListStamp
 
 @OptIn(ExperimentalFoundationApi::class)
 /**
  * One note. In the list it is a flat row (time, bold title, preview, tag chips, three-dot menu) with a
- * left accent bar for pinned or colored notes; in the grid the same content sits in a rounded card.
+ * plain background; in the grid the same content sits in a rounded card.
  */
 @Composable
 fun NoteCard(
@@ -77,17 +73,14 @@ fun NoteCard(
         animationSpec = tween(180),
         label = "noteBackground",
     )
-    val accent = NoteColors.accent(note.color) ?: if (note.pinned) colors.primary else null
     val shape = RoundedCornerShape(12.dp)
-    val barWidth = with(LocalDensity.current) { ACCENT_BAR_WIDTH.toPx() }
     Box(
         modifier = modifier
             .fillMaxWidth()
             .clip(shape)
             .background(background)
             .border(1.dp, colors.outlineVariant.copy(alpha = 0.6f), shape)
-            .combinedClickable(role = Role.Button, onClick = onClick, onLongClick = onLongClick)
-            .drawBehind { if (accent != null) drawRect(accent, size = Size(barWidth, size.height)) },
+            .combinedClickable(role = Role.Button, onClick = onClick, onLongClick = onLongClick),
     ) {
         Row(
             modifier = Modifier.padding(start = 16.dp, top = 8.dp, bottom = 8.dp, end = 4.dp),
@@ -168,4 +161,3 @@ fun NoteCard(
     }
 }
 
-private val ACCENT_BAR_WIDTH = 4.dp

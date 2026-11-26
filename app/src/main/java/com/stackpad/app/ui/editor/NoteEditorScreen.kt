@@ -73,7 +73,6 @@ import com.stackpad.app.audio.AudioPlayer
 import com.stackpad.app.data.media.MediaStorage
 import com.stackpad.app.data.model.SpanType
 import com.stackpad.app.data.model.TextBlock
-import com.stackpad.app.data.model.look
 import com.stackpad.app.data.model.TextLevel
 import com.stackpad.app.domain.notes.TrashPolicy
 import com.stackpad.app.notifications.ReminderNotifications
